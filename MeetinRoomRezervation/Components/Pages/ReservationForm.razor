@@ -1,0 +1,59 @@
+﻿@page "/user/reserve"
+@using MeetinRoomRezervation.Models
+@inject IReservationService ReservationService
+@inject AuthenticationStateProvider AuthProvider
+@inject NavigationManager Navigation
+
+<h3>Yeni Rezervasyon</h3>
+
+<form method="post" asp-action="SubmitReservation">
+    <a-form layout="vertical">
+        <!-- Toplantı Odası -->
+        <a-form-item label="Toplantı Odası">
+            <a-select id="SelectedRoomId" name="SelectedRoomId" style="width: 100%;">
+                @foreach (var option in RoomOptions)
+                {
+                    <a-select-option value="@option.Value">@option.Label</a-select-option>
+                }
+            </a-select>
+        </a-form-item>
+
+        <!-- Başlangıç Zamanı -->
+        <a-form-item label="Başlangıç Zamanı">
+            <a-date-picker id="StartTime" name="StartTime" show-time="true" style="width: 100%;" />
+        </a-form-item>
+
+        <!-- Bitiş Zamanı -->
+        <a-form-item label="Bitiş Zamanı">
+            <a-date-picker id="EndTime" name="EndTime" show-time="true" style="width: 100%;" />
+        </a-form-item>
+
+        <!-- Submit Button -->
+        <a-form-item>
+            <a-button type="primary" html-type="submit">Rezervasyon Yap</a-button>
+        </a-form-item>
+    </a-form>
+</form>
+
+@code {
+    private List<SelectOptionItem> RoomOptions = new();
+    private string SelectedRoomId;
+    private DateTime StartTime = DateTime.Now;
+    private DateTime EndTime = DateTime.Now.AddHours(1);
+
+    protected override async Task OnInitializedAsync()
+    {
+        var rooms = await ReservationService.GetAllRoomsAsync();
+
+        RoomOptions = rooms
+            .Where(r => r != null && !string.IsNullOrEmpty(r.Id))
+            .Select(r => new SelectOptionItem { Value = r.Id, Label = $"{r.Name} ({r.Capacity})" })
+            .ToList();
+    }
+
+    public class SelectOptionItem
+    {
+        public string Value { get; set; }
+        public string Label { get; set; }
+    }
+}

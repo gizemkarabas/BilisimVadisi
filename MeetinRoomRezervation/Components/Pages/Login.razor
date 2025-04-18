@@ -1,0 +1,86 @@
+﻿@page "/login"
+@using Blazored.FluentValidation
+@using MeetinRoomRezervation.Services
+@inject IAuthService AuthService
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthProvider
+
+<div class="login-container" style="max-width: 400px; margin: 0 auto; padding: 24px;">
+    <Card Title="Giriş Yap" Style="width: 100%;">
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+            <Alert Message="@ErrorMessage" Type="@AlertType.Error" ShowIcon="true" />
+        }
+
+        <Form Model="@LoginModel" OnFinish="HandleLogin" Layout="@FormLayout.Vertical">
+            <FluentValidationValidator />
+            <FormItem Label="E-posta">
+                <Input @bind-Value="@LoginModel.Email" Placeholder="E-posta Adresinizi Giriniz" />
+            </FormItem>
+            
+            <FormItem Label="Şifre">
+                <InputPassword @bind-Value="@LoginModel.Password" Placeholder="Şifrenizi Giriniz" />
+            </FormItem>
+            
+            <FormItem>
+                <Button Type="@ButtonType.Primary" HtmlType="submit" Block>
+                    Giriş Yap
+                </Button>
+            </FormItem>
+            
+            <Divider>
+                <span>Hesabınız yok mu?</span>
+            </Divider>
+            
+            <Button Type="@ButtonType.Link" OnClick="@(() => Navigation.NavigateTo("/register"))" Block>
+                Kayıt Ol
+            </Button>
+        </Form>
+    </Card>
+</div>
+
+@code {
+    private LoginInputModel LoginModel = new();
+    private string ErrorMessage = "";
+
+    private async Task HandleLogin()
+    {
+        if (string.IsNullOrWhiteSpace(LoginModel.Email) || string.IsNullOrWhiteSpace(LoginModel.Password))
+        {
+            ErrorMessage = "E-posta ve şifre alanları zorunludur.";
+            return;
+        }
+
+        try
+        {
+            var result = await AuthService.LoginAsync(LoginModel);
+
+            if (result)
+            {
+               
+                if (AuthProvider is CustomAuthenticationStateProvider customAuth)
+                {
+                    customAuth.MarkUserAsAuthenticated(LoginModel.Email);
+                }
+
+                Navigation.NavigateTo("/user/dashboard");
+            }
+            else
+            {
+                ErrorMessage = "Geçersiz e-posta veya şifre.";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Bir hata oluştu. Lütfen tekrar deneyiniz.";
+            Console.Error.WriteLine($"Login error: {ex.Message}");
+        }
+    }
+
+    public class LoginInputModel
+    {
+        public string Email { get; set; } 
+        
+        public string Password { get; set; } 
+    }
+}

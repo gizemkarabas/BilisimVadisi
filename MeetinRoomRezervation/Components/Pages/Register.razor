@@ -1,0 +1,87 @@
+﻿@page "/register"
+@using MeetinRoomRezervation.Services
+@inject IAuthService AuthService
+@inject NavigationManager Navigation
+
+<div class="register-container" style="max-width: 400px; margin: 0 auto; padding: 24px;">
+    <Card Title="Kayıt Ol">
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+            <Alert Message="@ErrorMessage" Type="@AlertType.Error" ShowIcon="true" />
+        }
+
+        <Form Model="@RegisterModel" OnFinish="HandleRegister" Layout="@FormLayout.Vertical">
+            <FormItem Label="Ad">
+                <Input @bind-Value="@RegisterModel.Name" Placeholder="Adınızı Giriniz" />
+            </FormItem>
+            
+            <FormItem Label="Soyad">
+                <Input @bind-Value="@RegisterModel.Surname" Placeholder="Soyadınızı Giriniz" />
+            </FormItem>
+            
+            <FormItem Label="E-posta">
+                <Input @bind-Value="@RegisterModel.Email" Placeholder="E-posta Adresinizi Giriniz" />
+            </FormItem>
+            
+            <FormItem Label="Şifre">
+                <InputPassword @bind-Value="@RegisterModel.Password" Placeholder="Şifrenizi Giriniz" />
+            </FormItem>
+            
+            <FormItem Label="Şifre Tekrar">
+                <InputPassword @bind-Value="@RegisterModel.ConfirmPassword" Placeholder="Şifrenizi Tekrar Giriniz" />
+            </FormItem>
+            
+            <FormItem>
+                <Button Type="@ButtonType.Primary" HtmlType="submit" Block>
+                    Kayıt Ol
+                </Button>
+            </FormItem>
+            
+            <Divider>
+                <span>Zaten hesabınız var mı?</span>
+            </Divider>
+            
+            <Button Type="@ButtonType.Link" OnClick="@(() => Navigation.NavigateTo("/login"))" Block>
+                Giriş Yap
+            </Button>
+        </Form>
+    </Card>
+</div>
+
+@code {
+    private RegisterInputModel RegisterModel = new();
+    private string ErrorMessage = "";
+
+    private async Task HandleRegister()
+    {
+        if (RegisterModel.Password != RegisterModel.ConfirmPassword)
+        {
+            ErrorMessage = "Parolalar uyuşmuyor.";
+            return;
+        }
+
+        var success = await AuthService.RegisterAsync(RegisterModel);
+
+        if (success)
+        {
+            Navigation.NavigateTo("/login");
+        }
+        else
+        {
+            ErrorMessage = "Bu e-posta zaten kayıtlı.";
+        }
+    }
+
+    public class RegisterInputModel
+    {
+        public string Name { get; set; } 
+        
+        public string Surname { get; set; } 
+        
+        public string Email { get; set; } 
+        
+        public string Password { get; set; } 
+        
+        public string ConfirmPassword { get; set; } 
+    }
+}

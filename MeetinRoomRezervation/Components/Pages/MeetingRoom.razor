@@ -1,0 +1,24 @@
+﻿@page "/meeting-rooms"
+@using MeetinRoomRezervation.Models
+@inject IReservationService ReservationService
+
+<h3>Toplantı Odaları</h3>
+
+<div class="room-list">
+    @foreach (var room in Rooms)
+    {
+        <Card Title="@room.Name" Style="width: 200px; margin: 16px;">
+            <p>Kapasite: @room.Capacity</p>
+            <p>Doluluk Oranı: @room.OccupancyRate%</p>
+        </Card>
+    }
+</div>
+
+@code {
+    private List<MeetinRoomRezervation.Models.MeetingRoom> Rooms = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Rooms = await ReservationService.GetAllRoomsWithOccupancyAsync();
+    }
+}

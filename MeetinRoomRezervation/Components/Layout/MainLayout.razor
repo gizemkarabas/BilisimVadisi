@@ -1,0 +1,74 @@
+﻿@inherits LayoutComponentBase
+@inject AuthenticationStateProvider AuthProvider
+@inject NavigationManager Navigation
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthProvider
+
+
+<AntDesign.AntContainer />
+
+<Layout Style="min-height: 100vh;">
+    <Header Style="background: #fff; padding: 0 24px; display: flex; align-items: center; justify-content: space-between;">
+        <div class="logo" style="font-size: 18px; font-weight: bold;">
+            Toplantı Odası Rezervasyon
+        </div>
+        <Menu Mode="MenuMode.Horizontal" Theme="MenuTheme.Light">
+            <MenuItem Key="1" RouterLink="/" RouterMatch="NavLinkMatch.All">
+                <Icon Type="home" Theme="IconThemeType.Outline" />
+                Ana Sayfa
+            </MenuItem>
+            <MenuItem Key="2" RouterLink="/register">
+                <Icon Type="user-add" Theme="IconThemeType.Outline" />
+                Kayıt Ol
+            </MenuItem>
+            <MenuItem Key="3" RouterLink="/login">
+                <Icon Type="login" Theme="IconThemeType.Outline"/>
+                Giriş Yap
+            </MenuItem>
+            <AuthorizeView>
+                <Authorized>
+                    <Icon Type="login" Theme="IconThemeType.Outline" OnClick="Logout"/>
+                    Çıkış Yap
+                </Authorized>
+            </AuthorizeView>
+            <AuthorizeView>
+                <Authorized>
+                    <p>Hoş geldin, @userEmail</p>
+                </Authorized>
+            </AuthorizeView>
+        </Menu>
+    </Header>
+    <Content Style="padding: 24px;">
+        <div style="background: #fff; padding: 24px; min-height: 280px;">
+            @Body
+        </div>
+    </Content>
+    <Footer Style="text-align: center;">
+        Toplantı Odası Rezervasyon Sistemi ©@DateTime.Now.Year
+    </Footer>
+</Layout>
+
+
+
+@code {
+    private void Logout()
+    {
+        if (AuthProvider is CustomAuthenticationStateProvider customAuth)
+        {
+            customAuth.MarkUserAsLoggedOut();
+            Navigation.NavigateTo("/login", forceLoad: true);
+        }
+    }
+    private string userEmail = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity?.IsAuthenticated == true)
+        {
+            userEmail = user.Identity.Name!;
+        }
+    }
+}
