@@ -24,7 +24,7 @@ namespace MeetinRoomRezervation.Services
 
 			var hash = HashPassword(model.Password);
 
-			var user = new User
+			var user = new UserDto
 			{
 				Email = model.Email,
 				PasswordHash = hash

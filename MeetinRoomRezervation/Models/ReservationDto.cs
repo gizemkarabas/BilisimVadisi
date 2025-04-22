@@ -1,7 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-public class Reservation
+public class ReservationDto
 {
 	public string? Id { get; set; }
 

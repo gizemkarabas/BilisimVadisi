@@ -55,22 +55,6 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
 var app = builder.Build();
-using (var scope = app.Services.CreateScope())
-{
-	var mongoContext = scope.ServiceProvider.GetRequiredService<MongoDbContext>();
-
-	var existingRoom = await mongoContext.Rooms.Find(u => u.Id == "1111111").FirstOrDefaultAsync();
-	if (existingRoom == null)
-	{
-		await mongoContext.Rooms.InsertOneAsync(new MeetingRoom
-		{
-			Id = ObjectId.GenerateNewId().ToString(),
-			Name = "Test Room",
-			Capacity = 200
-		});
-	}
-}
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

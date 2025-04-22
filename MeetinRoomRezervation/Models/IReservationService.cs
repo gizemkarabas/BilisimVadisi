@@ -2,9 +2,10 @@
 {
 	public interface IReservationService
 	{
-		Task<List<MeetingRoom>> GetAllRoomsAsync();
-		Task<bool> AddReservationAsync(Reservation reservation);
-		Task<List<MeetingRoom>> GetAllRoomsWithOccupancyAsync();
+		Task<List<MeetingRoomDto>> GetAllRoomsAsync();
+		Task<bool> AddReservationAsync(ReservationDto reservation);
 		Task<List<string>> GetAvailableTimesAsync(string roomId);
+		Task<List<MeetingRoomDto>> GetAllRoomsWithOccupancyAsync(DateTime date);
+		double CalculateOccupancyRate(List<ReservationDto> reservations, int capacity);
 	}
 }

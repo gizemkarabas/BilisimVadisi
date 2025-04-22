@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using MeetinRoomRezervation.Models;
 
-public class MeetingRoomValidator : AbstractValidator<MeetingRoom>
+public class MeetingRoomValidator : AbstractValidator<MeetingRoomDto>
 {
 	public MeetingRoomValidator()
 	{

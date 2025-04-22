@@ -11,38 +11,46 @@ namespace MeetinRoomRezervation.Models
 			_context = context;
 		}
 
-		public async Task<List<MeetingRoom>> GetAllRoomsAsync()
+		public async Task<List<MeetingRoomDto>> GetAllRoomsAsync()
 		{
 			return await _context.Rooms.Find(_ => true).ToListAsync();
 		}
 
-		public async Task<bool> AddReservationAsync(Reservation reservation)
+		public async Task<bool> AddReservationAsync(ReservationDto reservation)
 		{
 			await _context.Reservations.InsertOneAsync(reservation);
 			return true;
 		}
 
-		public async Task<List<MeetingRoom>> GetAllRoomsWithOccupancyAsync()
+		public double CalculateOccupancyRate(List<ReservationDto> reservations, int capacity)
 		{
-			var rooms = await _context.Rooms.Find(_ => true).ToListAsync();
-			foreach (var room in rooms)
-			{
-				var reservations = await _context.Reservations
-					.Find(r => r.RoomId == room.Id)
-					.ToListAsync();
-
-				// Doluluk oranını hesapla (örnek: toplam rezervasyon süresi / toplam saat)
-				room.OccupancyRate = CalculateOccupancyRate(reservations);
-			}
-			return rooms;
+			if (capacity <= 0) return 100;
+			return Math.Min(100, (reservations.Count * 1.0 / capacity) * 100);
 		}
 
-		private int CalculateOccupancyRate(List<Reservation> reservations)
+		public async Task<List<MeetingRoomDto>> GetAllRoomsWithOccupancyAsync(DateTime date)
 		{
-			// Örnek hesaplama: toplam rezervasyon süresi / toplam saat
-			var totalReservedHours = reservations.Sum(r => (r.EndTime - r.StartTime).TotalHours);
-			var totalHours = 24 * 7; // Haftalık toplam saat
-			return (int)((totalReservedHours / totalHours) * 100);
+			var rooms = await _context.Rooms.Find(_ => true).ToListAsync();
+			var reservations = await _context.Reservations
+				.Find(r => r.StartTime.Date == date.Date)
+				.ToListAsync();
+
+			var result = rooms.Select(room =>
+			{
+				var roomReservations = reservations.Where(r => r.RoomId == room.Id).ToList();
+				var occupancy = CalculateOccupancyRate(roomReservations, room.Capacity);
+				return new MeetingRoomDto
+				{
+					Id = room.Id!,
+					Name = room.Name,
+					Capacity = room.Capacity,
+					Location = "Bina 1 Koridor 2", // test için sabit
+					OccupancyRate = occupancy,
+					IsAvailable = occupancy < 100
+				};
+			}).ToList();
+
+			return result;
 		}
 
 		public async Task<List<string>> GetAvailableTimesAsync(string roomId)

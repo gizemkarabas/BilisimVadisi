@@ -1,24 +1,78 @@
-﻿@page "/meeting-rooms"
+﻿@page "/user/room-status"
+@using AntDesign
 @using MeetinRoomRezervation.Models
 @inject IReservationService ReservationService
+@inject NavigationManager Navigation
 
-<h3>Toplantı Odaları</h3>
+<PageTitle>Toplantı Odaları</PageTitle>
 
-<div class="room-list">
-    @foreach (var room in Rooms)
+<Card>
+    <Title Level="4">Toplantı Odaları</Title>
+    <div class="filter-bar">
+        <DatePicker @bind-Value="SelectedDate" />
+    </div>
+</Card>
+
+<Row Gutter="16" Style="margin-top: 16px;">
+    @if (Rooms.Count == 0)
     {
-        <Card Title="@room.Name" Style="width: 200px; margin: 16px;">
-            <p>Kapasite: @room.Capacity</p>
-            <p>Doluluk Oranı: @room.OccupancyRate%</p>
-        </Card>
+        <AntDesign.Col Span="24">
+            <Alert Message="Bu tarihte gösterilecek oda bulunamadı." Type="@AlertType.Info" ShowIcon="true" />
+        </AntDesign.Col>
     }
-</div>
+    else
+    {
+        @foreach (var room in Rooms)
+        {
+            <AntDesign.Col Span="6">
+                <div @onclick="@(() => NavigateToReservation(room))">
+                    <Card Hoverable Style="margin-bottom: 16px;">
+                        <CardMeta Title="@room.Name" Description="@room.Location" />
+                        <div style="margin-top: 16px;">
+                            <p><Icon Type="user" /> Kapasite: @room.Capacity</p>
+                            <p><Icon Type="calendar" /> Doluluk: @room.OccupancyRate.ToString("F0")%</p>
+                            <Tag Color="@GetStatusColor(room.IsAvailable)">
+                                @(room.IsAvailable ? "Müsait" : "Dolu")
+                            </Tag>
+                        </div>
+                    </Card>
+                </div>
+            </AntDesign.Col>
+        }
+    }
+</Row>
 
 @code {
-    private List<MeetinRoomRezervation.Models.MeetingRoom> Rooms = new();
+    private List<MeetingRoomDto> Rooms = new();
+    private DateTime _selectedDate = DateTime.Today;
+
+    private DateTime SelectedDate
+    {
+        get => _selectedDate;
+        set
+        {
+            _selectedDate = value;
+            InvokeAsync(LoadRooms);
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
-        Rooms = await ReservationService.GetAllRoomsWithOccupancyAsync();
+        await LoadRooms();
+    }
+
+    private async Task LoadRooms()
+    {
+        Rooms = await ReservationService.GetAllRoomsWithOccupancyAsync(SelectedDate);
+    }
+
+    private string GetStatusColor(bool available) => available ? "green" : "red";
+
+    private void NavigateToReservation(MeetingRoomDto room)
+    {
+        if (!room.IsAvailable) return;
+
+        var dateStr = SelectedDate.ToString("yyyy-MM-dd");
+        Navigation.NavigateTo($"/user/reserve?roomId={room.Id}&date={dateStr}");
     }
 }

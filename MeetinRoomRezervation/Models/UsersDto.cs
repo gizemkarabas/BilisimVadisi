@@ -4,16 +4,13 @@
 
 	namespace MeetinRoomRezervation.Models
 	{
-		public class User
+		public class UserDto
 		{
-			[BsonId]
-			[BsonRepresentation(BsonType.ObjectId)]
+			
 			public string? Id { get; set; }
 
-			[BsonElement("email")]
 			public required string Email { get; set; }
-
-			[BsonElement("passwordHash")]
+			
 			public required string PasswordHash { get; set; } 
 		}
 
