@@ -1,0 +1,82 @@
+﻿@page "/user/reservation-summary"
+@using MeetinRoomRezervation.Models
+@inject ReservationStateDto ReservationState
+@inject IReservationService ReservationService
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthProvider
+
+<PageHeader Title="Rezervasyonunuzu Onaylayın" />
+
+@if (ReservationState.SelectedSlots.Any())
+{
+    <div class="summary-card" style="background-color: #f5f5f5; padding: 20px; border-radius: 10px;">
+        <h4 style="text-align:center;">Seçili Saatler</h4>
+
+        <div class="slots-list" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content:center;">
+            @foreach (var slot in ReservationState.SelectedSlots)
+            {
+                <div style="background-color: #1890ff; color: white; padding: 8px 16px; border-radius: 5px; min-width: 100px; text-align: center;">
+                    @slot.StartTime.ToString("HH:mm") - @slot.EndTime.ToString("HH:mm")
+                </div>
+            }
+        </div>
+
+        <div style="text-align:center;">
+            <Descriptions Column="1">
+                <dl class="descriptions">
+                    <dt>📍 Konum</dt>
+                    <dd>@ReservationState.Location</dd>
+
+                    <dt>🏢 Bölge</dt>
+                    <dd>@ReservationState.RoomName</dd>
+
+                    <dt>📅 Tarih</dt>
+                    <dd>@ReservationState.SelectedDate.ToString("dd.MM.yyyy dddd")</dd>
+                </dl>
+            </Descriptions>
+        </div>
+
+        <h4 style="text-align:center; margin-top:20px;">Toplam @ReservationState.SelectedSlots.Count Saatlik Seçim</h4>
+
+        <div style="margin-top: 20px; text-align:center;">
+            <Button Type="ButtonType.Primary" OnClick="ConfirmReservation" Style="width: 200px;">Onayla</Button>
+        </div>
+
+        <div style="margin-top: 10px; text-align:center;">
+            <Button Type="ButtonType.Default" OnClick="GoBack" Style="width: 200px;">Geri</Button>
+        </div>
+    </div>
+}
+else
+{
+    <Alert Message="Seçili saat bulunamadı." Type="@AlertType.Warning" ShowIcon="true" />
+}
+
+@code {
+    private async Task ConfirmReservation()
+    {
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        foreach (var slot in ReservationState.SelectedSlots)
+        {
+            var reservation = new ReservationDto
+            {
+                UserEmail = user.Identity?.Name ?? "",
+                RoomId = ReservationState.RoomId,
+                RoomName = ReservationState.RoomName,
+                StartTime = slot.StartTime,
+                EndTime = slot.EndTime
+            };
+
+            await ReservationService.AddReservationAsync(reservation);
+        }
+
+        Navigation.NavigateTo("/user/myreservations");
+    }
+
+    private void GoBack()
+    {
+        Navigation.NavigateTo("/user/reserve");
+    }
+}

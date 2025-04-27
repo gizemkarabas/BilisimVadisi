@@ -1,4 +1,4 @@
-﻿using MeetinRoomRezervation.Models;
+﻿using MeetinRoomRezervation.Data;
 using MongoDB.Driver;
 using System.Security.Cryptography;
 using System.Text;
@@ -24,8 +24,9 @@ namespace MeetinRoomRezervation.Services
 
 			var hash = HashPassword(model.Password);
 
-			var user = new UserDto
+			var user = new User
 			{
+				Id = Guid.NewGuid().ToString(),
 				Email = model.Email,
 				PasswordHash = hash
 			};

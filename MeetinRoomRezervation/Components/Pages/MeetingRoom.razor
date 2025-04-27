@@ -6,7 +6,7 @@
 
 <PageTitle>Toplantı Odaları</PageTitle>
 
-<Card>
+<Card Class="custom">
     <Title Level="4">Toplantı Odaları</Title>
     <div class="filter-bar">
         <DatePicker @bind-Value="SelectedDate" />
@@ -41,6 +41,10 @@
         }
     }
 </Row>
+
+<div class="custom">
+    <p>sssss</p>
+</div>
 
 @code {
     private List<MeetingRoomDto> Rooms = new();

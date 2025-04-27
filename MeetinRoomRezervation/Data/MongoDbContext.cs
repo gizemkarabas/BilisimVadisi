@@ -1,4 +1,4 @@
-﻿using MeetinRoomRezervation.Models;
+﻿using MeetinRoomRezervation.Data;
 using MongoDB.Driver;
 
 public class MongoDbContext
@@ -11,8 +11,8 @@ public class MongoDbContext
 		_database = client.GetDatabase("ReservationDb");
 	}
 
-	public IMongoCollection<UserDto> Users => _database.GetCollection<UserDto>("Users");
-	public IMongoCollection<ReservationDto> Reservations => _database.GetCollection<ReservationDto>("Reservations");
-	public IMongoCollection<MeetingRoomDto> Rooms => _database.GetCollection<MeetingRoomDto>("MeetingRooms");
+	public IMongoCollection<User> Users => _database.GetCollection<User>("Users");
+	public IMongoCollection<Reservation> Reservations => _database.GetCollection<Reservation>("Reservations");
+	public IMongoCollection<MeetingRoom> Rooms => _database.GetCollection<MeetingRoom>("MeetingRooms");
 
 }

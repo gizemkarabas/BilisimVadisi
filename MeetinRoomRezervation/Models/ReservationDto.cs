@@ -1,14 +1,14 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-public class ReservationDto
+namespace MeetinRoomRezervation.Models
 {
-	public string? Id { get; set; }
-
-	public string UserEmail { get; set; } = string.Empty;
-	public string RoomId { get; set; } = string.Empty;
-	public string RoomName { get; set; } = string.Empty;
-
-	public DateTime StartTime { get; set; }
-	public DateTime EndTime { get; set; }
+	public class ReservationDto
+	{
+		public string UserEmail { get; set; }
+		public string RoomId { get; set; }
+		public string RoomName { get; set; }
+		public DateTime StartTime { get; set; }
+		public DateTime EndTime { get; set; }
+	}
 }
