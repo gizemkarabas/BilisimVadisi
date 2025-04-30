@@ -74,6 +74,7 @@ namespace MeetinRoomRezervation.Models
 				{
 					return false;
 				}
+				
 				// Yeni rezervasyon oluştur
 				var reservation = new Reservation
 				{
@@ -85,6 +86,7 @@ namespace MeetinRoomRezervation.Models
 					EndTime = reservationDto.EndTime
 				};
 				
+
 				 await _context.Reservations.InsertOneAsync(reservation);
 
 				// Rezervasyon yapıldıktan sonra odanın doluluk oranını güncelle
@@ -258,10 +260,11 @@ namespace MeetinRoomRezervation.Models
 			{
 				var slotStart = new DateTime(date.Year, date.Month, date.Day, hour, 0, 0);
 				var slotEnd = slotStart.AddHours(1);
-
+				
+				
 				// Eğer bu saat aralığında bir rezervasyon varsa slot dolu olur
 				bool isReserved = reservations.Any(r =>
-					(r.StartTime < slotEnd) && (r.EndTime > slotStart)
+					(r.StartTime.ToLocalTime() < slotEnd) && (r.EndTime.ToLocalTime() > slotStart)
 				);
 
 				// Bugün için geçmiş saatleri de disable olarak işaretle
