@@ -55,24 +55,54 @@ else
 @code {
     private async Task ConfirmReservation()
     {
-        var authState = await AuthProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-
-        foreach (var slot in ReservationState.SelectedSlots)
+        try
         {
-            var reservation = new ReservationDto
+            if (ReservationState.SelectedSlots == null || !ReservationState.SelectedSlots.Any())
             {
-                UserEmail = user.Identity?.Name ?? "",
-                RoomId = ReservationState.RoomId,
-                RoomName = ReservationState.RoomName,
-                StartTime = slot.StartTime,
-                EndTime = slot.EndTime
-            };
+                // Kullanıcıya bir hata mesajı gösterilebilir
+                return;
+            }
 
-            await ReservationService.AddReservationAsync(reservation);
+            var authState = await AuthProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            bool allReservationsSuccessful = true;
+
+            foreach (var slot in ReservationState.SelectedSlots)
+            {
+                var reservationDto = new ReservationDto
+                    {
+                        UserEmail = user.Identity?.Name ?? "",
+                        RoomId = ReservationState.RoomId,
+                        RoomName = ReservationState.RoomName,
+                        StartTime = slot.StartTime,
+                        EndTime = slot.EndTime
+                    };
+
+                bool success = await ReservationService.AddReservationAsync(reservationDto);
+                if (!success)
+                {
+                    allReservationsSuccessful = false;
+                    // Burada kullanıcıya bir hata mesajı gösterilebilir
+                }
+            }
+
+            if (allReservationsSuccessful)
+            {
+                // Başarılı rezervasyon sonrası yönlendirme
+                // forceLoad: true kullanarak sayfanın tamamen yeniden yüklenmesini sağlayın
+                Navigation.NavigateTo("/user/myreservations", forceLoad: true);
+            }
+            else
+            {
+                // Bazı rezervasyonlar başarısız oldu, kullanıcıya bilgi ver
+                // Burada bir hata mesajı gösterilebilir
+            }
         }
-
-        Navigation.NavigateTo("/user/myreservations");
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in ConfirmReservation: {ex.Message}");
+        }
     }
 
     private void GoBack()

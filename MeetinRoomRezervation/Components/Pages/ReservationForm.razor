@@ -1,12 +1,12 @@
 ﻿@page "/user/reserve"
+@using MeetinRoomRezervation.Data
 @using MeetinRoomRezervation.Models
-@using System.Security.Claims
 @inject IReservationService ReservationService
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthProvider
 @inject ReservationStateDto ReservationState
 
-<PageHeader Title="Rezervasyon Oluştur" />
+<PageHeader Title="Yeni Rezervasyon" />
 
 @if (SelectedRoom is null)
 {
@@ -14,59 +14,82 @@
 }
 else
 {
-    <div>
-        <h4>Lütfen Tarihi Seçin</h4>
-        <DatePicker @bind-Value="SelectedDate" />
-        <Button OnClick="RefreshSlots">Tarihi Uygula</Button>
+    <Form Model="this" OnFinish="GoToSummary">
+        <FormItem>
+            <h4>Lütfen Tarihi Seçin</h4>
+            <DatePicker @bind-Value="SelectedDate"
+                        DisabledDate="DisablePastDates" />
+        </FormItem>
 
         <div style="margin: 10px 0;">
             <AntDesign.Tag Color="@("blue")">Müsait</AntDesign.Tag>
             <AntDesign.Tag Color="@("gray")">Dolu</AntDesign.Tag>
         </div>
 
-        <h5>Çoklu Seçim Yapabilirsiniz</h5>
+        <h5>Çoklu Saat Seçebilirsiniz</h5>
 
-        <div class="slot-grid">
+        <div class="slot-grid" style="display: flex; flex-wrap: wrap; gap: 10px;">
             @foreach (var slot in Slots)
             {
-                <Button Style="margin:5px; width:120px;"
-                Type="@GetButtonType(slot)"
-                Disabled="@slot.IsReserved"
-                OnClick="() => ToggleSlot(slot)">
-                    @($"{slot.StartTime:HH:mm} - {slot.EndTime:HH:mm}")
+                <Button Type="@GetButtonType(slot)"
+                        Disabled="@(slot.IsReserved || slot.IsDisabled)"
+                        OnClick="() => ToggleSlot(slot)">
+                    @slot.StartTime.ToString("HH:mm") - @slot.EndTime.ToString("HH:mm")
+                    @if (slot.IsReserved)
+                    {
+                        <span> (Rezerve)</span>
+                    }
                 </Button>
             }
         </div>
 
-        <p style="margin-top:10px;">
-            <b>Toplamda @SelectedSlots.Count Saatlik Seçim Yaptınız</b>
-        </p>
-
-        <div style="margin-top: 20px;">
-            <Button Type="ButtonType.Primary" OnClick="GoToSummary" Disabled="@(!SelectedSlots.Any())">
-                Devam Et
-            </Button>
+        <div style="margin-top:10px;">
+            <p><b>Toplam @SelectedSlots.Count Saatlik Seçim Yapıldı</b></p>
         </div>
 
-    </div>
+        <FormItem>
+            <Button Type="ButtonType.Primary"
+                    OnClick="GoToSummary"
+                    Disabled="@(!SelectedSlots.Any())"
+                    Style="margin-top: 20px; width: 200px;">
+                Devam Et
+            </Button>
+        </FormItem>
+    </Form>
 }
 
+<style>
+    .selected-slot {
+        background-color: #1890ff;
+        color: white;
+    }
+</style>
+
 @code {
-    private MeetingRoomDto? SelectedRoom;
-    private DateTime SelectedDate = DateTime.Today;
     private List<SlotDto> Slots = new();
     private List<SlotDto> SelectedSlots = new();
+    private MeetingRoomDto? SelectedRoom;
+
+    private DateTime _selectedDate = DateTime.Today;
+    private DateTime SelectedDate
+    {
+        get => _selectedDate;
+        set
+        {
+            if (_selectedDate != value)
+            {
+                _selectedDate = value;
+                LoadSlots();
+            }
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadSlots();
-    }
-    private async Task RefreshSlots()
-    {
-        await LoadSlots();
+        await LoadInitialData();
     }
 
-    private async Task LoadSlots()
+    private async Task LoadInitialData()
     {
         var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
         var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
@@ -75,31 +98,60 @@ else
         var dateStr = query.Get("date");
 
         if (!string.IsNullOrEmpty(roomId))
+        {
             SelectedRoom = await ReservationService.GetRoomByIdAsync(roomId);
+        }
 
         if (!string.IsNullOrEmpty(dateStr) && DateTime.TryParse(dateStr, out var parsedDate))
-            SelectedDate = parsedDate;
-
-        if (SelectedRoom != null)
         {
-            var availableTimeSlots = await ReservationService.GetAvailableTimeSlotsAsync(SelectedRoom.Id!, SelectedDate);
-            Slots = availableTimeSlots.Select(timeSlot => new SlotDto
+            SelectedDate = parsedDate;
+        }
+        else
+        {
+            SelectedDate = DateTime.Today;
+        }
+
+        await LoadSlots();
+    }
+
+    private async Task LoadSlots()
+    {
+        try
+        {
+            if (SelectedRoom != null)
             {
-                StartTime = SelectedDate.Date.Add(timeSlot),
-                EndTime = SelectedDate.Date.Add(timeSlot).AddHours(1),
-                IsReserved = false
-            }).ToList();
+                // Slotları temizle ve yeniden yükle
+                Slots.Clear();
+                SelectedSlots.Clear();
+
+                Slots = await ReservationService.GetSlotsWithStatusAsync(SelectedRoom.Id!, SelectedDate);
+
+                // UI'ı güncelle
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in LoadSlots: {ex.Message}");
         }
     }
 
-    private async Task OnDateChange(DateTime date)
+    private void SelectSlot(SlotDto slot)
     {
-        SelectedDate = date;
-        await LoadSlots();
+        if (slot.IsReserved || slot.IsDisabled) return;
+
+        slot.IsSelected = !slot.IsSelected;
+
+        if (slot.IsSelected)
+            SelectedSlots.Add(slot);
+        else
+            SelectedSlots.Remove(slot);
     }
 
     private void ToggleSlot(SlotDto slot)
     {
+        if (slot.IsReserved || slot.IsDisabled) return;
+
         if (SelectedSlots.Contains(slot))
             SelectedSlots.Remove(slot);
         else
@@ -108,7 +160,7 @@ else
 
     private ButtonType GetButtonType(SlotDto slot)
     {
-        if (slot.IsReserved)
+        if (slot.IsReserved || slot.IsDisabled)
             return ButtonType.Default;
 
         if (SelectedSlots.Contains(slot))
@@ -117,49 +169,15 @@ else
         return ButtonType.Default;
     }
 
-    private async Task SubmitReservation()
-    {
-        try
-        {
-            var authState = await AuthProvider.GetAuthenticationStateAsync();
-            var user = authState.User;
-
-            // if (user?.Identity?.IsAuthenticated != true)
-            // {
-            //     // Kullanıcı oturum açmamış, giriş sayfasına yönlendir
-            //     Navigation.NavigateTo("/Identity/Account/Login", true);
-            //     return;
-            // }
-
-            // // Kullanıcı oturum açmış, devam et
-            // var email = user.FindFirst(ClaimTypes.Email)?.Value ??
-            //             user.Identity?.Name ??
-            //             "unknown@example.com";
-
-            foreach (var slot in SelectedSlots)
-            {
-                var reservationDto = new ReservationDto
-                {
-                    UserEmail = user.Identity?.Name ?? "",
-                    RoomId = SelectedRoom!.Id!,
-                    RoomName = SelectedRoom!.Name,
-                    StartTime = slot.StartTime,
-                    EndTime = slot.EndTime
-                };
-
-                await ReservationService.AddReservationAsync(reservationDto);
-            }
-
-            Navigation.NavigateTo("/user/myreservations", forceLoad: true);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error in SubmitReservation: {ex.Message}");
-        }
-    }
     private void GoToSummary()
     {
-        ReservationState.SelectedSlots = SelectedSlots;
+        if (SelectedSlots == null || !SelectedSlots.Any())
+        {
+            // Kullanıcıya bir hata mesajı gösterilebilir
+            return;
+        }
+
+        ReservationState.SelectedSlots = new List<SlotDto>(SelectedSlots); // Yeni bir liste oluştur
         ReservationState.Location = SelectedRoom?.Location ?? "";
         ReservationState.RoomName = SelectedRoom?.Name ?? "";
         ReservationState.SelectedDate = SelectedDate;
@@ -168,4 +186,8 @@ else
         Navigation.NavigateTo("/user/reservation-summary");
     }
 
+    private bool DisablePastDates(DateTime date)
+    {
+        return date.Date < DateTime.Today;
+    }
 }

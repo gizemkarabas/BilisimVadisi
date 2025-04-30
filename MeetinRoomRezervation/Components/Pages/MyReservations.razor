@@ -1,0 +1,82 @@
+﻿@page "/user/myreservations"
+@using MeetinRoomRezervation.Models
+@inject IReservationService ReservationService
+@inject AuthenticationStateProvider AuthProvider
+
+<PageHeader Title="Rezervasyonlarım" />
+
+<Tabs DefaultActiveKey="1">
+    <TabPane Key="1" Tab="Rezervasyonlarım">
+        @if (FutureReservations.Any())
+        {
+            <Row Gutter="16">
+                @foreach (var reservation in FutureReservations)
+                {
+                    <AntDesign.Col Span="8">
+                        <Card Title="@($"{reservation.StartTime.ToLocalTime().ToString("HH:mm")} - {reservation.EndTime.ToLocalTime().ToString("HH:mm")}")" Style="margin-bottom: 16px;">
+                            <p><Icon Type="calendar" /> Tarih: @reservation.StartTime.ToString("dd.MM.yyyy dddd")</p>
+                            <p><Icon Type="home" /> Şirket: @reservation.RoomName</p>
+                            <p><Icon Type="user" /> Yetkili: @reservation.UserEmail</p>
+                            <p><Icon Type="phone" /> Telefon: ""</p>
+
+                            <Button Danger Type="ButtonType.Primary" OnClick="() => CancelReservation(reservation.Id)" Style="margin-top:10px;">
+                                Rezervasyonu İptal Et
+                            </Button>
+                        </Card>
+                    </AntDesign.Col>
+                }
+            </Row>
+        }
+        else
+        {
+            <Alert Message="Henüz bir rezervasyonunuz bulunmamaktadır." Type="AlertType.Info" ShowIcon="true" />
+        }
+    </TabPane>
+
+    <TabPane Key="2" Tab="Geçmiş Rezervasyonlarım">
+        @if (PastReservations.Any())
+        {
+            <Row Gutter="16">
+                @foreach (var reservation in PastReservations)
+                {
+                    <AntDesign.Col Span="8">
+                        <Card Title="@($"{reservation.StartTime:HH:mm} - {reservation.EndTime:HH:mm}")" Style="margin-bottom: 16px;">
+                            <p><Icon Type="calendar" /> Tarih: @reservation.StartTime.ToString("dd.MM.yyyy dddd")</p>
+                            <p><Icon Type="home" /> Şirket: @reservation.RoomName</p>
+                            <p><Icon Type="user" /> Yetkili: @reservation.UserEmail</p>
+                            <p><Icon Type="phone" /> Telefon:""</p>
+                        </Card>
+                    </AntDesign.Col>
+                }
+            </Row>
+        }
+        else
+        {
+            <Alert Message="Geçmiş bir rezervasyonunuz bulunmamaktadır." Type="AlertType.Info" ShowIcon="true" />
+        }
+    </TabPane>
+</Tabs>
+
+@code {
+    private List<ReservationDto> FutureReservations = new();
+    private List<ReservationDto> PastReservations = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        var user = authState.User.Identity?.Name ?? "";
+
+        var allReservations = await ReservationService.GetUserReservations(user);
+
+        var now = DateTime.Now;
+
+        FutureReservations = allReservations.Where(r => r.EndTime > now).ToList();
+        PastReservations = allReservations.Where(r => r.EndTime <= now).ToList();
+    }
+
+    private async Task CancelReservation(string reservationId)
+    {
+        await ReservationService.CancelReservationAsync(reservationId);
+        await OnInitializedAsync(); // tekrar yükle
+    }
+}

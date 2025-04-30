@@ -9,7 +9,8 @@
 <Card Class="custom">
     <Title Level="4">Toplantı Odaları</Title>
     <div class="filter-bar">
-        <DatePicker @bind-Value="SelectedDate" />
+        <DatePicker @bind-Value="SelectedDate" 
+            DisabledDate="DisablePastDates" />
     </div>
 </Card>
 
@@ -26,7 +27,7 @@
         {
             <AntDesign.Col Span="6">
                 <div @onclick="@(() => NavigateToReservation(room))">
-                    <Card Hoverable Style="margin-bottom: 16px;">
+                    <Card Hoverable Style="margin-bottom: 16px;" Class="@(room.IsAvailable ? "available-room" : "unavailable-room")">
                         <CardMeta Title="@room.Name" Description="@room.Location" />
                         <div style="margin-top: 16px;">
                             <p><Icon Type="user" /> Kapasite: @room.Capacity</p>
@@ -42,9 +43,16 @@
     }
 </Row>
 
-<div class="custom">
-    <p>sssss</p>
-</div>
+<style>
+    .unavailable-room {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+    
+    .available-room {
+        cursor: pointer;
+    }
+</style>
 
 @code {
     private List<MeetingRoomDto> Rooms = new();
@@ -64,19 +72,39 @@
     {
         await LoadRooms();
     }
-
+   
     private async Task LoadRooms()
     {
-        Rooms = await ReservationService.GetAllRoomsWithOccupancyAsync(SelectedDate);
-    }
+        try
+        {
+            // Veritabanından en güncel verileri almak için önbelleği temizle
+            Rooms.Clear();
 
+            // Odaları yükle
+            Rooms = await ReservationService.GetAllRoomsWithOccupancyAsync(SelectedDate);
+
+            // UI'ı güncelle
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in LoadRooms: {ex.Message}");
+        }
+    }
+    
     private string GetStatusColor(bool available) => available ? "green" : "red";
 
     private void NavigateToReservation(MeetingRoomDto room)
     {
+        // Only navigate if the room is available
         if (!room.IsAvailable) return;
 
         var dateStr = SelectedDate.ToString("yyyy-MM-dd");
         Navigation.NavigateTo($"/user/reserve?roomId={room.Id}&date={dateStr}");
+    }
+
+    private bool DisablePastDates(DateTime date)
+    {
+        return date.Date < DateTime.Today;
     }
 }

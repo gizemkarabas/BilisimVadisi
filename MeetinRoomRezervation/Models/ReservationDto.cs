@@ -5,6 +5,7 @@ namespace MeetinRoomRezervation.Models
 {
 	public class ReservationDto
 	{
+		public string Id { get; set; }
 		public string UserEmail { get; set; }
 		public string RoomId { get; set; }
 		public string RoomName { get; set; }
