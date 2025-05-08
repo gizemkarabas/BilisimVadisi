@@ -1,6 +1,8 @@
 ﻿@page "/user/reserve"
-@using MeetinRoomRezervation.Data
+@using System.Security.Claims
 @using MeetinRoomRezervation.Models
+@using MeetinRoomRezervation.Services.ReservationService
+ls
 @inject IReservationService ReservationService
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthProvider
@@ -68,7 +70,7 @@ else
 @code {
     private List<SlotDto> Slots = new();
     private List<SlotDto> SelectedSlots = new();
-    private MeetingRoomDto? SelectedRoom;
+    private MeetingRoomDto SelectedRoom;
 
     private DateTime _selectedDate = DateTime.Today;
     private DateTime SelectedDate
@@ -79,7 +81,7 @@ else
             if (_selectedDate != value)
             {
                 _selectedDate = value;
-                LoadSlots();
+                InvokeAsync(LoadSlots);
             }
         }
     }

@@ -1,15 +1,10 @@
+using FluentValidation;
+using MeetinRoomRezervation.Components;
+using MeetinRoomRezervation.Models;
+using MeetinRoomRezervation.Services;
+using MeetinRoomRezervation.Services.ReservationService;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using MeetinRoomRezervation.Components;
-using MeetinRoomRezervation.Components.Account;
-using MeetinRoomRezervation.Data;
-using MeetinRoomRezervation.Services;
-using FluentValidation;
-using FluentValidation.AspNetCore;
-using MeetinRoomRezervation.Models;
-using MongoDB.Bson;
-using MongoDB.Driver;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,28 +28,13 @@ builder.Services.AddScoped<ReservationStateDto>();
 builder.Services.AddAuthenticationCore();
 
 builder.Services.AddCascadingAuthenticationState();
-builder.Services.AddScoped<IdentityUserAccessor>();
-builder.Services.AddScoped<IdentityRedirectManager>();
-builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
 
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = IdentityConstants.ApplicationScheme;
     options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
 })
-.AddIdentityCookies();
-
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-
-builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddSignInManager()
-    .AddDefaultTokenProviders();
-
-builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+.AddCookie();
 
 var app = builder.Build();
 
@@ -78,8 +58,5 @@ app.UseAntiforgery();
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
-
-// Add additional endpoints required by the Identity /Account Razor components.
-app.MapAdditionalIdentityEndpoints();
 
 app.Run();
