@@ -14,6 +14,7 @@ using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<IReservationService, ReservationService>();
+
 builder.Services.AddValidatorsFromAssemblyContaining<MeetingRoomValidator>();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 builder.Services.AddAuthorizationCore();

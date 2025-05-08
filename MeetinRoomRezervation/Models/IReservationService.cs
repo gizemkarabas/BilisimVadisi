@@ -1,7 +1,4 @@
-﻿using MeetinRoomRezervation.Components.Pages;
-using MeetinRoomRezervation.Data;
-
-namespace MeetinRoomRezervation.Models
+﻿namespace MeetinRoomRezervation.Models
 {
 	public interface IReservationService
 	{
@@ -13,6 +10,9 @@ namespace MeetinRoomRezervation.Models
 		Task<List<SlotDto>> GetSlotsWithStatusAsync(string roomId, DateTime date);
 		Task<List<ReservationDto>> GetUserReservations(string email);
 		Task CancelReservationAsync(string reservationId);
+		Task<List<ReservationDto>> GetAllReservationsAsync();
+		Task<bool> UpdateReservationAsync(ReservationDto reservation);
+		Task<bool> DeleteReservationAsync(string reservationId);
 
 	}
 }

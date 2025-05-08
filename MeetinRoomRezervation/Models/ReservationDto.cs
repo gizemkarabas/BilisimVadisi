@@ -9,6 +9,7 @@ namespace MeetinRoomRezervation.Models
 		public string UserEmail { get; set; }
 		public string RoomId { get; set; }
 		public string RoomName { get; set; }
+		public string Location { get; set; }
 		public DateTime StartTime { get; set; }
 		public DateTime EndTime { get; set; }
 	}

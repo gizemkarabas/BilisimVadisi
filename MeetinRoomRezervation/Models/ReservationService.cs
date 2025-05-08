@@ -74,7 +74,7 @@ namespace MeetinRoomRezervation.Models
 				{
 					return false;
 				}
-				
+
 				// Yeni rezervasyon oluştur
 				var reservation = new Reservation
 				{
@@ -85,9 +85,9 @@ namespace MeetinRoomRezervation.Models
 					StartTime = reservationDto.StartTime,
 					EndTime = reservationDto.EndTime
 				};
-				
 
-				 await _context.Reservations.InsertOneAsync(reservation);
+
+				await _context.Reservations.InsertOneAsync(reservation);
 
 				// Rezervasyon yapıldıktan sonra odanın doluluk oranını güncelle
 				await UpdateRoomOccupancyRate(reservationDto.RoomId, reservationDto.StartTime.Date);
@@ -119,8 +119,8 @@ namespace MeetinRoomRezervation.Models
 				var roomReservations = await _context.Reservations.Find(reservationFilter).ToListAsync();
 
 				// Gün içinde 09:00 - 18:00 arası saat slotları oluştur
-				var startHour = 9;
-				var endHour = 18;
+				var startHour = 0;
+				var endHour = 24;
 				int reservedHoursCount = 0;
 
 				for (int hour = startHour; hour < endHour; hour++)
@@ -140,7 +140,7 @@ namespace MeetinRoomRezervation.Models
 				}
 
 				// Toplam saat sayısı (09:00 - 18:00 arası 9 saat)
-				double totalHours = 9;
+				double totalHours = 24;
 
 				// Rezerve edilen saat sayısı
 				double reservedHours = reservedHoursCount;
@@ -260,8 +260,8 @@ namespace MeetinRoomRezervation.Models
 			{
 				var slotStart = new DateTime(date.Year, date.Month, date.Day, hour, 0, 0);
 				var slotEnd = slotStart.AddHours(1);
-				
-				
+
+
 				// Eğer bu saat aralığında bir rezervasyon varsa slot dolu olur
 				bool isReserved = reservations.Any(r =>
 					(r.StartTime.ToLocalTime() < slotEnd) && (r.EndTime.ToLocalTime() > slotStart)
@@ -331,7 +331,55 @@ namespace MeetinRoomRezervation.Models
 			await _context.Reservations.DeleteOneAsync(filter);
 		}
 
+		public async Task<List<ReservationDto>> GetAllReservationsAsync()
+		{
+			var reservations = await _context.Reservations.Find(_ => true).ToListAsync();
+			return reservations.Select(reservation => new ReservationDto
+			{
+				Id = reservation.Id,
+				UserEmail = reservation.UserEmail,
+				RoomId = reservation.RoomId,
+				RoomName = reservation.RoomName,
+				StartTime = reservation.StartTime,
+				EndTime = reservation.EndTime
+			}).ToList();
 
+		}
+
+
+		public async Task<bool> UpdateReservationAsync(ReservationDto updated)
+		{
+			var reservation = new Reservation
+			{
+				Id = updated.Id,
+				RoomName = updated.RoomName,
+				//Location = updated.Location,
+				StartTime = updated.StartTime,
+				EndTime = updated.EndTime,
+				//Company = updated.Company,
+				//ContactName = updated.ContactName,
+				//ContactPhone = updated.ContactPhone,
+				UserEmail = updated.UserEmail
+			};
+			var filter = Builders<Reservation>.Filter.Eq(r => r.Id, updated.Id);
+			var update = Builders<Reservation>.Update
+				.Set(r => r.RoomName, reservation.RoomName)
+				//.Set(r => r.Location, reservation.Location)
+				.Set(r => r.StartTime, updated.StartTime)
+				.Set(r => r.EndTime, updated.EndTime);
+			//.Set(r => r.Company, updated.Company)
+			//.Set(r => r.ContactName, updated.ContactName)
+			//.Set(r => r.ContactPhone, updated.ContactPhone);
+
+			var result = await _context.Reservations.UpdateOneAsync(filter, update);
+			return result.ModifiedCount > 0;
+		}
+		public async Task<bool> DeleteReservationAsync(string reservationId)
+		{
+			var filter = Builders<Reservation>.Filter.Eq(r => r.Id, reservationId);
+			var result = await _context.Reservations.DeleteOneAsync(filter);
+			return result.DeletedCount > 0;
+		}
 
 	}
 

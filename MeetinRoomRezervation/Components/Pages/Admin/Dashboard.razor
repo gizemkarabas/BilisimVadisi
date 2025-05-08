@@ -1,0 +1,260 @@
+﻿@page "/admin/dashboard"
+@using MeetinRoomRezervation.Models
+@inject IReservationService ReservationService
+@using AntDesign
+@* @inject IUserService UserService *@
+
+<PageHeader Title="Yönetici Paneli" />
+
+<Row Gutter="16" Style="margin-bottom: 30px;">
+    <Col Span="6">
+    <Card>
+        <Statistic Title="Toplam Toplantı Odası" Value="@TotalRoomCount" />
+    </Card>
+    </Col>
+    <Col Span="6">
+    <Card>
+        <Statistic Title="Toplam Kullanıcı Sayısı" Value="@TotalUserCount" />
+    </Card>
+    </Col>
+    <Col Span="6">
+    <Card>
+        <Statistic Title="Bugünkü Doluluk" Suffix="%" Value="@TodayOccupancy" />
+    </Card>
+    </Col>
+    <Col Span="6">
+    <Card>
+        <Statistic Title="Haftalık Doluluk Oranı" Suffix="%" Value="@WeeklyOccupancy" />
+    </Card>
+    </Col>
+</Row>
+<Card Title="Son Rezervasyonlar" Style="margin-top: 30px;">
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>Konum</th>
+                    <th>Salon</th>
+                    <th>Tarih</th>
+                    <th>Saat</th>
+                    <th>Şirket</th>
+                    <th>Yetkili</th>
+                    <th>Telefon</th>
+                    <th>Eylem</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var res in LastReservations)
+                {
+                    <tr>
+                        <td>@res.Location</td>
+                        <td>@res.RoomName</td>
+                        <td>@res.StartTime.ToString("dd-MM-yyyy ddd")</td>
+                        <td>
+                            <Tag Color="TagColor.Blue">
+                                @res.StartTime.ToString("HH:mm") - @res.EndTime.ToString("HH:mm")
+                            </Tag>
+                        </td>
+                        <td>@res.UserEmail</td>
+                        <td>@res.UserEmail</td>
+                        <td>@res.UserEmail</td>
+                        <td>
+                            <Space>
+                                <Button Icon="Edit" Shape="ButtonShape.Circle" OnClick="@(() => OpenEditModal(res))" />
+                                <Button Icon="Delete" Shape="ButtonShape.Circle" Danger OnClick="@(() => ConfirmDelete(res))" />
+                            </Space>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</Card>
+<Modal Title="Rezervasyonu Düzenle"
+       @bind-Visible="@IsEditModalVisible"
+       OnOk="SubmitEdit"
+       OnCancel="@CloseEditModal">
+
+    @if (EditModel != null)
+    {
+        <Form Model="@EditModel">
+            <FormItem Label="Salon">
+                <Input @bind-Value="EditModel.RoomName" />
+            </FormItem>
+            <FormItem Label="Konum">
+                <Input @bind-Value="EditModel.Location" />
+            </FormItem>
+            <FormItem Label="Tarih">
+                <DatePicker @bind-Value="EditModel.StartTime" />
+            </FormItem>
+            <FormItem Label="Saat (başlangıç)">
+                <TimePicker @bind-Value="EditModel.StartTime" />
+            </FormItem>
+            <FormItem Label="Saat (bitiş)">
+                <TimePicker @bind-Value="EditModel.EndTime" />
+            </FormItem>
+        </Form>
+    }
+</Modal>
+
+<Modal Title="Rezervasyon Detayı"
+       @bind-Visible="@IsDetailModalVisible"
+       OnOk="@CloseDetailModal"
+       OnCancel="@CloseDetailModal">
+
+    @if (SelectedReservation != null)
+    {
+        <Descriptions Title="Bilgiler" Column="1" Size="DescriptionsSize.Small">
+            <DescriptionsItem Label="Salon">@SelectedReservation.RoomName</DescriptionsItem>
+            <DescriptionsItem Label="Konum">@SelectedReservation.Location</DescriptionsItem>
+            <DescriptionsItem Label="Tarih">@SelectedReservation.StartTime.ToString("dd-MM-yyyy")</DescriptionsItem>
+            <DescriptionsItem Label="Saat">@SelectedReservation.StartTime.ToString("HH:mm") - @SelectedReservation.EndTime.ToString("HH:mm")</DescriptionsItem>
+            <DescriptionsItem Label="Şirket">@SelectedReservation.UserEmail</DescriptionsItem>
+            <DescriptionsItem Label="Yetkili">@SelectedReservation.UserEmail</DescriptionsItem>
+            <DescriptionsItem Label="Telefon">@SelectedReservation.UserEmail</DescriptionsItem>
+        </Descriptions>
+    }
+</Modal>
+<Modal Title="Rezervasyonu Sil"
+       @bind-Visible="@IsDeleteConfirmVisible"
+       OnOk="DeleteReservation"
+       OnCancel="CancelDelete"
+       OkText=@okButtonText
+       CancelText=@cancelButtonText
+       OkType="ButtonType.Primary">
+
+    <p>@ReservationToDelete?.RoomName rezervasyonunu silmek istediğinize emin misiniz?</p>
+</Modal>
+
+@code {
+    private int TotalRoomCount = 0;
+    private int TotalUserCount = 0;
+    private double TodayOccupancy = 0;
+    private double WeeklyOccupancy = 0;
+    private bool IsDetailModalVisible = false;
+    private ReservationDto? SelectedReservation;
+    private bool IsEditModalVisible = false;
+    private ReservationDto? EditModel;
+    private bool IsDeleteConfirmVisible = false;
+    private ReservationDto? ReservationToDelete;
+    private string okButtonText = "Evet, sil";
+    private string cancelButtonText = "Vazgeç";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var reservations = await ReservationService.GetAllReservationsAsync();
+
+        LastReservations = reservations
+            .OrderByDescending(r => r.StartTime)
+            .Take(10)
+            .ToList();
+
+        var allRooms = await ReservationService.GetAllRoomsAsync();
+        //var allUsers = await UserService.GetAllUsersAsync();
+        var allReservations = await ReservationService.GetAllReservationsAsync();
+
+        TotalRoomCount = allRooms.Count;
+        TotalUserCount = 1245;
+
+        var today = DateTime.Today;
+        var tomorrow = today.AddDays(1);
+        var todayReservations = allReservations
+            .Where(r => r.StartTime >= today && r.StartTime < tomorrow)
+            .ToList();
+
+        TodayOccupancy = CalculateOccupancyPercentage(todayReservations, allRooms.Count);
+
+        var weekStart = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek);
+        var weekEnd = weekStart.AddDays(7);
+        var weekReservations = allReservations
+            .Where(r => r.StartTime >= weekStart && r.StartTime < weekEnd)
+            .ToList();
+
+        WeeklyOccupancy = CalculateOccupancyPercentage(weekReservations, allRooms.Count * 7); // tüm haftalık oda/saat kapasitesi
+    }
+
+    private double CalculateOccupancyPercentage(List<ReservationDto> reservations, int totalRoomDays)
+    {
+        double reservedHours = reservations.Count; // 1 saatlik rezervasyon varsayıyoruz
+        double totalHours = totalRoomDays * 9; // 09:00-18:00 → 9 saat
+        if (totalHours == 0) return 0;
+
+        return Math.Round((reservedHours / totalHours) * 100, 2);
+    }
+
+    private List<ReservationDto> LastReservations = new();
+
+    private void ShowDetails(ReservationDto res)
+    {
+        SelectedReservation = res;
+        IsDetailModalVisible = true;
+    }
+
+    private void CloseDetailModal()
+    {
+        IsDetailModalVisible = false;
+        SelectedReservation = null;
+    }
+    private void OpenEditModal(ReservationDto res)
+    {
+        // Klonlayarak çalışmak için deep copy
+            EditModel = new ReservationDto
+            {
+                Id = res.Id,
+                RoomName = res.RoomName,
+                Location = res.Location,
+                StartTime = res.StartTime,
+                EndTime = res.EndTime,
+                UserEmail = res.UserEmail
+            };
+
+        IsEditModalVisible = true;
+    }
+
+    private void CloseEditModal()
+    {
+        IsEditModalVisible = false;
+        EditModel = null;
+    }
+
+    private async Task SubmitEdit()
+    {
+        if (EditModel is not null)
+        {
+            await ReservationService.UpdateReservationAsync(EditModel);
+            await RefreshReservations();
+            CloseEditModal();
+        }
+    }
+   
+    private void ConfirmDelete(ReservationDto res)
+    {
+        ReservationToDelete = res;
+        IsDeleteConfirmVisible = true;
+    }
+
+    private void CancelDelete()
+    {
+        ReservationToDelete = null;
+        IsDeleteConfirmVisible = false;
+    }
+
+    private async Task DeleteReservation()
+    {
+        if (ReservationToDelete is not null)
+        {
+            await ReservationService.DeleteReservationAsync(ReservationToDelete.Id!);
+            await RefreshReservations();
+            CancelDelete();
+        }
+    }
+    private async Task RefreshReservations()
+    {
+        var reservations = await ReservationService.GetAllReservationsAsync();
+        LastReservations = reservations
+            .OrderByDescending(r => r.StartTime)
+            .Take(10)
+            .ToList();
+    }
+
+}
