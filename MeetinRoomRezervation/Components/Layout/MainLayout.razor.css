@@ -8,12 +8,27 @@ main {
     flex: 1;
 }
 
+
+.panel-transparent {
+    background-color: unset;
+    color: white !important;
+}
+.panel-gray {
+    background-color: #e6e6e6;
+    border-radius: 10px;
+    margin-top: 65px;
+    margin-left: 75px;
+    margin-right: 75px;
+    min-height: 350px;
+}
+
 .sidebar {
     background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
 }
 
 .top-row {
     background-color: #f7f7f7;
+    color : white!important;
     border-bottom: 1px solid #d6d5d5;
     justify-content: flex-end;
     height: 3.5rem;

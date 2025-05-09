@@ -6,30 +6,39 @@
 
 
 
-<AntDesign.AntContainer />
+<AntDesign.AntContainer/>
 
-<Layout Style="min-height: 100vh;">
-    <Header Style="background: #fff; padding: 0 24px; display: flex; align-items: center; justify-content: space-between;">
-        <div class="logo" style="font-size: 18px; font-weight: bold;">
+<Layout Style="min-height: 100vh; background-color: white;">
+    <Header Style="background: #0095ff; padding: 0 24px; display: flex; align-items: center; justify-content: space-between;">
+        <div class="logo" style="font-size: 18px; font-weight: bold; color: white;">
+            <Icon Type="home" Theme="IconThemeType.Outline"/>
             Toplantı Odası Rezervasyon
         </div>
-        <Menu Mode="MenuMode.Horizontal" Theme="MenuTheme.Light">
-            <MenuItem Key="1" RouterLink="/" RouterMatch="NavLinkMatch.All">
-                <Icon Type="home" Theme="IconThemeType.Outline" />
-                Ana Sayfa
+        <Menu Mode="MenuMode.Horizontal" style="background-color: unset;">
+            <MenuItem Key="1" RouterLink="/" RouterMatch="NavLinkMatch.All" style="color: white!important;">
+                <div class="panel-transparent">
+                    <Icon Type="home" Theme="IconThemeType.Outline"/>
+                    Ana Sayfa
+                </div>
             </MenuItem>
             <MenuItem Key="2" RouterLink="/register">
-                <Icon Type="user-add" Theme="IconThemeType.Outline" />
-                Kayıt Ol
+                <div class="panel-transparent">
+                    <Icon Type="user-add" Theme="IconThemeType.Outline"/>
+                    Kayıt Ol
+                </div>
             </MenuItem>
             <MenuItem Key="3" RouterLink="/login">
-                <Icon Type="login" Theme="IconThemeType.Outline"/>
-                Giriş Yap
+                <div class="panel-transparent">
+                    <Icon Type="login" Theme="IconThemeType.Outline"/>
+                    Giriş Yap
+                </div>
             </MenuItem>
             <AuthorizeView>
                 <Authorized>
-                    <Icon Type="login" Theme="IconThemeType.Outline" OnClick="Logout"/>
-                    Çıkış Yap
+                    <div class="panel-transparent">
+                        <Icon Type="login" Theme="IconThemeType.Outline" OnClick="Logout"/>
+                        Çıkış Yap
+                    </div>
                 </Authorized>
             </AuthorizeView>
             <AuthorizeView>
@@ -39,8 +48,8 @@
             </AuthorizeView>
         </Menu>
     </Header>
-    <Content Style="padding: 24px;">
-        <div style="background: #fff; padding: 24px; min-height: 280px;">
+    <Content>
+        <div Class="panel-gray" style="padding: 24px; ">
             @Body
         </div>
     </Content>
@@ -50,8 +59,8 @@
 </Layout>
 
 
-
 @code {
+
     private void Logout()
     {
         if (AuthProvider is CustomAuthenticationStateProvider customAuth)
@@ -60,6 +69,7 @@
             Navigation.NavigateTo("/login", forceLoad: true);
         }
     }
+
     private string userEmail = string.Empty;
 
     protected override async Task OnInitializedAsync()
@@ -72,4 +82,5 @@
             userEmail = user.Identity.Name!;
         }
     }
+
 }
