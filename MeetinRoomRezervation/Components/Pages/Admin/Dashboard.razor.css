@@ -1,0 +1,6 @@
+﻿.dashboard-container {
+    box-shadow: 5px 5px 10px rgba(87, 87, 87, 0.1);
+    border-radius: 10px;
+    border-color: #929292;
+    border-style: solid;
+}

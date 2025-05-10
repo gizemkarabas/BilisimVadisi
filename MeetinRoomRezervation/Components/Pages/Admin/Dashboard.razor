@@ -6,68 +6,84 @@
 @using MeetinRoomRezervation.Services.ReservationService
 @* @inject IUserService UserService *@
 
-<PageHeader Title="Yönetici Paneli" />
+<PageHeader Title="Yönetici Paneli" Style="background-color: unset"/>
 
 <Row Gutter="16" Style="margin-bottom: 30px;">
     <Col Span="6">
-    <Card>
-        <Statistic Title="Toplam Toplantı Odası" Value="@TotalRoomCount" />
+    <Card Style="box-shadow: 5px 5px 10px rgba(87, 87, 87, 0.1);
+                border-radius: 10px;
+                border-color: #d2d2d2;
+                border-style: solid;">
+        <Statistic Title="Toplam Toplantı Odası" Value="@TotalRoomCount"/>
     </Card>
     </Col>
     <Col Span="6">
-    <Card>
-        <Statistic Title="Toplam Kullanıcı Sayısı" Value="@TotalUserCount" />
+    <Card Style="box-shadow: 5px 5px 10px rgba(87, 87, 87, 0.1);
+                border-radius: 10px;
+                border-color: #d2d2d2;
+                border-style: solid;">
+        <Statistic Title="Toplam Kullanıcı Sayısı" Value="@TotalUserCount"/>
     </Card>
     </Col>
     <Col Span="6">
-    <Card>
-        <Statistic Title="Bugünkü Doluluk" Suffix="%" Value="@TodayOccupancy" />
+    <Card Style="box-shadow: 5px 5px 10px rgba(87, 87, 87, 0.1);
+                border-radius: 10px;
+                border-color: #d2d2d2;
+                border-style: solid;">
+        <Statistic Title="Bugünkü Doluluk" Suffix="%" Value="@TodayOccupancy"/>
     </Card>
     </Col>
     <Col Span="6">
-    <Card>
-        <Statistic Title="Haftalık Doluluk Oranı" Suffix="%" Value="@WeeklyOccupancy" />
+    <Card Style="box-shadow: 5px 5px 10px rgba(87, 87, 87, 0.1);
+                border-radius: 10px;
+                border-color: #d2d2d2;
+                border-style: solid;">
+        <Statistic Title="Haftalık Doluluk Oranı" Suffix="%" Value="@WeeklyOccupancy"/>
     </Card>
     </Col>
 </Row>
-<Card Title="Son Rezervasyonlar" Style="margin-top: 30px;">
+<Card Title="Son Rezervasyonlar" Style="margin-top: 30px;box-shadow: 5px 5px 10px rgba(87, 87, 87, 0.1);
+                border-radius: 10px;
+                border-color: #d2d2d2;
+                border-style: solid;">
     <div class="table-responsive">
         <table class="table table-bordered table-hover">
             <thead>
-                <tr>
-                    <th>Konum</th>
-                    <th>Salon</th>
-                    <th>Tarih</th>
-                    <th>Saat</th>
-                    <th>Şirket</th>
-                    <th>Yetkili</th>
-                    <th>Telefon</th>
-                    <th>Eylem</th>
-                </tr>
+            <tr>
+                <th>Konum</th>
+                <th>Salon</th>
+                <th>Tarih</th>
+                <th>Saat</th>
+                <th>Şirket</th>
+                <th>Yetkili</th>
+                <th>Telefon</th>
+                <th>Eylem</th>
+            </tr>
             </thead>
             <tbody>
-                @foreach (var res in PagedReservations)
-                {
-                    <tr>
-                        <td>@res.Location</td>
-                        <td>@res.RoomName</td>
-                        <td>@res.StartTime.ToString("dd-MM-yyyy ddd")</td>
-                        <td>
-                            <Tag Color="TagColor.Blue">
-                                @res.StartTime.ToString("HH:mm") - @res.EndTime.ToString("HH:mm")
-                            </Tag>
-                        </td>
-                        <td>@res.UserEmail</td>
-                        <td>@res.UserEmail</td>
-                        <td>@res.UserEmail</td>
-                        <td>
-                            <Space>
-                                <Button Icon="edit" Shape="ButtonShape.Circle" OnClick="@(() => OpenEditModal(res))" />
-                                <Button Icon="delete" Shape="ButtonShape.Circle" Danger OnClick="@(() => ConfirmDelete(res))" />
-                            </Space>
-                        </td>
-                    </tr>
-                }
+            @foreach (var res in PagedReservations)
+            {
+                <tr>
+                    <td>@res.Location</td>
+                    <td>@res.RoomName</td>
+                    <td>@res.StartTime.ToString("dd-MM-yyyy ddd")</td>
+                    <td>
+                        <Tag Color="TagColor.Blue">
+                            @res.StartTime.ToString("HH:mm") - @res.EndTime.ToString("HH:mm")
+                        </Tag>
+                    </td>
+                    <td>@res.UserEmail</td>
+                    <td>@res.UserEmail</td>
+                    <td>@res.UserEmail</td>
+                    <td>
+                        <Space>
+                            <Button Icon="edit" Shape="ButtonShape.Circle" OnClick="@(() => OpenEditModal(res))"/>
+                            <Button Icon="delete" Shape="ButtonShape.Circle" Danger
+                                    OnClick="@(() => ConfirmDelete(res))"/>
+                        </Space>
+                    </td>
+                </tr>
+            }
             </tbody>
         </table>
     </div>
@@ -78,7 +94,7 @@
                     Current="@CurrentPage"
                     OnChange="@HandlePaginationChange"
                     ShowSizeChanger="true"
-                    PageSizeOptions="@(new int[] {5, 10, 20, 50, 100})" />
+                    PageSizeOptions="@(new int[] { 5, 10, 20, 50, 100 })"/>
 
 
     </div>
@@ -93,19 +109,19 @@
     {
         <Form Model="@EditModel">
             <FormItem Label="Salon">
-                <Input @bind-Value="EditModel.RoomName" />
+                <Input @bind-Value="EditModel.RoomName"/>
             </FormItem>
             <FormItem Label="Konum">
-                <Input @bind-Value="EditModel.Location" />
+                <Input @bind-Value="EditModel.Location"/>
             </FormItem>
             <FormItem Label="Tarih">
-                <DatePicker @bind-Value="EditModel.StartTime" />
+                <DatePicker @bind-Value="EditModel.StartTime"/>
             </FormItem>
             <FormItem Label="Saat (başlangıç)">
-                <TimePicker @bind-Value="EditModel.StartTime" />
+                <TimePicker @bind-Value="EditModel.StartTime"/>
             </FormItem>
             <FormItem Label="Saat (bitiş)">
-                <TimePicker @bind-Value="EditModel.EndTime" />
+                <TimePicker @bind-Value="EditModel.EndTime"/>
             </FormItem>
         </Form>
     }
@@ -122,7 +138,8 @@
             <DescriptionsItem Label="Salon">@SelectedReservation.RoomName</DescriptionsItem>
             <DescriptionsItem Label="Konum">@SelectedReservation.Location</DescriptionsItem>
             <DescriptionsItem Label="Tarih">@SelectedReservation.StartTime.ToString("dd-MM-yyyy")</DescriptionsItem>
-            <DescriptionsItem Label="Saat">@SelectedReservation.StartTime.ToString("HH:mm") - @SelectedReservation.EndTime.ToString("HH:mm")</DescriptionsItem>
+            <DescriptionsItem
+                Label="Saat">@SelectedReservation.StartTime.ToString("HH:mm") - @SelectedReservation.EndTime.ToString("HH:mm")</DescriptionsItem>
             <DescriptionsItem Label="Şirket">@SelectedReservation.UserEmail</DescriptionsItem>
             <DescriptionsItem Label="Yetkili">@SelectedReservation.UserEmail</DescriptionsItem>
             <DescriptionsItem Label="Telefon">@SelectedReservation.UserEmail</DescriptionsItem>
@@ -218,18 +235,19 @@
         IsDetailModalVisible = false;
         SelectedReservation = null;
     }
+
     private void OpenEditModal(ReservationDto res)
     {
         // Klonlayarak çalışmak için deep copy
-            EditModel = new ReservationDto
-            {
-                Id = res.Id,
-                RoomName = res.RoomName,
-                Location = res.Location,
-                StartTime = res.StartTime,
-                EndTime = res.EndTime,
-                UserEmail = res.UserEmail
-            };
+        EditModel = new ReservationDto
+        {
+            Id = res.Id,
+            RoomName = res.RoomName,
+            Location = res.Location,
+            StartTime = res.StartTime,
+            EndTime = res.EndTime,
+            UserEmail = res.UserEmail
+        };
 
         IsEditModalVisible = true;
     }
@@ -249,7 +267,7 @@
             CloseEditModal();
         }
     }
-   
+
     private void ConfirmDelete(ReservationDto res)
     {
         ReservationToDelete = res;
@@ -271,12 +289,14 @@
             CancelDelete();
         }
     }
+
     private async Task RefreshReservations()
     {
         AllReservations = await ReservationService.GetAllReservationsAsync();
         TotalReservationCount = AllReservations.Count;
         LoadPage(); // Sayfalanmış verileri yeniden yükle
     }
+
     private void HandlePageIndexChange(PaginationEventArgs args)
     {
         CurrentPage = args.Page;
@@ -287,7 +307,7 @@
     private void HandlePageSizeChange(PaginationEventArgs args)
     {
         PageSize = args.PageSize;
-        CurrentPage = 1; 
+        CurrentPage = 1;
         LoadPage();
         StateHasChanged();
     }
@@ -324,11 +344,12 @@
         if (PageSize != queryModel.PageSize)
         {
             PageSize = queryModel.PageSize;
-            CurrentPage = 1; 
+            CurrentPage = 1;
         }
 
         LoadPage();
     }
+
     private void HandlePaginationChange(PaginationEventArgs args)
     {
         // args içinde hem sayfa hem de sayfa boyutu bilgisi olabilir

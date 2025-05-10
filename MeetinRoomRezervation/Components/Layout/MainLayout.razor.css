@@ -20,6 +20,7 @@ main {
     margin-left: 75px;
     margin-right: 75px;
     min-height: 350px;
+    box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.05);
 }
 
 .sidebar {
