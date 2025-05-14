@@ -1,0 +1,189 @@
+﻿@page "/admin/users"
+@using MeetinRoomRezervation.Models
+@inject IReservationService ReservationService
+@using AntDesign
+@using MeetinRoomRezervation.Services.ReservationService
+
+<PageHeader Title="Kullanıcı Yönetimi" />
+
+<Card>
+   @*  <Button Type="ButtonType.Primary" OnClick="@OpenCreateModal" Style="margin-bottom: 16px;">
+        Yeni Kullanıcı Oluştur
+    </Button> *@
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>Ad Soyad</th>
+                    <th>Email</th>
+                    <th>Durum</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in PagedUsers)
+                {
+                    <tr>
+                        <td>@user.FirstName</td>
+                        <td>@user.LastName</td>
+                        <td>@user.Email</td>
+                        <td>
+                            @if (user.IsActive)
+                            {
+                                <Tag Color="TagColor.Lime">Aktif</Tag>
+                            }
+                            else
+                            {
+                                <Tag Color="TagColor.Red">Pasif</Tag>
+                            }
+                        </td>
+                        <td>
+                            <Space>
+                                <Button Type="ButtonType.Link"
+                                OnClick="@(() => ToggleStatus(user))">
+                                    @(user.IsActive ? "Pasifleştir" : "Aktifleştir")
+                                </Button>
+                                <Popconfirm Title="Bu kullanıcı silinsin mi?"
+                                OnConfirm="@(() => DeleteUser(user.Id))">
+                                    <Button Type="ButtonType.Link" Danger>Sil</Button>
+                                </Popconfirm>
+                            </Space>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div style="margin-top: 16px; text-align: right;">
+        <Pagination Total="@TotalUserCount"
+        PageSize="@PageSize"
+        Current="@CurrentPage"
+        OnChange="@HandlePaginationChange"
+        ShowSizeChanger="true"
+        PageSizeOptions="@(new int[] {5, 10, 20, 50, 100})" />
+    </div>
+    <Modal Title="Yeni Kullanıcı Oluştur"
+    @bind-Visible="@IsCreateModalVisible"
+    OnOk="CreateUser"
+    OnCancel="CancelCreate">
+
+       @*  <Form Model="@NewUser">
+             <FormItem Label="Kullanıcı İsmi">
+                <Input @bind-Value="NewUser.FirstName" />
+            </FormItem>
+             <FormItem Label="Kullanıcı Soyisim">
+                <Input @bind-Value="NewUser.Lastname" />
+            </FormItem>
+            <FormItem Label="Kullanıcı Email">
+                <Input @bind-Value="NewUser.Email" />
+            </FormItem>
+            <FormItem Label="Şirket İsmi">
+                <Input @bind-Value="NewUser.Company" />
+            </FormItem>
+
+            <FormItem Label="Yetkili">
+                <Input @bind-Value="NewUser.CompanyOfficial" />
+            </FormItem>
+
+            <FormItem Label="Telefon">
+                <Input @bind-Value="NewUser.ContactPhone" />
+            </FormItem>
+            <FormItem Label="Aylık Kullanım Hakkı (Saat)">
+                <AntDesign.InputNumber @bind-Value="NewUser.MonthlyUsageLimit" />
+            </FormItem>
+            <FormItem Label="Bu Ay Kullanıldı">
+                <Typography Type="TextElementType.Secondary">
+                    @NewUser.UsedThisMonth Moments
+                </Typography>
+            </FormItem>
+        </Form> *@
+    </Modal>
+</Card>
+
+@code {
+    private List<UserDto> AllUsers = new();
+    private List<UserDto> PagedUsers = new();
+    private int PageSize = 5;
+    private int CurrentPage = 1;
+    private int TotalUserCount = 0;
+    private bool IsCreateModalVisible = false;
+    private UserDto NewUser = new();
+    // private void OpenCreateModal()
+    // {
+    //     NewUser = new UserDto
+    //     {
+    //             Id = Guid.NewGuid().ToString(),
+    //             Email = NewUser.Email,
+    //             FirstName = NewUser.FirstName,
+    //             LastName = NewUser.LastName,
+    //             Company = NewUser.Company,
+    //             CompanyOfficial = NewUser.CompanyOfficial,
+    //             ContactPhone = NewUser.ContactPhone,
+    //             MonthlyUsageLimit = NewUser.MonthlyUsageLimit,
+    //             UsedThisMonth = 0
+    //         };
+    //     IsCreateModalVisible = true;
+    // }
+
+    private void CancelCreate()
+    {
+        IsCreateModalVisible = false;
+        NewUser = new();
+    }
+
+    private async Task CreateUser()
+    {
+        await ReservationService.AddUserAsync(NewUser);
+        await LoadUsers();
+        CancelCreate();
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        await ReservationService.UpdateMonthlyUsageAsync(); 
+        await LoadUsers();
+    }
+
+    private async Task LoadUsers()
+    {
+        AllUsers = await ReservationService.GetAllUsersAsync();
+        TotalUserCount = AllUsers.Count;
+        LoadPage();
+    }
+
+    private void LoadPage()
+    {
+        PagedUsers = AllUsers
+            .OrderByDescending(r => r.Id)
+            .Skip((CurrentPage - 1) * PageSize)
+            .Take(PageSize)
+            .ToList();
+    }
+
+    private async Task ToggleStatus(UserDto user)
+    {
+        user.IsActive = !user.IsActive;
+        await ReservationService.UpdateUserStatusAsync(user.Id, user.IsActive);
+        await LoadUsers();
+    }
+
+    private async Task DeleteUser(string id)
+    {
+        await ReservationService.DeleteUserAsync(id);
+        await LoadUsers();
+    }
+
+    private void HandlePaginationChange(PaginationEventArgs args)
+    {
+        // args içinde hem sayfa hem de sayfa boyutu bilgisi olabilir
+        CurrentPage = args.Page;
+
+        if (args.PageSize != PageSize)
+        {
+            PageSize = args.PageSize;
+        }
+
+        LoadPage();
+        StateHasChanged();
+    }
+}

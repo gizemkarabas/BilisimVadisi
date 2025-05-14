@@ -1,6 +1,4 @@
-﻿using MeetinRoomRezervation.Components.Pages;
-using MeetinRoomRezervation.Data;
-using MeetinRoomRezervation.Models;
+﻿using MeetinRoomRezervation.Models;
 
 namespace MeetinRoomRezervation.Services.ReservationService
 {
@@ -17,6 +15,11 @@ namespace MeetinRoomRezervation.Services.ReservationService
 		Task<List<ReservationDto>> GetAllReservationsAsync();
 		Task<bool> UpdateReservationAsync(ReservationDto reservation);
 		Task<bool> DeleteReservationAsync(string reservationId);
+		Task<List<UserDto>> GetAllUsersAsync();
+		Task<bool> UpdateUserStatusAsync(string userId, bool isActive);
+		Task<bool> DeleteUserAsync(string userId);
+		Task AddUserAsync(UserDto userDto);
+		Task UpdateMonthlyUsageAsync();
 
 	}
 }

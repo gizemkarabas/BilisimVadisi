@@ -64,6 +64,7 @@ namespace MeetinRoomRezervation.Models
 				// Önce bu saat için rezervasyon var mı kontrol et
 				var existingReservationFilter = Builders<Reservation>.Filter.And(
 					Builders<Reservation>.Filter.Eq(r => r.RoomId, reservationDto.RoomId),
+					Builders<Reservation>.Filter.Eq(r => r.UserId, reservationDto.UserId),
 					Builders<Reservation>.Filter.Lt(r => r.StartTime, reservationDto.EndTime),
 					Builders<Reservation>.Filter.Gt(r => r.EndTime, reservationDto.StartTime)
 				);
@@ -80,9 +81,8 @@ namespace MeetinRoomRezervation.Models
 				var reservation = new Reservation
 				{
 					Id = ObjectId.GenerateNewId().ToString(),
-					UserEmail = reservationDto.UserEmail,
 					RoomId = reservationDto.RoomId,
-					RoomName = reservationDto.RoomName,
+					//Room = reservationDto.Room.Name,
 					StartTime = reservationDto.StartTime,
 					EndTime = reservationDto.EndTime
 				};
@@ -313,64 +313,55 @@ namespace MeetinRoomRezervation.Models
 
 		public async Task<List<ReservationDto>> GetUserReservations(string email)
 		{
-			var filter = Builders<Reservation>.Filter.Eq(r => r.UserEmail, email);
+			var filter = Builders<Reservation>.Filter.Eq(r => r.User.Email, email);
 			var reservations = await _context.Reservations.Find(filter).ToListAsync();
 			return reservations.Select(reservation => new ReservationDto
 			{
 				Id = reservation.Id,
 				RoomId = reservation.RoomId,
-				RoomName = reservation.RoomName,
+				UserId = reservation.UserId,
 				StartTime = reservation.StartTime,
 				EndTime = reservation.EndTime,
 			}).ToList();
 
 		}
-
 		public async Task CancelReservationAsync(string reservationId)
 		{
 			var filter = Builders<Reservation>.Filter.Eq(r => r.Id, reservationId);
 			await _context.Reservations.DeleteOneAsync(filter);
 		}
-
+		private ReservationDto test;
 		public async Task<List<ReservationDto>> GetAllReservationsAsync()
 		{
+
 			var reservations = await _context.Reservations.Find(_ => true).ToListAsync();
 			return reservations.Select(reservation => new ReservationDto
 			{
 				Id = reservation.Id,
-				UserEmail = reservation.UserEmail,
+				UserId = reservation.UserId,
 				RoomId = reservation.RoomId,
-				RoomName = reservation.RoomName,
+				UserEmail = reservation.User?.Email,
+				RoomName = reservation.Room.Name,
 				StartTime = reservation.StartTime,
 				EndTime = reservation.EndTime
 			}).ToList();
 
 		}
-
-
 		public async Task<bool> UpdateReservationAsync(ReservationDto updated)
 		{
 			var reservation = new Reservation
 			{
 				Id = updated.Id,
-				RoomName = updated.RoomName,
-				//Location = updated.Location,
+				UserId = updated.UserId,
+				RoomId = updated.RoomId,
 				StartTime = updated.StartTime,
 				EndTime = updated.EndTime,
-				//Company = updated.Company,
-				//ContactName = updated.ContactName,
-				//ContactPhone = updated.ContactPhone,
-				UserEmail = updated.UserEmail
+
 			};
 			var filter = Builders<Reservation>.Filter.Eq(r => r.Id, updated.Id);
 			var update = Builders<Reservation>.Update
-				.Set(r => r.RoomName, reservation.RoomName)
-				//.Set(r => r.Location, reservation.Location)
 				.Set(r => r.StartTime, updated.StartTime)
 				.Set(r => r.EndTime, updated.EndTime);
-			//.Set(r => r.Company, updated.Company)
-			//.Set(r => r.ContactName, updated.ContactName)
-			//.Set(r => r.ContactPhone, updated.ContactPhone);
 
 			var result = await _context.Reservations.UpdateOneAsync(filter, update);
 			return result.ModifiedCount > 0;
@@ -381,7 +372,130 @@ namespace MeetinRoomRezervation.Models
 			var result = await _context.Reservations.DeleteOneAsync(filter);
 			return result.DeletedCount > 0;
 		}
+		public async Task<List<UserDto>> GetAllUsersAsync()
+		{
+			try
+			{
+				var users = await _context.Users.Find(_ => true).ToListAsync();
+				return users.Select(user => new UserDto
+				{
+					Id = user.Id,
+					FirstName = user.FirstName,
+					LastName = user.LastName,
+					Email = user.Email,
+					Company = user.Company,
+					CompanyOfficial = user.CompanyOfficial,
+					IsActive = user.IsActive,
 
+				}).ToList();
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine($"Error in GetAllUsersAsync: {ex.Message}");
+				return new List<UserDto>();
+			}
+		}
+
+		public async Task<bool> UpdateUserStatusAsync(string userId, bool isActive)
+		{
+			try
+			{
+				var filter = Builders<User>.Filter.Eq("_id", userId);
+				var update = Builders<User>.Update.Set(u => u.IsActive, isActive);
+
+				var result = await _context.Users.UpdateOneAsync(filter, update);
+				return result.ModifiedCount > 0;
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine($"Error in UpdateUserStatusAsync: {ex.Message}");
+				return false;
+			}
+		}
+
+		public async Task<bool> DeleteUserAsync(string userId)
+		{
+			try
+			{
+				var filter = Builders<User>.Filter.Eq("_id", userId);
+				var result = await _context.Users.DeleteOneAsync(filter);
+				return result.DeletedCount > 0;
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine($"Error in DeleteUserAsync: {ex.Message}");
+				return false;
+			}
+		}
+
+		public async Task<UserDto> GetUserByIdAsync(string userId)
+		{
+			try
+			{
+				var filter = Builders<User>.Filter.Eq("_id", userId);
+				var user = await _context.Users.Find(filter).FirstOrDefaultAsync();
+
+				if (user == null)
+				{
+					return null;
+				}
+
+				return new UserDto
+				{
+					Id = user.Id,
+					FirstName = user.FirstName,
+					LastName = user.LastName,
+					Email = user.Email,
+					IsActive = user.IsActive,
+					// Diğer kullanıcı özellikleri buraya eklenebilir
+				};
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine($"Error in GetUserByIdAsync: {ex.Message}");
+				return null;
+			}
+		}
+		public async Task AddUserAsync(UserDto userDto)
+		{
+			var user = new User
+			{
+				Id = ObjectId.GenerateNewId().ToString(),
+				Email = userDto.Email,
+				Company = userDto.Company,
+				CompanyOfficial = userDto.CompanyOfficial,
+				ContactPhone = userDto.ContactPhone,
+				MonthlyUsageLimit = userDto.MonthlyUsageLimit,
+				UsedThisMonth = userDto.UsedThisMonth
+			};
+			await _context.Users.InsertOneAsync(user);
+		}
+
+		public async Task UpdateMonthlyUsageAsync()
+		{
+			var users = await _context.Users.Find(_ => true).ToListAsync();
+			var now = DateTime.UtcNow;
+			var monthStart = new DateTime(now.Year, now.Month, 1);
+			var nextMonth = monthStart.AddMonths(1);
+
+			foreach (var user in users)
+			{
+				var userReservations = await _context.Reservations
+					.Find(r => r.User.Email == user.Email &&
+							   r.StartTime >= monthStart &&
+							   r.StartTime < nextMonth)
+					.ToListAsync();
+
+				double totalHours = userReservations
+					.Sum(r => (r.EndTime - r.StartTime).TotalHours);
+
+				var update = Builders<User>.Update.Set(u => u.UsedThisMonth, (int)Math.Round(totalHours));
+
+				var filter = Builders<User>.Filter.Eq(u => u.Id, user.Id);
+
+				await _context.Users.UpdateOneAsync(filter, update);
+			}
+		}
 	}
 
 }

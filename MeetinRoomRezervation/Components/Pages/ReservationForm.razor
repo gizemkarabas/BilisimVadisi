@@ -6,7 +6,7 @@ ls
 @inject IReservationService ReservationService
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthProvider
-@inject ReservationStateDto ReservationState
+@inject ReservationDto Reservation
 
 <PageHeader Title="Yeni Rezervasyon" />
 
@@ -122,13 +122,11 @@ else
         {
             if (SelectedRoom != null)
             {
-                // Slotları temizle ve yeniden yükle
                 Slots.Clear();
                 SelectedSlots.Clear();
 
                 Slots = await ReservationService.GetSlotsWithStatusAsync(SelectedRoom.Id!, SelectedDate);
 
-                // UI'ı güncelle
                 await InvokeAsync(StateHasChanged);
             }
         }
@@ -179,11 +177,11 @@ else
             return;
         }
 
-        ReservationState.SelectedSlots = new List<SlotDto>(SelectedSlots); // Yeni bir liste oluştur
-        ReservationState.Location = SelectedRoom?.Location ?? "";
-        ReservationState.RoomName = SelectedRoom?.Name ?? "";
-        ReservationState.SelectedDate = SelectedDate;
-        ReservationState.RoomId = SelectedRoom?.Id ?? "";
+        Reservation.SelectedSlots = new List<SlotDto>(SelectedSlots); 
+        Reservation.Location = SelectedRoom?.Location ?? "";
+        Reservation.Room.Name = SelectedRoom?.Name ?? "";
+        Reservation.SelectedDate = SelectedDate;
+        Reservation.RoomId = SelectedRoom?.Id ?? "";
 
         Navigation.NavigateTo("/user/reservation-summary");
     }

@@ -1,16 +1,15 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace MeetinRoomRezervation.Data
+namespace MeetinRoomRezervation.Models
 {
-	public class User
+	public class UserDto
 	{
 		[BsonId]
 		[BsonRepresentation(BsonType.ObjectId)]
-		public string Id { get; set; }
-
+		public string Id { get; set; } = string.Empty;
 		[BsonElement("email")]
-		public required string Email { get; set; }
+		public string Email { get; set; }
 		[BsonElement("passwordHash")]
 		public string PasswordHash { get; set; }
 
@@ -21,10 +20,10 @@ namespace MeetinRoomRezervation.Data
 		public string LastName { get; set; }
 
 		[BsonElement("company")]
-		public string Company { get; set; }
+		public string Company { get; set; } = string.Empty;
 
 		[BsonElement("companyOfficial")]
-		public string CompanyOfficial { get; set; }
+		public string CompanyOfficial { get; set; } = string.Empty;
 
 		[BsonElement("contactPhone")]
 		public string ContactPhone { get; set; } = string.Empty;
@@ -37,6 +36,8 @@ namespace MeetinRoomRezervation.Data
 
 		[BsonElement("isActive")]
 		public bool IsActive { get; set; } = true;
+
+
 	}
 
 }

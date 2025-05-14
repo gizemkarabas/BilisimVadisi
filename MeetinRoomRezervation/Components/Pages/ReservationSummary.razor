@@ -1,10 +1,12 @@
 ﻿@page "/user/reservation-summary"
 @using MeetinRoomRezervation.Models
 @using MeetinRoomRezervation.Services.ReservationService
-@inject ReservationStateDto ReservationState
+@using AntDesign
+@inject ReservationDto ReservationState
 @inject IReservationService ReservationService
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthProvider
+
 
 <PageHeader Title="Rezervasyonunuzu Onaylayın" />
 
@@ -29,7 +31,7 @@
                     <dd>@ReservationState.Location</dd>
 
                     <dt>🏢 Bölge</dt>
-                    <dd>@ReservationState.RoomName</dd>
+                    <dd>@ReservationState.Room.Name</dd>
 
                     <dt>📅 Tarih</dt>
                     <dd>@ReservationState.SelectedDate.ToString("dd.MM.yyyy dddd")</dd>
@@ -72,13 +74,13 @@ else
             foreach (var slot in ReservationState.SelectedSlots)
             {
                 var reservationDto = new ReservationDto
-                    {
-                        UserEmail = user.Identity?.Name ?? "",
-                        RoomId = ReservationState.RoomId,
-                        RoomName = ReservationState.RoomName,
-                        StartTime = slot.StartTime,
-                        EndTime = slot.EndTime
-                    };
+                {
+                    User = ReservationState.User,
+                    Room = ReservationState.Room,
+                    StartTime = slot.StartTime,
+                    EndTime = slot.EndTime,
+                    Location = ReservationState.Location,
+                };
 
                 bool success = await ReservationService.AddReservationAsync(reservationDto);
                 if (!success)
@@ -90,8 +92,6 @@ else
 
             if (allReservationsSuccessful)
             {
-                // Başarılı rezervasyon sonrası yönlendirme
-                // forceLoad: true kullanarak sayfanın tamamen yeniden yüklenmesini sağlayın
                 Navigation.NavigateTo("/user/myreservations", forceLoad: true);
             }
             else

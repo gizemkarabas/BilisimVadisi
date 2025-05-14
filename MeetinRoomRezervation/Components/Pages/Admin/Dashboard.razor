@@ -4,7 +4,6 @@
 @inject IReservationService ReservationService
 @using AntDesign
 @using MeetinRoomRezervation.Services.ReservationService
-@* @inject IUserService UserService *@
 
 <PageHeader Title="Yönetici Paneli" />
 
@@ -50,16 +49,16 @@
                 {
                     <tr>
                         <td>@res.Location</td>
-                        <td>@res.RoomName</td>
+                        <td>@res.Room.Name</td>
                         <td>@res.StartTime.ToString("dd-MM-yyyy ddd")</td>
                         <td>
                             <Tag Color="TagColor.Blue">
                                 @res.StartTime.ToString("HH:mm") - @res.EndTime.ToString("HH:mm")
                             </Tag>
                         </td>
-                        <td>@res.UserEmail</td>
-                        <td>@res.UserEmail</td>
-                        <td>@res.UserEmail</td>
+                        <td>@res.User.Company</td>
+                        <td>@res.User.CompanyOfficial</td>
+                        <td>@res.User.ContactPhone</td>
                         <td>
                             <Space>
                                 <Button Icon="edit" Shape="ButtonShape.Circle" OnClick="@(() => OpenEditModal(res))" />
@@ -93,7 +92,7 @@
     {
         <Form Model="@EditModel">
             <FormItem Label="Salon">
-                <Input @bind-Value="EditModel.RoomName" />
+                <Input @bind-Value="EditModel.Room.Name" />
             </FormItem>
             <FormItem Label="Konum">
                 <Input @bind-Value="EditModel.Location" />
@@ -119,13 +118,13 @@
     @if (SelectedReservation != null)
     {
         <Descriptions Title="Bilgiler" Column="1" Size="DescriptionsSize.Small">
-            <DescriptionsItem Label="Salon">@SelectedReservation.RoomName</DescriptionsItem>
+            <DescriptionsItem Label="Salon">@SelectedReservation.Room.Name</DescriptionsItem>
             <DescriptionsItem Label="Konum">@SelectedReservation.Location</DescriptionsItem>
             <DescriptionsItem Label="Tarih">@SelectedReservation.StartTime.ToString("dd-MM-yyyy")</DescriptionsItem>
             <DescriptionsItem Label="Saat">@SelectedReservation.StartTime.ToString("HH:mm") - @SelectedReservation.EndTime.ToString("HH:mm")</DescriptionsItem>
-            <DescriptionsItem Label="Şirket">@SelectedReservation.UserEmail</DescriptionsItem>
-            <DescriptionsItem Label="Yetkili">@SelectedReservation.UserEmail</DescriptionsItem>
-            <DescriptionsItem Label="Telefon">@SelectedReservation.UserEmail</DescriptionsItem>
+            <DescriptionsItem Label="Şirket">@SelectedReservation.User.Company</DescriptionsItem>
+            <DescriptionsItem Label="Yetkili">@SelectedReservation.User.CompanyOfficial</DescriptionsItem>
+            <DescriptionsItem Label="Telefon">@SelectedReservation.User.ContactPhone</DescriptionsItem>
         </Descriptions>
     }
 </Modal>
@@ -137,7 +136,7 @@
        CancelText=@cancelButtonText
        OkType="ButtonType.Primary">
 
-    <p>@ReservationToDelete?.RoomName rezervasyonunu silmek istediğinize emin misiniz?</p>
+    <p>@ReservationToDelete?.Room.Name rezervasyonunu silmek istediğinize emin misiniz?</p>
 </Modal>
 
 @code {
@@ -220,15 +219,14 @@
     }
     private void OpenEditModal(ReservationDto res)
     {
-        // Klonlayarak çalışmak için deep copy
             EditModel = new ReservationDto
             {
                 Id = res.Id,
-                RoomName = res.RoomName,
+                Room = res.Room,
                 Location = res.Location,
                 StartTime = res.StartTime,
                 EndTime = res.EndTime,
-                UserEmail = res.UserEmail
+                User = res.User,
             };
 
         IsEditModalVisible = true;
@@ -275,7 +273,7 @@
     {
         AllReservations = await ReservationService.GetAllReservationsAsync();
         TotalReservationCount = AllReservations.Count;
-        LoadPage(); // Sayfalanmış verileri yeniden yükle
+        LoadPage(); 
     }
     private void HandlePageIndexChange(PaginationEventArgs args)
     {
@@ -294,7 +292,7 @@
 
     private void LoadPage()
     {
-        // Sayfalama mantığı
+       
         PagedReservations = AllReservations
             .OrderByDescending(r => r.StartTime)
             .Skip((CurrentPage - 1) * PageSize)
@@ -307,13 +305,13 @@
     {
         CurrentPage = args.Page;
         LoadPage();
-        await Task.CompletedTask; // Eğer asenkron işlem yoksa
+        await Task.CompletedTask; 
     }
 
     private void OnPageSizeChanged(int pageSize)
     {
         PageSize = pageSize;
-        CurrentPage = 1; // Sayfa boyutu değiştiğinde ilk sayfaya dön
+        CurrentPage = 1; 
         LoadPage();
     }
 

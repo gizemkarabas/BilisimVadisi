@@ -16,8 +16,8 @@
                     <AntDesign.Col Span="8">
                         <Card Title="@($"{reservation.StartTime.ToLocalTime().ToString("HH:mm")} - {reservation.EndTime.ToLocalTime().ToString("HH:mm")}")" Style="margin-bottom: 16px;">
                             <p><Icon Type="calendar" /> Tarih: @reservation.StartTime.ToString("dd.MM.yyyy dddd")</p>
-                            <p><Icon Type="home" /> Şirket: @reservation.RoomName</p>
-                            <p><Icon Type="user" /> Yetkili: @reservation.UserEmail</p>
+                            <p><Icon Type="home" /> Şirket: @reservation.Room.Name</p>
+                            <p><Icon Type="user" /> Yetkili: @reservation.User.Email</p>
                             <p><Icon Type="phone" /> Telefon: ""</p>
 
                             <Button Danger Type="ButtonType.Primary" OnClick="() => CancelReservation(reservation.Id)" Style="margin-top:10px;">
@@ -43,8 +43,8 @@
                     <AntDesign.Col Span="8">
                         <Card Title="@($"{reservation.StartTime:HH:mm} - {reservation.EndTime:HH:mm}")" Style="margin-bottom: 16px;">
                             <p><Icon Type="calendar" /> Tarih: @reservation.StartTime.ToString("dd.MM.yyyy dddd")</p>
-                            <p><Icon Type="home" /> Şirket: @reservation.RoomName</p>
-                            <p><Icon Type="user" /> Yetkili: @reservation.UserEmail</p>
+                            <p><Icon Type="home" /> Şirket: @reservation.Room.Name</p>
+                            <p><Icon Type="user" /> Yetkili: @reservation.User.Email</p>
                             <p><Icon Type="phone" /> Telefon:""</p>
                         </Card>
                     </AntDesign.Col>
