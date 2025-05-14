@@ -7,13 +7,13 @@
 
 <PageTitle>Toplantı Odaları</PageTitle>
 
-<Card Class="custom">
-    <Title Level="4">Toplantı Odaları</Title>
+<div style="margin-top: 16px; margin-left: 16px;" >
+    <Title Level="4">Lütfen Tarihi Seçin</Title>
     <div class="filter-bar">
         <DatePicker @bind-Value="SelectedDate" 
             DisabledDate="DisablePastDates" />
     </div>
-</Card>
+</div>
 
 <Row Gutter="16" Style="margin-top: 16px;">
     @if (Rooms.Count == 0)
@@ -28,7 +28,7 @@
         {
             <AntDesign.Col Span="6">
                 <div @onclick="@(() => NavigateToReservation(room))">
-                    <Card Hoverable Style="margin-bottom: 16px;" Class="@(room.IsAvailable ? "available-room" : "unavailable-room")">
+                    <Card Hoverable Style="margin-bottom: 16px; border-radius: 10px" Class="@(room.IsAvailable ? "available-room" : "unavailable-room")">
                         <CardMeta Title="@room.Name" Description="@room.Location" />
                         <div style="margin-top: 16px;">
                             <p><Icon Type="user" /> Kapasite: @room.Capacity</p>

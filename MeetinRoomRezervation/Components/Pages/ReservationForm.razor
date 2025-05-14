@@ -2,17 +2,16 @@
 @using System.Security.Claims
 @using MeetinRoomRezervation.Models
 @using MeetinRoomRezervation.Services.ReservationService
-ls
+
 @inject IReservationService ReservationService
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthProvider
 @inject ReservationDto Reservation
 
-<PageHeader Title="Yeni Rezervasyon" />
 
 @if (SelectedRoom is null)
 {
-    <Alert Message="Toplantı odası bulunamadı." Type="AlertType.Error" ShowIcon="true" />
+    <Alert Message="Toplantı odası bulunamadı." Type="AlertType.Error" ShowIcon="true"/>
 }
 else
 {
@@ -20,8 +19,20 @@ else
         <FormItem>
             <h4>Lütfen Tarihi Seçin</h4>
             <DatePicker @bind-Value="SelectedDate"
-                        DisabledDate="DisablePastDates" />
+                        DisabledDate="DisablePastDates"/>
         </FormItem>
+        <div class="availability-panel">
+            <div style="display: flex">
+                <div class="blue-circle"></div>
+                <div style="margin-left: 4px; font-weight: bold;">
+                    Müsait
+                </div>
+                <div class="gray-circle"></div>
+                <div style="margin-left: 4px; font-weight: bold;">
+                    Dolu
+                </div>
+            </div>
+        </div>
 
         <div style="margin: 10px 0;">
             <AntDesign.Tag Color="@("blue")">Müsait</AntDesign.Tag>
@@ -73,6 +84,7 @@ else
     private MeetingRoomDto SelectedRoom;
 
     private DateTime _selectedDate = DateTime.Today;
+
     private DateTime SelectedDate
     {
         get => _selectedDate;
@@ -190,4 +202,5 @@ else
     {
         return date.Date < DateTime.Today;
     }
+
 }
