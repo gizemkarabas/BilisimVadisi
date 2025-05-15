@@ -50,7 +50,7 @@
 </div>
 
 @code {
-    private RegisterInputModel RegisterModel = new();
+    private readonly RegisterInputModel RegisterModel = new();
     private string ErrorMessage = "";
 
     private async Task HandleRegister()

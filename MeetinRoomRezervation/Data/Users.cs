@@ -1,42 +1,18 @@
-﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
-
-namespace MeetinRoomRezervation.Data
+﻿namespace MeetinRoomRezervation.Data
 {
-	public class User
-	{
-		[BsonId]
-		[BsonRepresentation(BsonType.ObjectId)]
-		public string Id { get; set; }
-
-		[BsonElement("email")]
-		public required string Email { get; set; }
-		[BsonElement("passwordHash")]
-		public string PasswordHash { get; set; }
-
-		[BsonElement("firstName")]
-		public string FirstName { get; set; }
-
-		[BsonElement("lastName")]
-		public string LastName { get; set; }
-
-		[BsonElement("company")]
-		public string Company { get; set; }
-
-		[BsonElement("companyOfficial")]
-		public string CompanyOfficial { get; set; }
-
-		[BsonElement("contactPhone")]
-		public string ContactPhone { get; set; } = string.Empty;
-
-		[BsonElement("monthlyUsageLimit")]
-		public int MonthlyUsageLimit { get; set; }
-
-		[BsonElement("usedThisMonth")]
-		public int UsedThisMonth { get; set; } = 0;
-
-		[BsonElement("isActive")]
-		public bool IsActive { get; set; } = true;
-	}
+    public class User
+    {
+        public string Id { get; set; }
+        public required string Email { get; set; }
+        public string PasswordHash { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Company { get; set; }
+        public string CompanyOfficial { get; set; }
+        public string ContactPhone { get; set; } = string.Empty;
+        public int MonthlyUsageLimit { get; set; }
+        public int UsedThisMonth { get; set; } = 0;
+        public bool IsActive { get; set; } = true;
+    }
 
 }

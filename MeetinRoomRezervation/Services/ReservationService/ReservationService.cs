@@ -499,23 +499,3 @@ namespace MeetinRoomRezervation.Models
 	}
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
