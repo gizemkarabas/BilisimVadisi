@@ -311,9 +311,9 @@ namespace MeetinRoomRezervation.Models
 			return slots;
 		}
 
-		public async Task<List<ReservationDto>> GetUserReservations(string email)
+		public async Task<List<ReservationDto>> GetUserReservations(string userId)
 		{
-			var filter = Builders<Reservation>.Filter.Eq(r => r.User.Email, email);
+			var filter = Builders<Reservation>.Filter.Eq(r => r.UserId, userId);
 			var reservations = await _context.Reservations.Find(filter).ToListAsync();
 			return reservations.Select(reservation => new ReservationDto
 			{
@@ -330,21 +330,41 @@ namespace MeetinRoomRezervation.Models
 			var filter = Builders<Reservation>.Filter.Eq(r => r.Id, reservationId);
 			await _context.Reservations.DeleteOneAsync(filter);
 		}
-		private ReservationDto test;
 		public async Task<List<ReservationDto>> GetAllReservationsAsync()
 		{
-
 			var reservations = await _context.Reservations.Find(_ => true).ToListAsync();
-			return reservations.Select(reservation => new ReservationDto
+			var result = new List<ReservationDto>();
+			foreach (var reservation in reservations)
 			{
-				Id = reservation.Id,
-				UserId = reservation.UserId,
-				RoomId = reservation.RoomId,
-				UserEmail = reservation.User?.Email,
-				RoomName = reservation.Room.Name,
-				StartTime = reservation.StartTime,
-				EndTime = reservation.EndTime
-			}).ToList();
+				string userEmail = null;
+				if (!string.IsNullOrEmpty(reservation.UserId))
+				{
+					var userFilter = Builders<User>.Filter.Eq("_id", reservation.UserId);
+					var user = await _context.Users.Find(userFilter).FirstOrDefaultAsync();
+					userEmail = user?.Email;
+				}
+
+				string roomName = null;
+				if (!string.IsNullOrEmpty(reservation.RoomId))
+				{
+					var roomFilter = Builders<Data.MeetingRoom>.Filter.Eq("_id", reservation.RoomId);
+					var room = await _context.Rooms.Find(roomFilter).FirstOrDefaultAsync();
+					roomName = room?.Name;
+				}
+
+				result.Add(new ReservationDto
+				{
+					Id = reservation.Id,
+					UserId = reservation.UserId,
+					RoomId = reservation.RoomId,
+					UserEmail = userEmail,
+					RoomName = roomName,
+					StartTime = reservation.StartTime,
+					EndTime = reservation.EndTime
+				});
+			}
+
+			return result;
 
 		}
 		public async Task<bool> UpdateReservationAsync(ReservationDto updated)
@@ -385,7 +405,10 @@ namespace MeetinRoomRezervation.Models
 					Email = user.Email,
 					Company = user.Company,
 					CompanyOfficial = user.CompanyOfficial,
-					IsActive = user.IsActive,
+					ContactPhone = user.ContactPhone,
+					MonthlyUsageLimit = user.MonthlyUsageLimit,
+					UsedThisMonth = user.UsedThisMonth,
+					IsActive = user.IsActive
 
 				}).ToList();
 			}
@@ -462,11 +485,14 @@ namespace MeetinRoomRezervation.Models
 			{
 				Id = ObjectId.GenerateNewId().ToString(),
 				Email = userDto.Email,
+				FirstName = userDto.FirstName,
+				LastName = userDto.LastName,
 				Company = userDto.Company,
 				CompanyOfficial = userDto.CompanyOfficial,
 				ContactPhone = userDto.ContactPhone,
 				MonthlyUsageLimit = userDto.MonthlyUsageLimit,
-				UsedThisMonth = userDto.UsedThisMonth
+				UsedThisMonth = userDto.UsedThisMonth,
+				IsActive = userDto.IsActive
 			};
 			await _context.Users.InsertOneAsync(user);
 		}
@@ -481,7 +507,7 @@ namespace MeetinRoomRezervation.Models
 			foreach (var user in users)
 			{
 				var userReservations = await _context.Reservations
-					.Find(r => r.User.Email == user.Email &&
+					.Find(r => r.UserId == user.Id &&
 							   r.StartTime >= monthStart &&
 							   r.StartTime < nextMonth)
 					.ToListAsync();
@@ -496,6 +522,101 @@ namespace MeetinRoomRezervation.Models
 				await _context.Users.UpdateOneAsync(filter, update);
 			}
 		}
+
+		public async Task<bool> UpdateUserAsync(UserDto userDto)
+		{
+			try
+			{
+				var filter = Builders<User>.Filter.Eq("_id", userDto.Id);
+				var update = Builders<User>.Update
+					.Set(u => u.FirstName, userDto.FirstName)
+					.Set(u => u.LastName, userDto.LastName)
+					.Set(u => u.Email, userDto.Email)
+					.Set(u => u.Company, userDto.Company)
+					.Set(u => u.CompanyOfficial, userDto.CompanyOfficial)
+					.Set(u => u.ContactPhone, userDto.ContactPhone)
+					.Set(u => u.MonthlyUsageLimit, userDto.MonthlyUsageLimit)
+					.Set(u => u.IsActive, userDto.IsActive);
+
+				var result = await _context.Users.UpdateOneAsync(filter, update);
+				return result.ModifiedCount > 0;
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine($"Error in UpdateUserAsync: {ex.Message}");
+				return false;
+			}
+		}
+
+		public async Task<bool> AddRoomAsync(MeetingRoomDto roomDto)
+		{
+			try
+			{
+				var room = new Data.MeetingRoom
+				{
+					Id = ObjectId.GenerateNewId().ToString(),
+					Name = roomDto.Name,
+					Location = roomDto.Location,
+					Capacity = roomDto.Capacity,
+					OccupancyRate = 0,
+					IsAvailable = true
+				};
+
+				await _context.Rooms.InsertOneAsync(room);
+				return true;
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine($"Error in AddRoomAsync: {ex.Message}");
+				return false;
+			}
+		}
+		public async Task<List<ReservationDto>> GetReservationsByDateAsync(DateTime date)
+		{
+			var start = date.Date;
+			var end = start.AddDays(1);
+
+			var filter = Builders<Reservation>.Filter.And(
+				Builders<Reservation>.Filter.Gte(r => r.StartTime, start),
+				Builders<Reservation>.Filter.Lt(r => r.StartTime, end)
+			);
+
+			var reservations = await _context.Reservations.Find(filter).ToListAsync();
+
+			var result = new List<ReservationDto>();
+			foreach (var reservation in reservations)
+			{
+				string userEmail = null;
+				if (!string.IsNullOrEmpty(reservation.UserId))
+				{
+					var userFilter = Builders<User>.Filter.Eq("_id", reservation.UserId);
+					var user = await _context.Users.Find(userFilter).FirstOrDefaultAsync();
+					userEmail = user?.Email;
+				}
+
+				string roomName = null;
+				if (!string.IsNullOrEmpty(reservation.RoomId))
+				{
+					var roomFilter = Builders<Data.MeetingRoom>.Filter.Eq("_id", reservation.RoomId);
+					var room = await _context.Rooms.Find(roomFilter).FirstOrDefaultAsync();
+					roomName = room?.Name;
+				}
+
+				result.Add(new ReservationDto
+				{
+					Id = reservation.Id,
+					UserId = reservation.UserId,
+					RoomId = reservation.RoomId,
+					UserEmail = userEmail,
+					RoomName = roomName,
+					StartTime = reservation.StartTime,
+					EndTime = reservation.EndTime
+				});
+			}
+
+			return result;
+		}
+
 	}
 
 }

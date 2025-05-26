@@ -10,8 +10,9 @@ namespace MeetinRoomRezervation.Models
 		public string Id { get; set; } = string.Empty;
 		[BsonElement("email")]
 		public string Email { get; set; }
-		[BsonElement("passwordHash")]
-		public string PasswordHash { get; set; }
+		public string Password { get; set; }
+
+		public string ConfirmPassword { get; set; }
 
 		[BsonElement("firstName")]
 		public string FirstName { get; set; }
@@ -20,19 +21,19 @@ namespace MeetinRoomRezervation.Models
 		public string LastName { get; set; }
 
 		[BsonElement("company")]
-		public string Company { get; set; } = string.Empty;
+		public string Company { get; set; }
 
 		[BsonElement("companyOfficial")]
-		public string CompanyOfficial { get; set; } = string.Empty;
+		public string CompanyOfficial { get; set; }
 
 		[BsonElement("contactPhone")]
-		public string ContactPhone { get; set; } = string.Empty;
+		public string ContactPhone { get; set; }
 
 		[BsonElement("monthlyUsageLimit")]
 		public int MonthlyUsageLimit { get; set; }
 
 		[BsonElement("usedThisMonth")]
-		public int UsedThisMonth { get; set; } = 0;
+		public int UsedThisMonth { get; set; }
 
 		[BsonElement("isActive")]
 		public bool IsActive { get; set; } = true;

@@ -4,6 +4,7 @@
 @inject IReservationService ReservationService
 @using AntDesign
 @using MeetinRoomRezervation.Services.ReservationService
+<AuthorizeView RequiredRole="UserRole.Admin">
 
 <PageHeader Title="Yönetici Paneli" Style="background-color: unset"/>
 
@@ -64,16 +65,16 @@
                 {
                     <tr>
                         <td>@res.Location</td>
-                        <td>@res.Room.Name</td>
+                        <td>@res.Room?.Name</td>
                         <td>@res.StartTime.ToString("dd-MM-yyyy ddd")</td>
                         <td>
                             <Tag Color="TagColor.Blue">
                                 @res.StartTime.ToString("HH:mm") - @res.EndTime.ToString("HH:mm")
                             </Tag>
                         </td>
-                        <td>@res.User.Company</td>
-                        <td>@res.User.CompanyOfficial</td>
-                        <td>@res.User.ContactPhone</td>
+                        <td>@res.User?.Company</td>
+                        <td>@res.User?.CompanyOfficial</td>
+                        <td>@res.User?.ContactPhone</td>
                         <td>
                             <Space>
                                 <Button Icon="edit" Shape="ButtonShape.Circle" OnClick="@(() => OpenEditModal(res))" />
@@ -97,7 +98,7 @@
 
     </div>
 </Card>
-
+</AuthorizeView>
 <Modal Title="Rezervasyonu Düzenle"
        @bind-Visible="@IsEditModalVisible"
        OnOk="SubmitEdit"

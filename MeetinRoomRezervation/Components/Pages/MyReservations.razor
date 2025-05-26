@@ -1,6 +1,7 @@
 ﻿@page "/user/myreservations"
 @using MeetinRoomRezervation.Models
 @using MeetinRoomRezervation.Services.ReservationService
+@using System.Security.Claims
 @inject IReservationService ReservationService
 @inject AuthenticationStateProvider AuthProvider
 
@@ -100,10 +101,8 @@
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthProvider.GetAuthenticationStateAsync();
-        var user = authState.User.Identity?.Name ?? "";
-
-        var allReservations = await ReservationService.GetUserReservations(user);
-
+        var userId = authState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
+        var allReservations = await ReservationService.GetUserReservations(userId);
         var now = DateTime.Now;
 
         FutureReservations = allReservations.Where(r => r.EndTime > now).ToList();
@@ -113,7 +112,7 @@
     private async Task CancelReservation(string reservationId)
     {
         await ReservationService.CancelReservationAsync(reservationId);
-        await OnInitializedAsync(); // tekrar yükle
+        await OnInitializedAsync(); 
     }
 
 }

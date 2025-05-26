@@ -1,0 +1,51 @@
+﻿@using MeetinRoomRezervation.Models
+@using MeetinRoomRezervation.Data
+@inject IAuthService AuthService
+@inject IJSRuntime JSRuntime
+
+@if (IsAuthorized)
+{
+    @ChildContent
+}
+else if (ShowUnauthorizedContent)
+{
+    <div class="alert alert-warning">
+        Bu sayfaya erişim yetkiniz bulunmamaktadır.
+    </div>
+}
+
+@code {
+    [Parameter] public RenderFragment ChildContent { get; set; }
+    [Parameter] public UserRole RequiredRole { get; set; } = UserRole.User;
+    [Parameter] public bool ShowUnauthorizedContent { get; set; } = true;
+
+    private bool IsAuthorized = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CheckAuthorization();
+    }
+
+    private async Task CheckAuthorization()
+    {
+        try
+        {
+            var userId = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "userId");
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                IsAuthorized = false;
+                return;
+            }
+
+            var userRole = await AuthService.GetUserRoleAsync(userId);
+
+            IsAuthorized = userRole == UserRole.Admin ||
+                          (userRole == UserRole.User && RequiredRole == UserRole.User);
+        }
+        catch
+        {
+            IsAuthorized = false;
+        }
+    }
+}

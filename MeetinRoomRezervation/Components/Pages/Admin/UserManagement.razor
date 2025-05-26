@@ -4,12 +4,10 @@
 @using AntDesign
 @using MeetinRoomRezervation.Services.ReservationService
 
+<AuthorizeView RequiredRole="UserRole.Admin">
 <PageHeader Title="Kullanıcı Yönetimi" />
-
 <Card>
-   @*  <Button Type="ButtonType.Primary" OnClick="@OpenCreateModal" Style="margin-bottom: 16px;">
-        Yeni Kullanıcı Oluştur
-    </Button> *@
+   
     <div class="table-responsive">
         <table class="table table-bordered table-hover">
             <thead>
@@ -40,6 +38,10 @@
                         <td>
                             <Space>
                                 <Button Type="ButtonType.Link"
+                                        OnClick="@(() => EditUser(user))">
+                                    Düzenle
+                                </Button>
+                                <Button Type="ButtonType.Link"
                                 OnClick="@(() => ToggleStatus(user))">
                                     @(user.IsActive ? "Pasifleştir" : "Aktifleştir")
                                 </Button>
@@ -63,17 +65,17 @@
         ShowSizeChanger="true"
         PageSizeOptions="@(new int[] {5, 10, 20, 50, 100})" />
     </div>
-    <Modal Title="Yeni Kullanıcı Oluştur"
-    @bind-Visible="@IsCreateModalVisible"
-    OnOk="CreateUser"
-    OnCancel="CancelCreate">
+    <Button Type="ButtonType.Primary" OnClick="@OpenCreateModal" Style="margin-bottom: 16px;">
+        Yeni Kullanıcı Oluştur
+    </Button>
+    <Modal Title="Yeni Kullanıcı Oluştur" @bind-Visible="@IsCreateModalVisible" OnOk="CreateUser"  OnCancel="CancelCreate">
 
-       @*  <Form Model="@NewUser">
+        <Form Model="@NewUser">
              <FormItem Label="Kullanıcı İsmi">
                 <Input @bind-Value="NewUser.FirstName" />
             </FormItem>
              <FormItem Label="Kullanıcı Soyisim">
-                <Input @bind-Value="NewUser.Lastname" />
+                <Input @bind-Value="NewUser.LastName" />
             </FormItem>
             <FormItem Label="Kullanıcı Email">
                 <Input @bind-Value="NewUser.Email" />
@@ -97,10 +99,41 @@
                     @NewUser.UsedThisMonth Moments
                 </Typography>
             </FormItem>
-        </Form> *@
+        </Form>
     </Modal>
-</Card>
+    <Modal Title="Kullanıcı Düzenle" @bind-Visible="@IsEditModalVisible" OnOk="UpdateUser" OnCancel="CancelEdit">
+        <Form Model="@EditingUser">
+            <FormItem Label="Kullanıcı İsmi">
+                <Input @bind-Value="EditingUser.FirstName" />
+            </FormItem>
+            <FormItem Label="Kullanıcı Soyisim">
+                <Input @bind-Value="EditingUser.LastName" />
+            </FormItem>
+            <FormItem Label="Kullanıcı Email">
+                <Input @bind-Value="EditingUser.Email" />
+            </FormItem>
+            <FormItem Label="Şirket İsmi">
+                <Input @bind-Value="EditingUser.Company" />
+            </FormItem>
+            <FormItem Label="Yetkili">
+                <Input @bind-Value="EditingUser.CompanyOfficial" />
+            </FormItem>
+            <FormItem Label="Telefon">
+                <Input @bind-Value="EditingUser.ContactPhone" />
+            </FormItem>
+            <FormItem Label="Aylık Kullanım Hakkı (Saat)">
+                <AntDesign.InputNumber @bind-Value="EditingUser.MonthlyUsageLimit" />
+            </FormItem>
+            <FormItem Label="Bu Ay Kullanıldı">
+                <Typography Type="TextElementType.Secondary">
+                    @EditingUser.UsedThisMonth Saat
+                </Typography>
+            </FormItem>
+        </Form>
+    </Modal>
 
+</Card>
+</AuthorizeView>
 @code {
     private List<UserDto> AllUsers = new();
     private List<UserDto> PagedUsers = new();
@@ -109,22 +142,26 @@
     private int TotalUserCount = 0;
     private bool IsCreateModalVisible = false;
     private UserDto NewUser = new();
-    // private void OpenCreateModal()
-    // {
-    //     NewUser = new UserDto
-    //     {
-    //             Id = Guid.NewGuid().ToString(),
-    //             Email = NewUser.Email,
-    //             FirstName = NewUser.FirstName,
-    //             LastName = NewUser.LastName,
-    //             Company = NewUser.Company,
-    //             CompanyOfficial = NewUser.CompanyOfficial,
-    //             ContactPhone = NewUser.ContactPhone,
-    //             MonthlyUsageLimit = NewUser.MonthlyUsageLimit,
-    //             UsedThisMonth = 0
-    //         };
-    //     IsCreateModalVisible = true;
-    // }
+    private bool IsEditModalVisible = false;
+    private UserDto EditingUser = new();
+
+    private void OpenCreateModal()
+    {
+        NewUser = new UserDto
+        {
+                Id = Guid.NewGuid().ToString(),
+                Email = NewUser.Email,
+                FirstName = NewUser.FirstName,
+                LastName = NewUser.LastName,
+                Company = NewUser.Company,
+                CompanyOfficial = NewUser.CompanyOfficial,
+                ContactPhone = NewUser.ContactPhone,
+                MonthlyUsageLimit = NewUser.MonthlyUsageLimit,
+                UsedThisMonth = 0
+            };
+        IsCreateModalVisible = true;
+        StateHasChanged();
+    }
 
     private void CancelCreate()
     {
@@ -186,4 +223,39 @@
         LoadPage();
         StateHasChanged();
     }
+    
+
+    private void EditUser(UserDto user)
+    {
+        EditingUser = new UserDto
+            {
+                Id = user.Id,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Company = user.Company,
+                CompanyOfficial = user.CompanyOfficial,
+                ContactPhone = user.ContactPhone,
+                MonthlyUsageLimit = user.MonthlyUsageLimit,
+                UsedThisMonth = user.UsedThisMonth,
+                IsActive = user.IsActive
+            };
+
+        IsEditModalVisible = true;
+    }
+
+    private void CancelEdit()
+    {
+        IsEditModalVisible = false;
+        EditingUser = new();
+    }
+
+    private async Task UpdateUser()
+    {
+        await ReservationService.UpdateUserAsync(EditingUser);
+        await LoadUsers();
+        IsEditModalVisible = false;
+    }
+
+
 }

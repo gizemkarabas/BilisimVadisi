@@ -1,0 +1,206 @@
+﻿@page "/admin/halls"
+@inject IReservationService ReservationService
+ @inject IRoomService RoomService
+@* @inject IUserService UserService *@ 
+@using AntDesign
+
+<AuthorizeView RequiredRole="UserRole.Admin">
+
+<PageHeader Title="Toplantı Salonu Yönetimi" />
+<Card>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <AntDesign.Col>
+            <Button OnClick="SelectToday">Bugün</Button>
+            <Button OnClick="SelectTomorrow" Style="margin-left: 8px;">Yarın</Button>
+            <DatePicker @bind-Value="SelectedDate" Style="margin-left: 8px;" />
+        </AntDesign.Col>
+        <AntDesign.Col>
+            <Button Type="ButtonType.Primary" OnClick="OpenCreateRoomModal">Yeni Toplantı Odası Oluştur</Button>
+        </AntDesign.Col>
+    </div>
+
+    <Row Gutter="16">
+        @foreach (var room in Rooms)
+        {
+            <AntDesign.Col Span="8">
+                <Card Title="@room.Name">
+                    <div style="text-align: right; margin-bottom: 8px;">
+                        <Button Size="ButtonSize.Small" OnClick="@(() => OpenEditModal(room))" Icon="edit" />
+                    </div>
+                    @if (room.Reservations.Any())
+                    {
+                        foreach (var res in room.Reservations)
+                        {
+                            <div class="reservation-block">
+                                <Tag Color="TagColor.Blue">@res.StartTime.ToString("HH:mm") - @res.EndTime.ToString("HH:mm")</Tag>
+                                <p><strong>Şirket:</strong> @res.User.Company</p>
+                                <p><strong>Yetkili:</strong> @res.User.CompanyOfficial</p>
+                                <p><strong>Telefon:</strong> @res.User.ContactPhone</p>
+                                <Button Type="ButtonType.Dashed" OnClick="@(() => CancelReservation(res.Id))">Rezervasyonu İptal</Button>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <Tag Color="TagColor.Green">Bugün için rezervasyon bulunmamaktadır.</Tag>
+                    }
+
+                    <Divider />
+                    <p><strong>Müsait Saatler</strong></p>
+                    @foreach (var slot in room.AvailableSlots)
+                    {
+                        <Tag>@slot</Tag>
+                    }
+                </Card>
+            </AntDesign.Col>
+        }
+    </Row>
+    <Button Type="ButtonType.Primary" OnClick="OpenCreateRoomModal">
+        Yeni Toplantı Odası Oluştur
+    </Button>
+    <Modal Title="Yeni Toplantı Odası Oluştur"
+           @bind-Visible="@IsCreateModalVisible"
+           OnOk="CreateRoom"
+           OnCancel="CloseCreateModal"
+           OkText="@okButtonText"
+           CancelText="@cancelButtonText">
+
+        <Form Model="@NewRoom">
+            <FormItem Label="Oda Adı" Required>
+                <Input @bind-Value="NewRoom.Name" />
+            </FormItem>
+            <FormItem Label="Kapasite" Required>
+                <AntDesign.InputNumber @bind-Value="NewRoom.Capacity" Min="1" />
+            </FormItem>
+        </Form>
+    </Modal>
+
+    <Modal Title="Toplantı Odası Düzenle"
+           @bind-Visible="@IsEditModalVisible"
+           OnOk="UpdateRoom"
+           OnCancel="CloseEditModal"
+           OkText="@okButtonText"
+           CancelText="@cancelButtonText">
+
+        <Form Model="@EditingRoom">
+            <FormItem Label="Oda Adı" Required>
+                <Input @bind-Value="EditingRoom.Name" />
+            </FormItem>
+            <FormItem Label="Kapasite" Required>
+                <AntDesign.InputNumber @bind-Value="EditingRoom.Capacity" Min="1" />
+            </FormItem>
+        </Form>
+    </Modal>
+</Card>
+</AuthorizeView>
+@code {
+    private DateTime SelectedDate = DateTime.Today;
+    private string okButtonText = "Kaydet";
+    private string cancelButtonText = "İptal";
+    private void SelectToday() => SelectedDate = DateTime.Today;
+    private void SelectTomorrow() => SelectedDate = DateTime.Today.AddDays(1);
+    private List<MeetingRoomDto> Rooms = new();
+    private bool IsCreateModalVisible = false;
+    private bool IsEditModalVisible = false;
+    private MeetingRoomDto NewRoom = new();
+    private MeetingRoomDto EditingRoom = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadRoomData();
+    }
+
+    private async Task LoadRoomData()
+    {
+        var allRooms = await ReservationService.GetAllRoomsAsync();
+        var reservations = await ReservationService.GetReservationsByDateAsync(SelectedDate);
+
+        foreach (var room in allRooms)
+        {
+            var roomReservations = reservations
+                .Where(r => r.RoomId == room.Id)
+                .OrderBy(r => r.StartTime)
+                .ToList();
+
+            room.Reservations = roomReservations;
+            room.AvailableSlots = GenerateAvailableSlots(roomReservations);
+        }
+
+        Rooms = allRooms;
+    }
+
+    private List<string> GenerateAvailableSlots(List<ReservationDto> reservations)
+    {
+        var slots = new List<string>();
+        for (int hour = 9; hour < 18; hour++)
+        {
+            var start = new TimeSpan(hour, 0, 0);
+            var end = new TimeSpan(hour + 1, 0, 0);
+            bool isOccupied = reservations.Any(r =>
+                r.StartTime.TimeOfDay < end && r.EndTime.TimeOfDay > start);
+
+            if (!isOccupied)
+            {
+                slots.Add($"{start:hh\\:mm} - {end:hh\\:mm}");
+            }
+        }
+        return slots;
+    }
+
+    private async Task CancelReservation(string reservationId)
+    {
+        await ReservationService.DeleteReservationAsync(reservationId);
+        await LoadRoomData();
+    }
+
+    private void OpenCreateRoomModal()
+    {
+        NewRoom = new MeetingRoomDto();
+        IsCreateModalVisible = true;
+    }
+
+    private void CloseCreateModal()
+    {
+        IsCreateModalVisible = false;
+        NewRoom = new();
+    }
+
+    private async Task CreateRoom()
+    {
+        if (!string.IsNullOrWhiteSpace(NewRoom.Name) && NewRoom.Capacity > 0)
+        {
+            await ReservationService.AddRoomAsync(NewRoom);
+            await LoadRoomData();
+            CloseCreateModal();
+        }
+    }
+
+    private void OpenEditModal(MeetingRoomDto room)
+    {
+        EditingRoom = new MeetingRoomDto
+        {
+            Id = room.Id,
+            Name = room.Name,
+            Capacity = room.Capacity,
+            Location = room.Location
+        };
+
+        IsEditModalVisible = true;
+    }
+
+    private void CloseEditModal()
+    {
+        IsEditModalVisible = false;
+        EditingRoom = new();
+    }
+
+    private async Task UpdateRoom()
+    {
+        if (!string.IsNullOrWhiteSpace(EditingRoom.Name) && EditingRoom.Capacity > 0)
+        {
+            await RoomService.UpdateRoomAsync(EditingRoom);
+            await LoadRoomData();
+            CloseEditModal();
+        }
+    }
+}

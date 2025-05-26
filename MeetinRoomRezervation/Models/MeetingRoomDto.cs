@@ -1,4 +1,6 @@
-﻿namespace MeetinRoomRezervation.Models
+﻿using MongoDB.Bson.Serialization.Attributes;
+
+namespace MeetinRoomRezervation.Models
 {
 	public class MeetingRoomDto
 	{
@@ -8,7 +10,10 @@
 		public int Capacity { get; set; }
 		public double OccupancyRate { get; set; }
 		public bool IsAvailable { get; set; }
+		public List<ReservationDto> Reservations { get; set; } = new();
 
+		[BsonIgnore]
+		public List<string> AvailableSlots { get; set; } = new();
 
 	}
 
