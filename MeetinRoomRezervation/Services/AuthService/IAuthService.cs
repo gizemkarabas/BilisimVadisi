@@ -6,8 +6,9 @@ namespace MeetinRoomRezervation.Services
 {
 	public interface IAuthService
 	{
-		Task<bool> RegisterAsync(RegisterInputModel model);
-		Task<bool> LoginAsync(LoginInputModel model);
+		Task<User> RegisterAsync(RegisterInputModel model);
+		Task<User> LoginAsync(LoginInputModel model);
+		Task LogoutAsync();
 		Task<bool> IsEmailTaken(string email);
 		Task<UserRole> GetUserRoleAsync(string userId);
 	}

@@ -1,8 +1,8 @@
-﻿@page "/user/room-status"
+﻿@page "/user/roomStatus"
 @using AntDesign
 @using MeetinRoomRezervation.Models
 @using MeetinRoomRezervation.Services.ReservationService
-@inject IReservationService ReservationService
+@inject IRoomService RoomService
 @inject NavigationManager Navigation
 
 <PageTitle>Toplantı Odaları</PageTitle>
@@ -82,7 +82,7 @@
             Rooms.Clear();
 
             // Odaları yükle
-            Rooms = await ReservationService.GetAllRoomsWithOccupancyAsync(SelectedDate);
+            Rooms = await RoomService.GetAllRoomsWithOccupancyAsync(SelectedDate);
 
             // UI'ı güncelle
             await InvokeAsync(StateHasChanged);

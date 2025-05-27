@@ -1,9 +1,11 @@
 ﻿@page "/login"
 @using Blazored.FluentValidation
+@using MeetinRoomRezervation.Data
 @using MeetinRoomRezervation.Services
 @inject IAuthService AuthService
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthProvider
+@inject IJSRuntime JSRuntime
 
 <div class="login-container" style="max-width: 400px; margin: 0 auto; padding: 24px;">
     <Card Title="Giriş Yap" Style="width: 100%;">
@@ -41,41 +43,47 @@
 
 @code {
     private LoginInputModel LoginModel = new();
+    private bool IsLoading = false;
     private string ErrorMessage = "";
 
     private async Task HandleLogin()
     {
-        if (string.IsNullOrWhiteSpace(LoginModel.Email) || string.IsNullOrWhiteSpace(LoginModel.Password))
-        {
-            ErrorMessage = "E-posta ve şifre alanları zorunludur.";
-            return;
-        }
+        IsLoading = true;
+        ErrorMessage = "";
 
         try
         {
-            var result = await AuthService.LoginAsync(LoginModel);
+            var user = await AuthService.LoginAsync(LoginModel);
 
-            if (result)
+            if (user != null)
             {
-               
-                if (AuthProvider is CustomAuthenticationStateProvider customAuth)
-                {
-                    customAuth.MarkUserAsAuthenticated(LoginModel.Email);
-                }
+                await JSRuntime.InvokeVoidAsync("localStorage.setItem", "userId", user.Id);
+                await JSRuntime.InvokeVoidAsync("localStorage.setItem", "userRole", user.Role.ToString());
 
-                Navigation.NavigateTo("/user/room-status");
+                if (user.Role == UserRole.Admin)
+                {
+                    Navigation.NavigateTo("/admin/dashboard");
+                }
+                else
+                {
+                    Navigation.NavigateTo("/user/roomStatus");
+                }
             }
             else
             {
-                ErrorMessage = "Geçersiz e-posta veya şifre.";
+                ErrorMessage = "Email veya şifre hatalı.";
             }
         }
         catch (Exception ex)
         {
-            ErrorMessage = "Bir hata oluştu. Lütfen tekrar deneyiniz.";
-            Console.Error.WriteLine($"Login error: {ex.Message}");
+            ErrorMessage = "Giriş yapılırken bir hata oluştu.";
+        }
+        finally
+        {
+            IsLoading = false;
         }
     }
+
 
     public class LoginInputModel
     {

@@ -4,6 +4,7 @@
 @using MeetinRoomRezervation.Services.ReservationService
 
 @inject IReservationService ReservationService
+@inject IRoomService RoomService
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthProvider
 @inject ReservationDto Reservation
@@ -113,7 +114,7 @@ else
 
         if (!string.IsNullOrEmpty(roomId))
         {
-            SelectedRoom = await ReservationService.GetRoomByIdAsync(roomId);
+            SelectedRoom = await RoomService.GetRoomByIdAsync(roomId);
         }
 
         if (!string.IsNullOrEmpty(dateStr) && DateTime.TryParse(dateStr, out var parsedDate))
@@ -137,7 +138,7 @@ else
                 Slots.Clear();
                 SelectedSlots.Clear();
 
-                Slots = await ReservationService.GetSlotsWithStatusAsync(SelectedRoom.Id!, SelectedDate);
+                Slots = await RoomService.GetSlotsWithStatusAsync(SelectedRoom.Id!, SelectedDate);
 
                 await InvokeAsync(StateHasChanged);
             }

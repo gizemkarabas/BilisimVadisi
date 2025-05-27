@@ -1,12 +1,28 @@
 ﻿@page "/admin/halls"
 @inject IReservationService ReservationService
  @inject IRoomService RoomService
-@* @inject IUserService UserService *@ 
+ @inject AuthenticationStateProvider AuthenticationStateProvider
 @using AntDesign
-
-<AuthorizeView RequiredRole="UserRole.Admin">
-
-<PageHeader Title="Toplantı Salonu Yönetimi" />
+@using MeetinRoomRezervation.Data
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+@inject NavigationManager Navigation
+<div style="background: #f0f0f0; padding: 10px; margin: 10px 0;">
+    <h4>Debug Bilgisi:</h4>
+    <p>Kullanıcı Authenticated: @isAuthenticated</p>
+    <p>Kullanıcı Adı: @userName</p>
+    <p>Tüm Claim'ler:</p>
+    <ul>
+        @foreach (var claim in allClaims)
+        {
+            <li><strong>@claim.Type:</strong> @claim.Value</li>
+        }
+    </ul>
+    <p>Admin mi: @isAdmin</p>
+</div>
+<AuthorizeView Roles="Admin" Context="authContext">
+    <Authorized Context="authContext">
+            <PageHeader Title="Toplantı Salonu Yönetimi" />
 <Card>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
         <AntDesign.Col>
@@ -92,6 +108,35 @@
         </Form>
     </Modal>
 </Card>
+    </Authorized>
+   <NotAuthorized>
+
+        @{
+            var currentUserRole = GetUserRole(authContext.User);
+        }
+        <div style="padding: 24px; max-width: 600px; margin: 0 auto;">
+            <Alert Type="@AlertType.Warning"
+                   Message="Yetkisiz Erişim"
+                   Description="Bu sayfaya erişim yetkiniz bulunmamaktadır. Admin yetkisi gereklidir."
+                   ShowIcon="true"
+                   Style="margin-bottom: 16px;" />
+
+            <div style="text-align: center;">
+                <Space>
+                    <SpaceItem>
+                        <Button Type="ButtonType.Primary" OnClick="@(() => Navigation.NavigateTo("/login"))" Icon="login">
+                            Giriş Yap
+                        </Button>
+                    </SpaceItem>
+                    <SpaceItem>
+                        <Button Type="ButtonType.Default" OnClick="@(() => Navigation.NavigateTo("/user/roomStatus"))" Icon="home">
+                            Ana Sayfaya Dön
+                        </Button>
+                    </SpaceItem>
+                </Space>
+            </div>
+        </div>
+    </NotAuthorized>
 </AuthorizeView>
 @code {
     private DateTime SelectedDate = DateTime.Today;
@@ -105,14 +150,25 @@
     private MeetingRoomDto NewRoom = new();
     private MeetingRoomDto EditingRoom = new();
 
+    private bool isAuthenticated = false;
+    private string userName = "";
+    private List<Claim> allClaims = new();
+    private bool isAdmin = false;
+
     protected override async Task OnInitializedAsync()
     {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        isAuthenticated = authState.User.Identity.IsAuthenticated;
+        userName = authState.User.Identity.Name ?? "";
+        allClaims = authState.User.Claims.ToList(); // Tüm claim'leri görmek için
+        isAdmin = authState.User.IsInRole("Admin");
+
         await LoadRoomData();
     }
 
     private async Task LoadRoomData()
     {
-        var allRooms = await ReservationService.GetAllRoomsAsync();
+        var allRooms = await RoomService.GetAllRoomsAsync();
         var reservations = await ReservationService.GetReservationsByDateAsync(SelectedDate);
 
         foreach (var room in allRooms)
@@ -169,7 +225,7 @@
     {
         if (!string.IsNullOrWhiteSpace(NewRoom.Name) && NewRoom.Capacity > 0)
         {
-            await ReservationService.AddRoomAsync(NewRoom);
+            await RoomService.AddRoomAsync(NewRoom);
             await LoadRoomData();
             CloseCreateModal();
         }
@@ -203,4 +259,15 @@
             CloseEditModal();
         }
     }
+    private UserRole GetUserRole(ClaimsPrincipal user)
+    {
+        var roleString = user.FindFirst(ClaimTypes.Role)?.Value;
+        return Enum.TryParse<UserRole>(roleString, out var role) ? role : UserRole.User;
+    }
+
+    private string GetUserCompany(ClaimsPrincipal user)
+    {
+        return user.FindFirst("Company")?.Value ?? "";
+    }
+
 }

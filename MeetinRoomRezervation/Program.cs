@@ -5,11 +5,26 @@ using MeetinRoomRezervation.Models;
 using MeetinRoomRezervation.Services;
 using MeetinRoomRezervation.Services.ReservationService;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Identity;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+Log.Logger = new LoggerConfiguration()
+	.MinimumLevel.Information()
+	.WriteTo.Console()
+	.WriteTo.File("Logs/app-.txt", rollingInterval: RollingInterval.Day)
+	.CreateLogger();
+
+builder.Host.UseSerilog();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddAuthentication()
+	.AddCookie(options =>
+	{
+		options.LoginPath = "/login";
+		options.LogoutPath = "/logout";
+	});
+builder.Services.AddAuthorization();
 builder.Services.AddScoped<IReservationService, ReservationService>();
 builder.Services.AddScoped<IRoomService, RoomService>();
 
@@ -40,12 +55,12 @@ builder.Services.AddAuthenticationCore();
 
 builder.Services.AddCascadingAuthenticationState();
 
-builder.Services.AddAuthentication(options =>
-{
-	options.DefaultScheme = IdentityConstants.ApplicationScheme;
-	options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
-})
-.AddCookie();
+//builder.Services.AddAuthentication(options =>
+//{
+//	options.DefaultScheme = IdentityConstants.ApplicationScheme;
+//	options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
+//})
+//.AddCookie();
 
 var app = builder.Build();
 
@@ -63,6 +78,8 @@ else
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseAntiforgery();
 

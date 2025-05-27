@@ -2,10 +2,13 @@
 @using AntDesign.TableModels
 @using MeetinRoomRezervation.Models
 @inject IReservationService ReservationService
+@inject IRoomService RoomService
 @using AntDesign
 @using MeetinRoomRezervation.Services.ReservationService
-<AuthorizeView RequiredRole="UserRole.Admin">
+@inject NavigationManager Navigation
 
+<AuthorizeView Roles="Admin" Context="authContext">
+    <Authorized Context="authContext">
 <PageHeader Title="Yönetici Paneli" Style="background-color: unset"/>
 
 <Row Gutter="16" Style="margin-bottom: 30px;">
@@ -98,6 +101,31 @@
 
     </div>
 </Card>
+    </Authorized>
+    <NotAuthorized>
+        <div style="padding: 24px; max-width: 600px; margin: 0 auto;">
+            <Alert Type="@AlertType.Warning"
+                   Message="Yetkisiz Erişim"
+                   Description="Bu sayfaya erişim yetkiniz bulunmamaktadır. Admin yetkisi gereklidir."
+                   ShowIcon="true"
+                   Style="margin-bottom: 16px;" />
+
+            <div style="text-align: center;">
+                <Space>
+                    <SpaceItem>
+                        <Button Type="ButtonType.Primary" OnClick="@(() => Navigation.NavigateTo("/login"))" Icon="login">
+                            Giriş Yap
+                        </Button>
+                    </SpaceItem>
+                    <SpaceItem>
+                        <Button Type="ButtonType.Default" OnClick="@(() => Navigation.NavigateTo("/user/roomStatus"))" Icon="home">
+                            Ana Sayfaya Dön
+                        </Button>
+                    </SpaceItem>
+                </Space>
+            </div>
+        </div>
+    </NotAuthorized>
 </AuthorizeView>
 <Modal Title="Rezervasyonu Düzenle"
        @bind-Visible="@IsEditModalVisible"
@@ -184,7 +212,7 @@
             .Take(10)
             .ToList();
 
-        var allRooms = await ReservationService.GetAllRoomsAsync();
+        var allRooms = await RoomService.GetAllRoomsAsync();
         //var allUsers = await UserService.GetAllUsersAsync();
         var allReservations = await ReservationService.GetAllReservationsAsync();
 

@@ -1,10 +1,13 @@
 ﻿@page "/admin/users"
 @using MeetinRoomRezervation.Models
 @inject IReservationService ReservationService
+@inject IUserService UserService   
 @using AntDesign
 @using MeetinRoomRezervation.Services.ReservationService
+@inject NavigationManager Navigation
 
-<AuthorizeView RequiredRole="UserRole.Admin">
+<AuthorizeView Roles="Admin" Context="authContext">
+    <Authorized Context="authContext">
 <PageHeader Title="Kullanıcı Yönetimi" />
 <Card>
    
@@ -133,6 +136,31 @@
     </Modal>
 
 </Card>
+    </Authorized>
+    <NotAuthorized>
+        <div style="padding: 24px; max-width: 600px; margin: 0 auto;">
+            <Alert Type="@AlertType.Warning"
+                   Message="Yetkisiz Erişim"
+                   Description="Bu sayfaya erişim yetkiniz bulunmamaktadır. Admin yetkisi gereklidir."
+                   ShowIcon="true"
+                   Style="margin-bottom: 16px;" />
+
+            <div style="text-align: center;">
+                <Space>
+                    <SpaceItem>
+                        <Button Type="ButtonType.Primary" OnClick="@(() => Navigation.NavigateTo("/login"))" Icon="login">
+                            Giriş Yap
+                        </Button>
+                    </SpaceItem>
+                    <SpaceItem>
+                        <Button Type="ButtonType.Default" OnClick="@(() => Navigation.NavigateTo("/user/roomStatus"))" Icon="home">
+                            Ana Sayfaya Dön
+                        </Button>
+                    </SpaceItem>
+                </Space>
+            </div>
+        </div>
+    </NotAuthorized>
 </AuthorizeView>
 @code {
     private List<UserDto> AllUsers = new();
@@ -171,19 +199,19 @@
 
     private async Task CreateUser()
     {
-        await ReservationService.AddUserAsync(NewUser);
+        await UserService.AddUserAsync(NewUser);
         await LoadUsers();
         CancelCreate();
     }
     protected override async Task OnInitializedAsync()
     {
-        await ReservationService.UpdateMonthlyUsageAsync(); 
+        await UserService.UpdateMonthlyUsageAsync(); 
         await LoadUsers();
     }
 
     private async Task LoadUsers()
     {
-        AllUsers = await ReservationService.GetAllUsersAsync();
+        AllUsers = await UserService.GetAllUsersAsync();
         TotalUserCount = AllUsers.Count;
         LoadPage();
     }
@@ -200,13 +228,13 @@
     private async Task ToggleStatus(UserDto user)
     {
         user.IsActive = !user.IsActive;
-        await ReservationService.UpdateUserStatusAsync(user.Id, user.IsActive);
+        await UserService.UpdateUserStatusAsync(user.Id, user.IsActive);
         await LoadUsers();
     }
 
     private async Task DeleteUser(string id)
     {
-        await ReservationService.DeleteUserAsync(id);
+        await UserService.DeleteUserAsync(id);
         await LoadUsers();
     }
 
@@ -252,7 +280,7 @@
 
     private async Task UpdateUser()
     {
-        await ReservationService.UpdateUserAsync(EditingUser);
+        await UserService.UpdateUserAsync(EditingUser);
         await LoadUsers();
         IsEditModalVisible = false;
     }

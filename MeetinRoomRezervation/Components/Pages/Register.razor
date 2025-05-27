@@ -61,9 +61,9 @@
             return;
         }
 
-        var success = await AuthService.RegisterAsync(RegisterModel);
+        var user = await AuthService.RegisterAsync(RegisterModel);
 
-        if (success)
+        if (user!=null)
         {
             Navigation.NavigateTo("/login");
         }
