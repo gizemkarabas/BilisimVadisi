@@ -9,6 +9,7 @@ using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using Serilog;
 
+
 var builder = WebApplication.CreateBuilder(args);
 Log.Logger = new LoggerConfiguration()
 	.MinimumLevel.Information()
@@ -63,7 +64,11 @@ builder.Services.AddCascadingAuthenticationState();
 //.AddCookie();
 
 var app = builder.Build();
-
+using (var scope = app.Services.CreateScope())
+{
+	var seedService = scope.ServiceProvider.GetRequiredService<SeedDataService>();
+	await seedService.SeedAdminUserAsync();
+}
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

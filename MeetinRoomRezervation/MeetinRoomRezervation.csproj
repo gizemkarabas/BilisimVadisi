@@ -29,4 +29,13 @@
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Components\Images\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\M-Home-Hand.png" />
+    <None Include="wwwroot\W-Home-Hand.png" />
+  </ItemGroup>
+
 </Project>

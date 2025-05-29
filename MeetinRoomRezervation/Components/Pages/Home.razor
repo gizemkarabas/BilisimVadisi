@@ -1,7 +1,49 @@
-﻿@page "/"
+﻿@page "/home"
+@using AntDesign
+<div class="container">
+    <div class="container-items" style="width: 20vw;">
+        <div style="font-size: 21px; font-weight: bold"> Giriş Yap</div>
+        <div style="font-size: 9px; margin-bottom: 10px"> Travelwise hesabınıza erişmek için giriş yapın
+        </div>
+        <div class="input-text">
+            <label>E-posta</label>
+            <Input TValue="string" Placeholder="E-posta adresiniz" Style="margin-top: 4px;"/>
+        </div>
+        <div class="input-text">
+            <label>Şifre</label>
+            <InputPassword TValue="string" Placeholder="Şifreniz" Style="margin-top: 4px;"/>
+        </div>
+        <div class="input-text" style="display: flex; align-items: baseline;">
+            <div>
+                <Checkbox>Beni Hatırla</Checkbox>
+            </div>
+            <p class="forget-password-text">
+                <a style="color:red" href="#">Şifremi Unuttum</a>
+            </p>
+        </div>
 
-<PageTitle>Home</PageTitle>
+        <Button Type="@ButtonType.Primary"
+                Style="background-color: #515def;
+                           color: #fff;
+                           margin-top: 10px;
+                           font-size: 9px;
+                           font-weight: bold " Block>
+            Giriş Yap
+        </Button>
+        <Button Type="@ButtonType.Primary"
+                Style="background-color: #515def;
+                           color: #fff;
+                           margin-top: 10px;
+                           font-size: 9px;
+                           font-weight: bold " Block>
+            Kayıt Ol
+        </Button>
 
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
+    </div>
+    <div class="image">
+        <Image width={200}
+               src="/W-Home-Hand.png"
+               alt="Travelwise Logo"
+               Preview="false"/>
+    </div>
+</div>
