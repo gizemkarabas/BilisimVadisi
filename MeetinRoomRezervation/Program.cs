@@ -53,7 +53,7 @@ builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddAuthenticationCore();
-
+builder.Services.AddScoped<SeedDataService>();
 builder.Services.AddCascadingAuthenticationState();
 
 //builder.Services.AddAuthentication(options =>
@@ -91,5 +91,11 @@ app.UseAntiforgery();
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
 	.AddInteractiveServerRenderMode();
+
+using (var scope = app.Services.CreateScope())
+{
+    var seedService = scope.ServiceProvider.GetRequiredService<SeedDataService>();
+    await seedService.SeedAdminUserAsync();
+}
 
 await app.RunAsync();

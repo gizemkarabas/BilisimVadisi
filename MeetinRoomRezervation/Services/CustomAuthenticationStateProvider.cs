@@ -17,7 +17,19 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider
 		NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(_user)));
 	}
 
-	public void MarkUserAsLoggedOut()
+    public void MarkUserAsAuthenticated(string email, string role)
+    {
+        var identity = new ClaimsIdentity(new[]
+        {
+        new Claim(ClaimTypes.Name, email),
+        new Claim(ClaimTypes.Role, role)
+    }, "CustomAuth");
+
+        _user = new ClaimsPrincipal(identity);
+        NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(_user)));
+    }
+
+    public void MarkUserAsLoggedOut()
 	{
 		_user = new ClaimsPrincipal(new ClaimsIdentity());
 		NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(_user)));
