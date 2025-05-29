@@ -101,9 +101,9 @@ namespace MeetinRoomRezervation.Services
 					throw new InvalidOperationException("Bu email adresi zaten kullanılıyor.");
 				}
 
-				var hash = HashPassword(model.Password);
+                var hash = BCrypt.Net.BCrypt.HashPassword(model.Password);
 
-				var user = new User
+                var user = new User
 				{
 					Id = Guid.NewGuid().ToString(),
 					Email = model.Email,

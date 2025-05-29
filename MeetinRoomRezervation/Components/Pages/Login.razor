@@ -19,21 +19,21 @@
             <FormItem Label="E-posta">
                 <Input @bind-Value="@LoginModel.Email" Placeholder="E-posta Adresinizi Giriniz" />
             </FormItem>
-            
+
             <FormItem Label="Şifre">
                 <InputPassword @bind-Value="@LoginModel.Password" Placeholder="Şifrenizi Giriniz" />
             </FormItem>
-            
+
             <FormItem>
                 <Button Type="@ButtonType.Primary" HtmlType="submit" Block>
                     Giriş Yap
                 </Button>
             </FormItem>
-            
+
             <Divider>
                 <span>Hesabınız yok mu?</span>
             </Divider>
-            
+
             <Button Type="@ButtonType.Link" OnClick="@(() => Navigation.NavigateTo("/register"))" Block>
                 Kayıt Ol
             </Button>
@@ -54,15 +54,18 @@
         try
         {
             var user = await AuthService.LoginAsync(LoginModel);
-
             if (user != null)
             {
-                await JSRuntime.InvokeVoidAsync("localStorage.setItem", "userId", user.Id);
-                await JSRuntime.InvokeVoidAsync("localStorage.setItem", "userRole", user.Role.ToString());
+                
+                if (AuthProvider is CustomAuthenticationStateProvider customProvider)
+                {
+                    customProvider.MarkUserAsAuthenticated(user.Email, user.Role.ToString());
+                }
 
                 if (user.Role == UserRole.Admin)
                 {
-                    Navigation.NavigateTo("/admin/dashboard");
+                    
+                    Navigation.NavigateTo("/admin/halls");
                 }
                 else
                 {
