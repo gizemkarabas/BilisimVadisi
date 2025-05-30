@@ -8,20 +8,7 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Security.Claims
 @inject NavigationManager Navigation
-<div style="background: #f0f0f0; padding: 10px; margin: 10px 0;">
-	<h4>Debug Bilgisi:</h4>
-	@*<p>Kullanıcı Authenticated: @isAuthenticated</p>
-	<p>Kullanıcı Adı: @userName</p>*@
-	<p>Tüm Claim'ler:</p>
-	<p>@isAdmin</p>
-	<ul>
-		@*@foreach (var claim in allClaims)
-		{
-			<li><strong>@claim.Type:</strong> @claim.Value</li>
-		}*@
-	</ul>
-	<p>Admin mi: @isAdmin</p>
-</div>
+
 <AuthorizeView Roles="Admin" Context="authContext">
 	<Authorized Context="authContext">
 		<PageHeader Title="Toplantı Salonu Yönetimi" />
@@ -112,10 +99,6 @@
 		</Card>
 	</Authorized>
 	<NotAuthorized>
-
-		@{
-			var currentUserRole = GetUserRole(authContext.User);
-		}
 		<div style="padding: 24px; max-width: 600px; margin: 0 auto;">
 			<Alert Type="@AlertType.Warning"
 			Message="Yetkisiz Erişim"
@@ -151,10 +134,6 @@
 	private bool IsEditModalVisible = false;
 	private MeetingRoomDto NewRoom = new();
 	private MeetingRoomDto EditingRoom = new();
-
-	//private bool isAuthenticated = false;
-	//Æprivate string userName = "";
-	//private List<Claim> allClaims = new();
 	private bool isAdmin = false;
 
 	protected override async Task OnInitializedAsync()
@@ -162,15 +141,7 @@
 		var authState = await AuthProvider.GetAuthenticationStateAsync();	
 		var user = authState.User;
 		var isAdmin = user.IsInRole("Admin");
-	
-
-	
-		/*var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-		isAuthenticated = authState.User.Identity.IsAuthenticated;
-		userName = authState.User.Identity.Name ?? "";
-		allClaims = authState.User.Claims.ToList(); // Tüm claim'leri görmek için
-		isAdmin = authState.User.IsInRole("Admin");
-		*/
+		
 		await LoadRoomData();
 	}
 

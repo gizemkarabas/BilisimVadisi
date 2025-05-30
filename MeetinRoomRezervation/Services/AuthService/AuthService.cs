@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using MongoDB.Driver;
 using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 using static MeetinRoomRezervation.Components.Pages.Login;
 using static MeetinRoomRezervation.Components.Pages.Register;
 
@@ -24,67 +22,57 @@ namespace MeetinRoomRezervation.Services
 			_httpContextAccessor = httpContextAccessor;
 			_logger = logger;
 		}
-
 		public async Task<User> LoginAsync(LoginInputModel model)
 		{
 			_logger.LogInformation("Login attempt for email: {Email}", model.Email);
 
-			try
+			var user = await _context.Users.Find(u => u.Email == model.Email).FirstOrDefaultAsync();
+			if (user != null && BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash))
 			{
-				var user = await _context.Users.Find(u => u.Email == model.Email).FirstOrDefaultAsync();
-
-				if (user != null && BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash))
-				{
-					_logger.LogInformation("Successful login for user: {Email}, Role: {Role}", user.Email, user.Role);
-
-					var claims = new List<Claim>
-				{
-					new Claim(ClaimTypes.Name, user.Email),
-					new Claim(ClaimTypes.NameIdentifier, user.Id),
-					new Claim(ClaimTypes.Role, user.Role.ToString()),
-					new Claim("Company", user.Company ?? ""),
-					new Claim("CompanyOfficial", user.CompanyOfficial ?? "")
-				};
-
-					var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-					var authProperties = new AuthenticationProperties
+				var claims = new List<Claim>
 					{
-						IsPersistent = true,
-						ExpiresUtc = DateTimeOffset.UtcNow.AddDays(7)
+						new Claim(ClaimTypes.Name, user.Email),
+						new Claim(ClaimTypes.NameIdentifier, user.Id),
+						new Claim(ClaimTypes.Role, user.Role.ToString()),
+						new Claim("Company", user.Company ?? ""),
+						new Claim("CompanyOfficial", user.CompanyOfficial ?? ""),
+						new Claim("FirstName", user.FirstName ?? ""),
+						new Claim("LastName", user.LastName ?? "")
 					};
 
+				var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+				var authProperties = new AuthenticationProperties
+				{
+					IsPersistent = true,
+					ExpiresUtc = DateTimeOffset.UtcNow.AddDays(7)
+				};
+				if (_httpContextAccessor.HttpContext != null && _httpContextAccessor.HttpContext.Response != null && !_httpContextAccessor.HttpContext.Response.HasStarted)
+				{
 					try
 					{
-						if (_httpContextAccessor.HttpContext != null &&
-							_httpContextAccessor.HttpContext.Response != null &&
-							!_httpContextAccessor.HttpContext.Response.HasStarted)
-						{
-							await _httpContextAccessor.HttpContext.SignInAsync(
-								CookieAuthenticationDefaults.AuthenticationScheme,
-								new ClaimsPrincipal(claimsIdentity),
-								authProperties);
-						}
+						await _httpContextAccessor.HttpContext.SignInAsync(
+							CookieAuthenticationDefaults.AuthenticationScheme,
+							new ClaimsPrincipal(claimsIdentity),
+							authProperties);
+
+						Console.WriteLine($"Cookie başarıyla kaydedildi: {user.Email}");
 					}
 					catch (InvalidOperationException ex)
 					{
-						_logger.LogWarning("Could not set authentication cookie: {Error}", ex.Message);
+						Console.WriteLine($"Cookie kaydetme hatası: {ex.Message}");
 					}
-
-					return user;
 				}
 				else
 				{
-					_logger.LogWarning("Failed login attempt for email: {Email}", model.Email);
+					Console.WriteLine("Response zaten başlamış, cookie kaydedilemedi");
 				}
+
+				return user;
 			}
-			catch (Exception ex)
-			{
-				_logger.LogError(ex, "Error during login for email: {Email}", model.Email);
-			}
+
 
 			return null;
 		}
-
 		public async Task<User> RegisterAsync(RegisterInputModel model)
 		{
 			_logger.LogInformation("Registration attempt for email: {Email}", model.Email);
@@ -101,9 +89,9 @@ namespace MeetinRoomRezervation.Services
 					throw new InvalidOperationException("Bu email adresi zaten kullanılıyor.");
 				}
 
-                var hash = BCrypt.Net.BCrypt.HashPassword(model.Password);
+				var hash = BCrypt.Net.BCrypt.HashPassword(model.Password);
 
-                var user = new User
+				var user = new User
 				{
 					Id = Guid.NewGuid().ToString(),
 					Email = model.Email,
@@ -122,7 +110,6 @@ namespace MeetinRoomRezervation.Services
 				throw;
 			}
 		}
-
 		public async Task LogoutAsync()
 		{
 			var userEmail = _httpContextAccessor.HttpContext?.User?.Identity?.Name;
@@ -143,8 +130,6 @@ namespace MeetinRoomRezervation.Services
 				_logger.LogWarning("Could not complete logout: {Error}", ex.Message);
 			}
 		}
-
-
 		public async Task SignInUserAsync(User user)
 		{
 			var claims = new List<Claim>
@@ -180,21 +165,11 @@ namespace MeetinRoomRezervation.Services
 				// Response zaten başlamışsa, yok say
 			}
 		}
-
-		private string HashPassword(string password)
-		{
-			using var sha256 = SHA256.Create();
-			var bytes = Encoding.UTF8.GetBytes(password);
-			var hash = sha256.ComputeHash(bytes);
-			return Convert.ToBase64String(hash);
-		}
-
 		public async Task<bool> IsEmailTaken(string email)
 		{
 			var existing = await _context.Users.Find(u => u.Email == email).FirstOrDefaultAsync();
 			return existing != null;
 		}
-
 		public async Task<bool> IsAdminAsync(string userId)
 		{
 			var user = await _context.Users
@@ -203,7 +178,6 @@ namespace MeetinRoomRezervation.Services
 
 			return user?.Role == UserRole.Admin;
 		}
-
 		public async Task<UserRole> GetUserRoleAsync(string userId)
 		{
 			var user = await _context.Users
@@ -212,7 +186,20 @@ namespace MeetinRoomRezervation.Services
 
 			return user?.Role ?? UserRole.User;
 		}
+		public async Task<User> GetCurrentUserAsync()
+		{
+			var httpContext = _httpContextAccessor.HttpContext;
+			var userEmail = httpContext.User.FindFirst(ClaimTypes.Name)?.Value;
+			if (!string.IsNullOrEmpty(userEmail))
+			{
+				var user = await _context.Users
+					.Find(u => u.Email == userEmail)
+					.FirstOrDefaultAsync();
+				return user;
+			}
 
+			return null;
+		}
 
 	}
 

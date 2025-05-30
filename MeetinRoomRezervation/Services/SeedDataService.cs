@@ -22,10 +22,11 @@ namespace MeetinRoomRezervation.Services
 			{
 				var admin = new User
 				{
-					Id=Guid.NewGuid().ToString(),
+					Id = Guid.NewGuid().ToString(),
 					Email = "admin@example.com",
 					PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123"),
 					Company = "Sistem Yönetimi",
+					FirstName = "Gizem",
 					CompanyOfficial = "Admin",
 					ContactPhone = "0000000000",
 					Role = UserRole.Admin,

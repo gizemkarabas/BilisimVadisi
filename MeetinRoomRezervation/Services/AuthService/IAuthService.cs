@@ -11,6 +11,7 @@ namespace MeetinRoomRezervation.Services
 		Task LogoutAsync();
 		Task<bool> IsEmailTaken(string email);
 		Task<UserRole> GetUserRoleAsync(string userId);
+		Task<User> GetCurrentUserAsync();
 	}
 
 }

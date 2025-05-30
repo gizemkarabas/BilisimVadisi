@@ -1,49 +1,57 @@
 ﻿@inherits LayoutComponentBase
 @inject AuthenticationStateProvider AuthProvider
 @inject NavigationManager Navigation
+@inject IAuthService AuthService
 @using Microsoft.AspNetCore.Components.Authorization
-@inject AuthenticationStateProvider AuthProvider
+@using MeetinRoomRezervation.Services
+@using MeetinRoomRezervation.Data
+@using System.Security.Claims
 
-
-
-<AntDesign.AntContainer/>
+<AntDesign.AntContainer />
 
 <Layout Style="min-height: 100vh; background-color: white;">
     <Header Style="background: #0095ff; padding: 0 24px; display: flex; align-items: center; justify-content: space-between;">
         <div class="logo" style="font-size: 18px; font-weight: bold; color: white;">
-            <Icon Type="home" Theme="IconThemeType.Outline"/>
+            <Icon Type="home" Theme="IconThemeType.Outline" />
             Toplantı Odası Rezervasyon
         </div>
         <Menu Mode="MenuMode.Horizontal" style="background-color: unset;">
             <MenuItem Key="1" RouterLink="/" RouterMatch="NavLinkMatch.All" style="color: white!important;">
                 <div class="panel-transparent">
-                    <Icon Type="home" Theme="IconThemeType.Outline"/>
+                    <Icon Type="home" Theme="IconThemeType.Outline" />
                     Ana Sayfa
                 </div>
             </MenuItem>
-            <MenuItem Key="2" RouterLink="/register">
-                <div class="panel-transparent">
-                    <Icon Type="user-add" Theme="IconThemeType.Outline"/>
-                    Kayıt Ol
-                </div>
-            </MenuItem>
-            <MenuItem Key="3" RouterLink="/login">
-                <div class="panel-transparent">
-                    <Icon Type="login" Theme="IconThemeType.Outline"/>
-                    Giriş Yap
-                </div>
-            </MenuItem>
+
             <AuthorizeView>
+                <NotAuthorized>
+                    <MenuItem Key="2" RouterLink="/register">
+                        <div class="panel-transparent">
+                            <Icon Type="user-add" Theme="IconThemeType.Outline" />
+                            Kayıt Ol
+                        </div>
+                    </MenuItem>
+                    <MenuItem Key="3" RouterLink="/login">
+                        <div class="panel-transparent">
+                            <Icon Type="login" Theme="IconThemeType.Outline" />
+                            Giriş Yap
+                        </div>
+                    </MenuItem>
+                </NotAuthorized>
+
                 <Authorized>
-                    <div class="panel-transparent">
-                        <Icon Type="login" Theme="IconThemeType.Outline" OnClick="Logout"/>
-                        Çıkış Yap
-                    </div>
-                </Authorized>
-            </AuthorizeView>
-            <AuthorizeView>
-                <Authorized>
-                    <p>Hoş geldin, @userEmail</p>
+                    <MenuItem Key="4">
+                        <div class="panel-transparent" style="cursor: pointer; color: white;" @onclick="HandleLogout">
+                            <Icon Type="logout" Theme="IconThemeType.Outline" />
+                            Çıkış Yap
+                        </div>
+                    </MenuItem>
+                    <MenuItem Key="5">
+                        <div class="panel-transparent" style="color: white;">
+                            <Icon Type="user" Theme="IconThemeType.Outline" />
+                            Hoş geldin, @GetUserDisplayName(context.User)
+                        </div>
+                    </MenuItem>
                 </Authorized>
             </AuthorizeView>
         </Menu>
@@ -58,29 +66,62 @@
     </Footer>
 </Layout>
 
-
 @code {
+    private User currentUser = null;
+    private bool isAuthenticated = false;
 
-    private void Logout()
-    {
-        if (AuthProvider is CustomAuthenticationStateProvider customAuth)
+    @code {
+        protected override async Task OnInitializedAsync()
         {
-            customAuth.MarkUserAsLoggedOut();
-            Navigation.NavigateTo("/login", forceLoad: true);
+            var authState = await AuthProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            // Debug bilgileri
+            Console.WriteLine($"IsAuthenticated: {user.Identity?.IsAuthenticated}");
+            Console.WriteLine($"Name: {user.Identity?.Name}");
+            Console.WriteLine($"Claims Count: {user.Claims.Count()}");
+
+            foreach (var claim in user.Claims)
+            {
+                Console.WriteLine($"Claim - {claim.Type}: {claim.Value}");
+            }
         }
     }
 
-    private string userEmail = string.Empty;
 
-    protected override async Task OnInitializedAsync()
+    private string GetUserDisplayName(ClaimsPrincipal user)
     {
-        var authState = await AuthProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-
-        if (user.Identity?.IsAuthenticated == true)
+        // Önce FirstName claim'ini kontrol et
+        var firstName = user.FindFirst("FirstName")?.Value;
+        if (!string.IsNullOrEmpty(firstName))
         {
-            userEmail = user.Identity.Name!;
+            var lastName = user.FindFirst("LastName")?.Value;
+            return !string.IsNullOrEmpty(lastName) ? $"{firstName} {lastName}" : firstName;
         }
+
+        // FirstName yoksa CompanyOfficial'ı kontrol et
+        var companyOfficial = user.FindFirst("CompanyOfficial")?.Value;
+        if (!string.IsNullOrEmpty(companyOfficial))
+        {
+            return companyOfficial;
+        }
+
+        // Hiçbiri yoksa email'i göster
+        var email = user.FindFirst(ClaimTypes.Name)?.Value;
+        return email ?? "Kullanıcı";
     }
 
+    private async Task HandleLogout()
+    {
+        try
+        {
+            await AuthService.LogoutAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Logout error: {ex.Message}");
+        }
+
+        Navigation.NavigateTo("/login", forceLoad: true);
+    }
 }

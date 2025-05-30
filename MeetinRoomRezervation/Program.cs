@@ -4,6 +4,7 @@ using MeetinRoomRezervation.Data;
 using MeetinRoomRezervation.Models;
 using MeetinRoomRezervation.Services;
 using MeetinRoomRezervation.Services.ReservationService;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components.Authorization;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
@@ -19,12 +20,19 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddAuthentication()
-	.AddCookie(options =>
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+	.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
 	{
 		options.LoginPath = "/login";
 		options.LogoutPath = "/logout";
+		options.AccessDeniedPath = "/login";
+		options.ExpireTimeSpan = TimeSpan.FromDays(7);
+		options.SlidingExpiration = true;
+		options.Cookie.HttpOnly = true;
+		options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+		options.Cookie.SameSite = SameSiteMode.Lax;
 	});
+
 builder.Services.AddAuthorization();
 builder.Services.AddScoped<IReservationService, ReservationService>();
 builder.Services.AddScoped<IRoomService, RoomService>();
@@ -55,13 +63,6 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddAuthenticationCore();
 builder.Services.AddScoped<SeedDataService>();
 builder.Services.AddCascadingAuthenticationState();
-
-//builder.Services.AddAuthentication(options =>
-//{
-//	options.DefaultScheme = IdentityConstants.ApplicationScheme;
-//	options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
-//})
-//.AddCookie();
 
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())
@@ -94,8 +95,8 @@ app.MapRazorComponents<App>()
 
 using (var scope = app.Services.CreateScope())
 {
-    var seedService = scope.ServiceProvider.GetRequiredService<SeedDataService>();
-    await seedService.SeedAdminUserAsync();
+	var seedService = scope.ServiceProvider.GetRequiredService<SeedDataService>();
+	await seedService.SeedAdminUserAsync();
 }
 
 await app.RunAsync();
