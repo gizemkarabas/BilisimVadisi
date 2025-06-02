@@ -119,6 +119,14 @@ namespace MeetinRoomRezervation.Services
 				var baseUrl = _configuration["BaseUrl"];
 				var enableSslStr = _configuration["Email:EnableSsl"];
 
+				// Null kontrolleri
+				if (string.IsNullOrEmpty(smtpHost) || string.IsNullOrEmpty(smtpPortStr) ||
+					string.IsNullOrEmpty(smtpUsername) || string.IsNullOrEmpty(smtpPassword) ||
+					string.IsNullOrEmpty(fromEmail) || string.IsNullOrEmpty(baseUrl))
+				{
+					throw new InvalidOperationException("Email configuration is incomplete");
+				}
+
 				if (!int.TryParse(smtpPortStr, out int smtpPort))
 				{
 					throw new InvalidOperationException("Invalid SMTP port configuration");
@@ -194,6 +202,7 @@ namespace MeetinRoomRezervation.Services
 				throw;
 			}
 		}
+
 
 	}
 }
