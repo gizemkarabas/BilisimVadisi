@@ -9,7 +9,10 @@
 
 <div class="container" style="max-width: 70vw; margin: 0 auto; padding: 24px; margin-top:60px;">
 	<div class="container-items">
-		<Card Title="Giriş Yap" Style="width: 100%;font-size: 25px; text-align: center;">
+		<Card>
+
+			<div class="head-title">Giriş Yap</div>
+
 			@if (!string.IsNullOrEmpty(ErrorMessage))
 			{
 				<Alert Message="@ErrorMessage" Type="@AlertType.Error" ShowIcon="true" />
@@ -27,10 +30,16 @@
 					</Button>
 				</FormItem>
 
-				
+
 
 				<FormItem>
-					<Button Type="@ButtonType.Primary" HtmlType="submit" Block>
+					<Button Type="@ButtonType.Primary"
+							HtmlType="submit"
+							Style="background-color: #515def;
+                           color: #fff;
+                           margin-top: 10px;
+                           font-size: 10px;
+                           font-weight: bold " Block>
 						Giriş Yap
 					</Button>
 				</FormItem>
@@ -39,7 +48,9 @@
 					<span>Hesabınız yok mu?</span>
 				</Divider>
 
-				<Button Type="@ButtonType.Link" OnClick="@(() => Navigation.NavigateTo("/register"))" Block>
+				<Button Type="@ButtonType.Link"
+						Style="color: #515def;"
+						OnClick="@(() => Navigation.NavigateTo(" /register"))" Block>
 					Kayıt Ol
 				</Button>
 
