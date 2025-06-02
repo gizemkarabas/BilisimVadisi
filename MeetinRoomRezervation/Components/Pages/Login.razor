@@ -7,95 +7,106 @@
 @inject AuthenticationStateProvider AuthProvider
 @inject IJSRuntime JSRuntime
 
-<div class="login-container" style="max-width: 400px; margin: 0 auto; padding: 24px;">
-    <Card Title="Giriş Yap" Style="width: 100%;">
-        @if (!string.IsNullOrEmpty(ErrorMessage))
-        {
-            <Alert Message="@ErrorMessage" Type="@AlertType.Error" ShowIcon="true" />
-        }
+<div class="container" style="max-width: 70vw; margin: 0 auto; padding: 24px; margin-top:60px;">
+	<div class="container-items">
+		<Card Title="Giriş Yap" Style="width: 100%;font-size: 25px; text-align: center;">
+			@if (!string.IsNullOrEmpty(ErrorMessage))
+			{
+				<Alert Message="@ErrorMessage" Type="@AlertType.Error" ShowIcon="true" />
+			}
 
-        <Form Model="@LoginModel" OnFinish="HandleLogin" Layout="@FormLayout.Vertical">
-            <FormItem Label="E-posta">
-                <Input @bind-Value="@LoginModel.Email" Placeholder="E-posta Adresinizi Giriniz" />
-            </FormItem>
+			<Form Model="@LoginModel" OnFinish="HandleLogin" Layout="@FormLayout.Vertical">
+				<FormItem Label="E-posta">
+					<Input @bind-Value="@LoginModel.Email" Placeholder="E-posta Adresinizi Giriniz" />
+				</FormItem>
 
-            <FormItem Label="Şifre">
-                <InputPassword @bind-Value="@LoginModel.Password" Placeholder="Şifrenizi Giriniz" />
-            </FormItem>
+				<FormItem Label="Şifre">
+					<InputPassword @bind-Value="@LoginModel.Password" Placeholder="Şifrenizi Giriniz" />
+					<Button Type="@ButtonType.Link" Style="display: flex; justify-content: flex-end; color:crimson; font-size:12px" OnClick="@(() => Navigation.NavigateTo("/forgot-password"))" Block>
+						Şifremi Unuttum
+					</Button>
+				</FormItem>
 
-            <FormItem>
-                <Button Type="@ButtonType.Primary" HtmlType="submit" Block>
-                    Giriş Yap
-                </Button>
-            </FormItem>
+				
 
-            <Divider>
-                <span>Hesabınız yok mu?</span>
-            </Divider>
-            <FormItem>
-                <Button Type="@ButtonType.Link" OnClick="@(() => Navigation.NavigateTo("/forgot-password"))" Block>
-                    Şifremi Unuttum
-                </Button>
-            </FormItem>
-            <Button Type="@ButtonType.Link" OnClick="@(() => Navigation.NavigateTo("/register"))" Block>
-                Kayıt Ol
-            </Button>
-        </Form>
-    </Card>
+				<FormItem>
+					<Button Type="@ButtonType.Primary" HtmlType="submit" Block>
+						Giriş Yap
+					</Button>
+				</FormItem>
+
+				<Divider>
+					<span>Hesabınız yok mu?</span>
+				</Divider>
+
+				<Button Type="@ButtonType.Link" OnClick="@(() => Navigation.NavigateTo("/register"))" Block>
+					Kayıt Ol
+				</Button>
+
+			</Form>
+
+		</Card>
+	</div>
+	<div class="image">
+		<Image width={200}
+			   src="/W-Home-Hand.png"
+			   alt="Travelwise Logo"
+			   Preview="false" />
+	</div>
 </div>
 
 @code {
-    private LoginInputModel LoginModel = new();
-    private bool IsLoading = false;
-    private string ErrorMessage = "";
+	private LoginInputModel LoginModel = new();
+	private bool IsLoading = false;
+	private string ErrorMessage = "";
 
-   
-    private async Task HandleLogin()
-    {
-        IsLoading = true;
-        ErrorMessage = "";
 
-        try
-        {
-            var user = await AuthService.LoginAsync(LoginModel);
-            if (user != null)
-            {
+	private async Task HandleLogin()
+	{
+		IsLoading = true;
+		ErrorMessage = "";
 
-                if (AuthProvider is CustomAuthenticationStateProvider customProvider)
-                {
-                    customProvider.MarkUserAsAuthenticated(user.Email, user.Role.ToString());
-                }
+		try
+		{
+			var user = await AuthService.LoginAsync(LoginModel);
+			if (user != null)
+			{
 
-                if (user.Role == UserRole.Admin)
-                {
+				if (AuthProvider is CustomAuthenticationStateProvider customProvider)
+				{
+					customProvider.MarkUserAsAuthenticated(user.Email, user.Role.ToString());
+				}
 
-                    Navigation.NavigateTo("/admin/halls");
-                }
-                else
-                {
-                    Navigation.NavigateTo("/user/roomStatus");
-                }
-            }
-            else
-            {
-                ErrorMessage = "Email veya şifre hatalı.";
-            }
-        }
-        catch (Exception ex)
-        {
-            ErrorMessage = "Giriş yapılırken bir hata oluştu.";
-        }
-        finally
-        {
-            IsLoading = false;
-        }
-    
-    }
+				if (user.Role == UserRole.Admin)
+				{
 
-    public class LoginInputModel
-    {
-        public string Email { get; set; }
+					Navigation.NavigateTo("/admin/halls");
+				}
+				else
+				{
+					Navigation.NavigateTo("/user/roomStatus");
+				}
+			}
+			else
+			{
+				ErrorMessage = "Email veya şifre hatalı.";
+			}
+		}
+		catch (Exception ex)
+		{
+			ErrorMessage = "Giriş yapılırken bir hata oluştu.";
+		}
+		finally
+		{
+			IsLoading = false;
+		}
 
-        public string Password { get; set; }
-    }
+	}
+
+	public class LoginInputModel
+	{
+		public string Email { get; set; }
+
+		public string Password { get; set; }
+	}
 }
