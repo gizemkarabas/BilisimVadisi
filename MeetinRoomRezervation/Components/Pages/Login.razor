@@ -1,11 +1,11 @@
 ﻿@page "/login"
-@using Blazored.FluentValidation
 @using MeetinRoomRezervation.Data
 @using MeetinRoomRezervation.Services
 @inject IAuthService AuthService
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthProvider
 @inject IJSRuntime JSRuntime
+@using AntDesign
 
 <div class="login-container" style="max-width: 400px; margin: 0 auto; padding: 24px;">
     <Card Title="Giriş Yap" Style="width: 100%;">
@@ -15,7 +15,6 @@
         }
 
         <Form Model="@LoginModel" OnFinish="HandleLogin" Layout="@FormLayout.Vertical">
-            <FluentValidationValidator />
             <FormItem Label="E-posta">
                 <Input @bind-Value="@LoginModel.Email" Placeholder="E-posta Adresinizi Giriniz" />
             </FormItem>
@@ -27,6 +26,12 @@
             <FormItem>
                 <Button Type="@ButtonType.Primary" HtmlType="submit" Block>
                     Giriş Yap
+                </Button>
+            </FormItem>
+
+            <FormItem>
+                <Button Type="@ButtonType.Link" OnClick="@(() => Navigation.NavigateTo("/forgot-password"))" Block>
+                    Şifremi Unuttum
                 </Button>
             </FormItem>
 
@@ -48,50 +53,41 @@
 
     private async Task HandleLogin()
     {
-        IsLoading = true;
-        ErrorMessage = "";
+        if (string.IsNullOrWhiteSpace(LoginModel.Email) || string.IsNullOrWhiteSpace(LoginModel.Password))
+        {
+            ErrorMessage = "E-posta ve şifre alanları zorunludur.";
+            return;
+        }
 
         try
         {
-            var user = await AuthService.LoginAsync(LoginModel);
-            if (user != null)
+            var result = await AuthService.LoginAsync(LoginModel);
+
+            if (result != null)
             {
-                
-                if (AuthProvider is CustomAuthenticationStateProvider customProvider)
+                if (AuthProvider is CustomAuthenticationStateProvider customAuth)
                 {
-                    customProvider.MarkUserAsAuthenticated(user.Email, user.Role.ToString());
+                    customAuth.MarkUserAsAuthenticated(LoginModel.Email);
                 }
 
-                if (user.Role == UserRole.Admin)
-                {
-                    
-                    Navigation.NavigateTo("/admin/dashboard");
-                }
-                else
-                {
-                    Navigation.NavigateTo("/user/roomStatus");
-                }
+                Navigation.NavigateTo("/user/roomStatus");
             }
             else
             {
-                ErrorMessage = "Email veya şifre hatalı.";
+                ErrorMessage = "Geçersiz e-posta veya şifre.";
             }
         }
         catch (Exception ex)
         {
-            ErrorMessage = "Giriş yapılırken bir hata oluştu.";
-        }
-        finally
-        {
-            IsLoading = false;
+            ErrorMessage = "Bir hata oluştu. Lütfen tekrar deneyiniz.";
+            Console.Error.WriteLine($"Login error: {ex.Message}");
         }
     }
 
-
     public class LoginInputModel
     {
-        public string Email { get; set; } 
-        
-        public string Password { get; set; } 
+        public string Email { get; set; }
+
+        public string Password { get; set; }
     }
 }

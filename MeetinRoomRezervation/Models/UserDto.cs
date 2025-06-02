@@ -37,7 +37,8 @@ namespace MeetinRoomRezervation.Models
 
 		[BsonElement("isActive")]
 		public bool IsActive { get; set; } = true;
-
+		public string? ResetToken { get; set; }
+		public DateTime? ResetTokenExpiry { get; set; }
 
 	}
 

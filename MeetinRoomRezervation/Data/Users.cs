@@ -13,10 +13,11 @@
 		public int MonthlyUsageLimit { get; set; }
 		public int UsedThisMonth { get; set; } = 0;
 		public UserRole Role { get; set; } = UserRole.User;
-
 		public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
 		public bool IsActive { get; set; } = true;
+		public string? ResetToken { get; set; }
+		public DateTime? ResetTokenExpiry { get; set; }
+
 	}
 
 }

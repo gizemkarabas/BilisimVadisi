@@ -36,6 +36,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddAuthorization();
 builder.Services.AddScoped<IReservationService, ReservationService>();
 builder.Services.AddScoped<IRoomService, RoomService>();
+builder.Services.AddScoped<IPasswordResetService, PasswordResetService>();
 
 builder.Services.AddValidatorsFromAssemblyContaining<MeetingRoomValidator>();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
