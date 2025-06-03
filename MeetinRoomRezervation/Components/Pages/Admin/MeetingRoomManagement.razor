@@ -167,10 +167,11 @@
 	private List<string> GenerateAvailableSlots(List<ReservationDto> reservations)
 	{
 		var slots = new List<string>();
-		for (int hour = 9; hour < 18; hour++)
+		for (int hour = 0; hour < 24; hour++)
 		{
 			var start = new TimeSpan(hour, 0, 0);
 			var end = new TimeSpan(hour + 1, 0, 0);
+
 			bool isOccupied = reservations.Any(r =>
 				r.StartTime.TimeOfDay < end && r.EndTime.TimeOfDay > start);
 

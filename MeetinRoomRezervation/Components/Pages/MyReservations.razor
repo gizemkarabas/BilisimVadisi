@@ -2,117 +2,268 @@
 @using MeetinRoomRezervation.Models
 @using MeetinRoomRezervation.Services.ReservationService
 @using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Globalization
 @inject IReservationService ReservationService
 @inject AuthenticationStateProvider AuthProvider
+@inject NavigationManager Navigation
 
-<PageHeader Style="background-color: unset" Title="Rezervasyonlarım"/>
 
-<Tabs DefaultActiveKey="1">
-    <TabPane Key="1" Tab="Rezervasyonlarım">
-        @if (FutureReservations.Any())
+        <PageHeader Style="background-color: unset" Title="Rezervasyonlarım" />
+
+        @if (isLoading)
         {
-            <Row Gutter="1">
-                @foreach (var reservation in FutureReservations)
-                {
-                    <AntDesign.Col Span="5">
-                        <Card
-                            Title="@($"{reservation.StartTime.ToLocalTime().ToString("HH:mm")} - {reservation.EndTime.ToLocalTime().ToString("HH:mm")}")"
-                            Class="reservation-card"
-                            Style= "margin-bottom: 16px;
-                                    width: 300px;
-                                    padding: 1px;
-                                    border-radius: 6px;
-                                    background-color: #f0f0f0;
-                                    color: #333;
-                                    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);">
-                            <p>
-                                <Icon Type="calendar"/>
-                                Tarih: @reservation.StartTime.ToString("dd.MM.yyyy dddd")</p>
-                            <p>
-                                <Icon Type="home"/>
-                                Şirket: @reservation.RoomName</p>
-                            <p>
-                                <Icon Type="user"/>
-                                Yetkili: @reservation.UserEmail</p>
-                            <p>
-                                <Icon Type="phone"/>
-                                Telefon: ""
-                            </p>
-
-                            <Button Danger Type="ButtonType.Primary" OnClick="() => CancelReservation(reservation.Id)"
-                                    Style="margin-top:10px;justify-content: center;">
-                                Rezervasyonu İptal Et
-                            </Button>
-                        </Card>
-                    </AntDesign.Col>
-                }
-            </Row>
+            <div style="text-align: center; padding: 50px;">
+                <Spin Size="SpinSize.Large" />
+                <p>Yükleniyor...</p>
+            </div>
         }
         else
         {
-            <Alert Message="Henüz bir rezervasyonunuz bulunmamaktadır." Type="AlertType.Info" ShowIcon="true"/>
-        }
-    </TabPane>
+            <Tabs DefaultActiveKey="1">
+                <TabPane Key="1" Tab="Aktif Rezervasyonlarım">
+                    @if (FutureReservations.Any())
+                    {
+                        <Row Gutter="16">
+                            @foreach (var reservation in FutureReservations)
+                            {
+                                <AntDesign.Col Span="8">
+                                    <Card Title="@($"{reservation.StartTime.ToLocalTime().ToString("HH:mm")} - {reservation.EndTime.ToLocalTime().ToString("HH:mm")}")"
+                                          Class="reservation-card"
+                                          Style="margin-bottom: 16px;
+                                                border-radius: 6px;
+                                                background-color: #f0f0f0;
+                                                color: #333;
+                                                box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);">
+                                        <p>
+                                            <Icon Type="calendar" />
+                                    Tarih: @reservation.StartTime.ToString("dd.MM.yyyy dddd", turkishCulture)
+                                        </p>
+                                        <p>
+                                            <Icon Type="home" />
+                                            Oda: @(reservation.Room?.Name ?? reservation.RoomName ?? "Bilinmiyor")
+                                        </p>
+                                        <p>
+                                            <Icon Type="environment" />
+                                            Konum: @(reservation.Location ?? "")
+                                        </p>
+                                        <p>
+                                            <Icon Type="user" />
+                                            Yetkili: @(reservation.User?.Email ?? reservation.UserEmail ?? "")
+                                        </p>
+                                        <p>
+                                            <Icon Type="phone" />
+                                            Telefon: @(reservation.User?.ContactPhone ?? "")
+                                        </p>
 
-    <TabPane Key="2" Tab="Geçmiş Rezervasyonlarım">
-        @if (PastReservations.Any())
-        {
-            <Row Gutter="1">
-                @foreach (var reservation in PastReservations)
-                {
-                    <AntDesign.Col Span="5">
-                        <Card Title="@($"{reservation.StartTime:HH:mm} - {reservation.EndTime:HH:mm}")"
-                              Style= "margin-bottom: 16px;
-                                    width: 300px;
-                                    padding: 1px;
-                                    border-radius: 6px;
-                                    background-color: #f0f0f0;
-                                    color: #333;
-                                    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);">
-                            <p>
-                                <Icon Type="calendar"/>
-                                Tarih: @reservation.StartTime.ToString("dd.MM.yyyy dddd")</p>
-                            <p>
-                                <Icon Type="home"/>
-                                Şirket: @reservation.RoomName</p>
-                            <p>
-                                <Icon Type="user"/>
-                                Yetkili: @reservation.UserEmail</p>
-                            <p>
-                                <Icon Type="phone"/>
-                                Telefon:""
-                            </p>
-                        </Card>
-                    </AntDesign.Col>
-                }
-            </Row>
+                                        <Button Danger Type="ButtonType.Primary" OnClick="() => CancelReservation(reservation.Id)"
+                                                Style="margin-top:10px; width: 100%;" Loading="@isCancelling">
+                                            Rezervasyonu İptal Et
+                                        </Button>
+                                    </Card>
+                                </AntDesign.Col>
+                            }
+                        </Row>
+                    }
+                    else
+                    {
+                        <Alert Message="Henüz bir rezervasyonunuz bulunmamaktadır." Type="AlertType.Info" ShowIcon="true" />
+                    }
+                </TabPane>
+
+                <TabPane Key="2" Tab="Geçmiş Rezervasyonlarım">
+                    @if (PastReservations.Any())
+                    {
+                        <Row Gutter="16">
+                            @foreach (var reservation in PastReservations)
+                            {
+                                <AntDesign.Col Span="8">
+                                    <Card Title="@($"{reservation.StartTime.ToString("HH:mm")} - {reservation.EndTime.ToString("HH:mm")}")"
+                                          Style="margin-bottom: 16px;
+                                                  border-radius: 6px;
+                                                  background-color: #f9f9f9;
+                                                  color: #666;
+                                                  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.05);">
+                                        <p>
+                                            <Icon Type="calendar" />
+                                    Tarih: @reservation.StartTime.ToString("dd.MM.yyyy dddd", turkishCulture)
+                                        </p>
+                                        <p>
+                                            <Icon Type="home" />
+                                            Oda: @(reservation.Room?.Name ?? reservation.RoomName ?? "Bilinmiyor")
+                                        </p>
+                                        <p>
+                                            <Icon Type="environment" />
+                                            Konum: @(reservation.Location ?? "")
+                                        </p>
+                                        <p>
+                                            <Icon Type="user" />
+                                            Yetkili: @(reservation.User?.Email ?? reservation.UserEmail ?? "")
+                                        </p>
+                                        <p>
+                                            <Icon Type="phone" />
+                                            Telefon: @(reservation.User?.ContactPhone ?? "")
+                                        </p>
+
+                                        <Tag Color="TagColor.Default">Tamamlandı</Tag>
+                                    </Card>
+                                </AntDesign.Col>
+                            }
+                        </Row>
+                    }
+                    else
+                    {
+                        <Alert Message="Geçmiş bir rezervasyonunuz bulunmamaktadır." Type="AlertType.Info" ShowIcon="true" />
+                    }
+                </TabPane>
+            </Tabs>
         }
-        else
-        {
-            <Alert Message="Geçmiş bir rezervasyonunuz bulunmamaktadır." Type="AlertType.Info" ShowIcon="true"/>
-        }
-    </TabPane>
-</Tabs>
+   @*  </Authorized>
+
+    <NotAuthorized>
+        <div style="padding: 24px; max-width: 600px; margin: 0 auto; text-align: center;">
+            <Alert Type="@AlertType.Warning"
+                   Message="Giriş Gerekli"
+                   Description="Bu sayfayı görüntülemek için giriş yapmanız gerekiyor."
+                   ShowIcon="true"
+                   Style="margin-bottom: 16px;" />
+
+            <Space>
+                <SpaceItem>
+                    <Button Type="ButtonType.Primary" OnClick="@(() => Navigation.NavigateTo("/login"))" Icon="login">
+                        Giriş Yap
+                    </Button>
+                </SpaceItem>
+                <SpaceItem>
+                    <Button Type="ButtonType.Default" OnClick="@(() => Navigation.NavigateTo("/"))" Icon="home">
+                        Ana Sayfaya Dön
+                    </Button>
+                </SpaceItem>
+            </Space>
+        </div>
+    </NotAuthorized>
+</AuthorizeView> *@
 
 @code {
+    private static readonly CultureInfo turkishCulture = new CultureInfo("tr-TR");
+
     private List<ReservationDto> FutureReservations = new();
     private List<ReservationDto> PastReservations = new();
+    private bool isLoading = true;
+    private bool isCancelling = false;
 
     protected override async Task OnInitializedAsync()
     {
-        var authState = await AuthProvider.GetAuthenticationStateAsync();
-        var userId = authState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
-        var allReservations = await ReservationService.GetUserReservations(userId);
-        var now = DateTime.Now;
+        try
+        {
+            await LoadReservations();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading reservations: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
 
-        FutureReservations = allReservations.Where(r => r.EndTime > now).ToList();
-        PastReservations = allReservations.Where(r => r.EndTime <= now).ToList();
+    private async Task LoadReservations()
+    {
+        try
+        {
+            var authState = await AuthProvider.GetAuthenticationStateAsync();
+            if (!authState.User.Identity?.IsAuthenticated == true)
+            {
+                return;
+            }
+
+            var allReservations = await ReservationService.GetUserReservationsAsync();
+
+            // Şu anki zamanı UTC olarak al
+            var nowUtc = DateTime.UtcNow;
+
+            Console.WriteLine($"Current time (UTC): {nowUtc}");
+            Console.WriteLine($"Current time (Local): {nowUtc.ToLocalTime()}");
+            Console.WriteLine($"Total reservations found: {allReservations.Count}");
+
+            // Debug: Tüm rezervasyonları logla
+            foreach (var res in allReservations)
+            {
+                Console.WriteLine($"Reservation ID: {res.Id}");
+                Console.WriteLine($"  UTC: {res.StartTime} - {res.EndTime}");
+                Console.WriteLine($"  Local: {res.StartTime.ToLocalTime()} - {res.EndTime.ToLocalTime()}");
+                Console.WriteLine($"  End time > now? {res.EndTime > nowUtc}");
+                Console.WriteLine($"  Is future? {res.EndTime > nowUtc}");
+                Console.WriteLine($"  ---");
+            }
+
+            // UTC zamanlarla karşılaştır
+            FutureReservations = allReservations
+                .Where(r => r.EndTime > nowUtc)
+                .OrderBy(r => r.StartTime)
+                .ToList();
+
+            PastReservations = allReservations
+                .Where(r => r.EndTime <= nowUtc)
+                .OrderByDescending(r => r.StartTime)
+                .ToList();
+
+            Console.WriteLine($"Future reservations: {FutureReservations.Count}");
+            Console.WriteLine($"Past reservations: {PastReservations.Count}");
+
+            // Debug: Kategorilere ayrılan rezervasyonları logla
+            Console.WriteLine("FUTURE RESERVATIONS:");
+            foreach (var res in FutureReservations)
+            {
+                Console.WriteLine($"  {res.Id}: {res.StartTime.ToLocalTime()} - {res.EndTime.ToLocalTime()}");
+            }
+
+            Console.WriteLine("PAST RESERVATIONS:");
+            foreach (var res in PastReservations)
+            {
+                Console.WriteLine($"  {res.Id}: {res.StartTime.ToLocalTime()} - {res.EndTime.ToLocalTime()}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in LoadReservations: {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+        }
     }
 
     private async Task CancelReservation(string reservationId)
     {
-        await ReservationService.CancelReservationAsync(reservationId);
-        await OnInitializedAsync(); 
-    }
+        if (string.IsNullOrEmpty(reservationId))
+        {
+            return;
+        }
 
+        isCancelling = true;
+        StateHasChanged();
+
+        try
+        {
+            var success = await ReservationService.DeleteReservationAsync(reservationId);
+
+            if (success)
+            {
+                await LoadReservations();
+            }
+            else
+            {
+                Console.WriteLine("Failed to cancel reservation");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error cancelling reservation: {ex.Message}");
+        }
+        finally
+        {
+            isCancelling = false;
+            StateHasChanged();
+        }
+    }
 }

@@ -2,6 +2,7 @@
 @using MeetinRoomRezervation.Models
 @using MeetinRoomRezervation.Services.ReservationService
 @using AntDesign
+@using System.Globalization
 @inject ReservationDto ReservationState
 @inject IReservationService ReservationService
 @inject NavigationManager Navigation
@@ -31,7 +32,7 @@
                     <dd>@ReservationState.Room.Name</dd>
 
                         <dt>📅 Tarih</dt>
-                        <dd>@ReservationState.SelectedDate.ToString("dd.MM.yyyy dddd")</dd>
+                        <dd>@ReservationState.SelectedDate.ToString("dd.MM.yyyy dddd", turkishCulture)</dd>
                     </dl>
                 </Descriptions>
             </div>
@@ -55,54 +56,43 @@
 </div>
 
 @code {
+    private static readonly CultureInfo turkishCulture = new CultureInfo("tr-TR");
+
+    protected override async Task OnInitializedAsync()
+    {
+        Console.WriteLine($"ReservationSummary - SelectedSlots count: {ReservationState?.SelectedSlots?.Count ?? 0}");
+
+        if (ReservationState?.SelectedSlots != null)
+        {
+            foreach (var slot in ReservationState.SelectedSlots)
+            {
+                Console.WriteLine($"Summary slot: {slot.StartTime:HH:mm} - {slot.EndTime:HH:mm}");
+            }
+        }
+    }
 
     private async Task ConfirmReservation()
     {
         try
         {
-            if (ReservationState.SelectedSlots == null || !ReservationState.SelectedSlots.Any())
+            Console.WriteLine($"ConfirmReservation - SelectedSlots count: {ReservationState?.SelectedSlots?.Count ?? 0}");
+
+            if (ReservationState?.SelectedSlots == null || !ReservationState.SelectedSlots.Any())
             {
-                // Kullanıcıya bir hata mesajı gösterilebilir
+                Console.WriteLine("No slots to reserve!");
                 return;
             }
 
-            var authState = await AuthProvider.GetAuthenticationStateAsync();
-            var user = authState.User;
+            var result = await ReservationService.AddReservationAsync(ReservationState);
 
-            bool allReservationsSuccessful = true;
-
-            foreach (var slot in ReservationState.SelectedSlots)
+            if (!string.IsNullOrEmpty(result))
             {
-                var reservationDto = new ReservationDto
-                {
-                    User = ReservationState.User,
-                    Room = ReservationState.Room,
-                    StartTime = slot.StartTime,
-                    EndTime = slot.EndTime,
-                    Location = ReservationState.Location,
-                };
-
-                bool success = await ReservationService.AddReservationAsync(reservationDto);
-                if (!success)
-                {
-                    allReservationsSuccessful = false;
-                    // Burada kullanıcıya bir hata mesajı gösterilebilir
-                }
-            }
-
-            if (allReservationsSuccessful)
-            {
-                Navigation.NavigateTo("/user/myreservations", forceLoad: true);
-            }
-            else
-            {
-                // Bazı rezervasyonlar başarısız oldu, kullanıcıya bilgi ver
-                // Burada bir hata mesajı gösterilebilir
+                Navigation.NavigateTo("/user/myreservations");
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error in ConfirmReservation: {ex.Message}");
+            Console.WriteLine($"Error confirming reservation: {ex.Message}");
         }
     }
 

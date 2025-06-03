@@ -1,137 +1,144 @@
 ﻿using MeetinRoomRezervation.Data;
-using MeetinRoomRezervation.Services.ReservationService;
-using Microsoft.EntityFrameworkCore;
-using MongoDB.Bson;
+using MeetinRoomRezervation.Models;
+using Microsoft.AspNetCore.Components.Authorization;
 using MongoDB.Driver;
+using System.Security.Claims;
 
-namespace MeetinRoomRezervation.Models
+namespace MeetinRoomRezervation.Services.ReservationService
 {
 	public class ReservationService : IReservationService
 	{
 		private readonly MongoDbContext _context;
+		private readonly IHttpContextAccessor _httpContextAccessor;
+		private readonly AuthenticationStateProvider _authStateProvider;
 		private readonly ILogger<ReservationService> _logger;
 
-		public ReservationService(MongoDbContext context, ILogger<ReservationService> logger)
+		public ReservationService(
+			MongoDbContext context,
+			IHttpContextAccessor httpContextAccessor,
+			AuthenticationStateProvider authStateProvider,
+			ILogger<ReservationService> logger)
 		{
 			_context = context;
+			_httpContextAccessor = httpContextAccessor;
+			_authStateProvider = authStateProvider;
 			_logger = logger;
 		}
 
-		public async Task<bool> AddReservationAsync(ReservationDto reservationDto)
+		public async Task<string> AddReservationAsync(ReservationDto reservationDto)
 		{
-			_logger.LogInformation("Creating reservation for room {RoomId} by user {UserId} from {StartTime} to {EndTime}",
-				reservationDto.RoomId, reservationDto.UserId, reservationDto.StartTime, reservationDto.EndTime);
-
 			try
 			{
-				var existingReservationFilter = Builders<Reservation>.Filter.And(
-					Builders<Reservation>.Filter.Eq(r => r.RoomId, reservationDto.RoomId),
-					Builders<Reservation>.Filter.Eq(r => r.UserId, reservationDto.UserId),
-					Builders<Reservation>.Filter.Lt(r => r.StartTime, reservationDto.EndTime),
-					Builders<Reservation>.Filter.Gt(r => r.EndTime, reservationDto.StartTime)
-			);
+				_logger.LogInformation("AddReservationAsync called for RoomId: {RoomId}", reservationDto.RoomId);
+				_logger.LogInformation("Selected date: {Date}", reservationDto.SelectedDate);
+				_logger.LogInformation("Selected slots count: {Count}", reservationDto.SelectedSlots?.Count ?? 0);
 
-				var existingReservation = await _context.Reservations.Find(existingReservationFilter).FirstOrDefaultAsync();
-
-				if (existingReservation != null)
+				if (reservationDto.SelectedSlots == null || !reservationDto.SelectedSlots.Any())
 				{
-					return false;
+					throw new InvalidOperationException("Hiç slot seçilmemiş.");
 				}
 
-				var reservation = new Reservation
+				var currentUser = await GetCurrentUserAsync();
+				if (currentUser == null)
 				{
-					Id = ObjectId.GenerateNewId().ToString(),
-					RoomId = reservationDto.RoomId,
-					//Room = reservationDto.Room.Name,
-					StartTime = reservationDto.StartTime,
-					EndTime = reservationDto.EndTime
-				};
+					_logger.LogWarning("Current user not found");
+					throw new InvalidOperationException("Kullanıcı oturumu bulunamadı. Lütfen tekrar giriş yapın.");
+				}
 
-				await _context.Reservations.InsertOneAsync(reservation);
+				var reservationIds = new List<string>();
 
-				await UpdateRoomOccupancyRate(reservationDto.RoomId, reservationDto.StartTime.Date);
-
-				_logger.LogInformation("Reservation created successfully with ID: {ReservationId}", reservation.Id);
-				return true;
-
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine($"Error in AddReservationAsync: {ex.Message}");
-				_logger.LogError(ex, "Failed to create reservation for room {RoomId}", reservationDto.RoomId);
-				return false;
-			}
-		}
-		private async Task UpdateRoomOccupancyRate(string roomId, DateTime date)
-		{
-			try
-			{
-				// Gün başlangıcı ve sonu için DateTime nesneleri oluştur
-				var startOfDay = new DateTime(date.Year, date.Month, date.Day, 0, 0, 0, DateTimeKind.Local);
-				var endOfDay = startOfDay.AddDays(1).AddTicks(-1);
-
-				// Belirli bir tarih için rezervasyonları al
-				var reservationFilter = Builders<Reservation>.Filter.And(
-					Builders<Reservation>.Filter.Eq(r => r.RoomId, roomId),
-					Builders<Reservation>.Filter.Gte(r => r.StartTime, startOfDay),
-					Builders<Reservation>.Filter.Lte(r => r.StartTime, endOfDay)
-				);
-				var roomReservations = await _context.Reservations.Find(reservationFilter).ToListAsync();
-
-				// Gün içinde 09:00 - 18:00 arası saat slotları oluştur
-				var startHour = 0;
-				var endHour = 24;
-				int reservedHoursCount = 0;
-
-				for (int hour = startHour; hour < endHour; hour++)
+				foreach (var slot in reservationDto.SelectedSlots)
 				{
-					var slotStart = new DateTime(date.Year, date.Month, date.Day, hour, 0, 0);
-					var slotEnd = slotStart.AddHours(1);
+					_logger.LogInformation("Processing slot: {StartTime} - {EndTime}", slot.StartTime, slot.EndTime);
 
-					// Eğer bu saat aralığında bir rezervasyon varsa slot dolu olur
-					bool isReserved = roomReservations.Any(r =>
-						(r.StartTime < slotEnd) && (r.EndTime > slotStart)
+					// Seçilen tarihi kullanarak doğru DateTime oluştur
+					var localStartTime = new DateTime(
+						reservationDto.SelectedDate.Year,
+						reservationDto.SelectedDate.Month,
+						reservationDto.SelectedDate.Day,
+						slot.StartTime.Hour,
+						slot.StartTime.Minute,
+						slot.StartTime.Second,
+						DateTimeKind.Local
 					);
 
-					if (isReserved)
+					var localEndTime = new DateTime(
+						reservationDto.SelectedDate.Year,
+						reservationDto.SelectedDate.Month,
+						reservationDto.SelectedDate.Day,
+						slot.EndTime.Hour,
+						slot.EndTime.Minute,
+						slot.EndTime.Second,
+						DateTimeKind.Local
+					);
+
+					// UTC'ye çevir
+					var utcStartTime = localStartTime.ToUniversalTime();
+					var utcEndTime = localEndTime.ToUniversalTime();
+
+					_logger.LogInformation("Local time: {LocalStart} - {LocalEnd}", localStartTime, localEndTime);
+					_logger.LogInformation("UTC time: {UtcStart} - {UtcEnd}", utcStartTime, utcEndTime);
+
+					var reservation = new Reservation
 					{
-						reservedHoursCount++;
-					}
+						Id = Guid.NewGuid().ToString(),
+						UserId = currentUser.Id,
+						RoomId = reservationDto.RoomId,
+						StartTime = utcStartTime,
+						EndTime = utcEndTime,
+						CreatedAt = DateTime.UtcNow,
+						Status = ReservationStatus.Active,
+
+						User = new UserDto
+						{
+							Id = currentUser.Id,
+							Email = currentUser.Email,
+							Company = currentUser.Company ?? "",
+							CompanyOfficial = currentUser.CompanyOfficial ?? "",
+							ContactPhone = currentUser.ContactPhone ?? "",
+							FirstName = currentUser.FirstName ?? "",
+							LastName = currentUser.LastName ?? ""
+						},
+
+						Room = reservationDto.Room ?? new MeetingRoomDto(),
+						Location = reservationDto.Location ?? ""
+					};
+
+					await _context.Reservations.InsertOneAsync(reservation);
+					reservationIds.Add(reservation.Id);
+
+					_logger.LogInformation("Reservation created: {ReservationId} - Local: {LocalStart}-{LocalEnd}, UTC: {UtcStart}-{UtcEnd}",
+						reservation.Id, localStartTime, localEndTime, utcStartTime, utcEndTime);
 				}
 
-				// Toplam saat sayısı (09:00 - 18:00 arası 9 saat)
-				double totalHours = 24;
-
-				// Rezerve edilen saat sayısı
-				double reservedHours = reservedHoursCount;
-
-				// Doluluk oranı hesaplama - %100'den fazla olmamalı
-				double occupancyRate = Math.Min(100, Math.Round((reservedHours / totalHours) * 100, 2));
-
-				// Odanın doluluk oranını güncelle
-				var filter = Builders<Data.MeetingRoom>.Filter.Eq(r => r.Id, roomId);
-				var update = Builders<Data.MeetingRoom>.Update.Set(r => r.OccupancyRate, occupancyRate);
-				await _context.Rooms.UpdateOneAsync(filter, update);
+				_logger.LogInformation("Total reservations created: {Count}", reservationIds.Count);
+				return string.Join(",", reservationIds);
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine($"Error in UpdateRoomOccupancyRate: {ex.Message}");
+				_logger.LogError(ex, "Error creating reservation for RoomId: {RoomId}", reservationDto.RoomId);
+				throw;
 			}
 		}
 
-		public async Task<List<ReservationDto>> GetUserReservations(string userId)
+		public async Task<bool> UpdateReservationAsync(ReservationDto updated)
 		{
-			var filter = Builders<Reservation>.Filter.Eq(r => r.UserId, userId);
-			var reservations = await _context.Reservations.Find(filter).ToListAsync();
-			return reservations.Select(reservation => new ReservationDto
+			var reservation = new Reservation
 			{
-				Id = reservation.Id,
-				RoomId = reservation.RoomId,
-				UserId = reservation.UserId,
-				StartTime = reservation.StartTime,
-				EndTime = reservation.EndTime,
-			}).ToList();
+				Id = updated.Id,
+				UserId = updated.UserId,
+				RoomId = updated.RoomId,
+				StartTime = updated.StartTime,
+				EndTime = updated.EndTime,
 
+			};
+			var filter = Builders<Reservation>.Filter.Eq(r => r.Id, updated.Id);
+			var update = Builders<Reservation>.Update
+				.Set(r => r.StartTime, updated.StartTime)
+				.Set(r => r.EndTime, updated.EndTime);
+
+			var result = await _context.Reservations.UpdateOneAsync(filter, update);
+			return result.ModifiedCount > 0;
 		}
 		public async Task CancelReservationAsync(string reservationId)
 		{
@@ -175,89 +182,255 @@ namespace MeetinRoomRezervation.Models
 			return result;
 
 		}
-		public async Task<bool> UpdateReservationAsync(ReservationDto updated)
+		public async Task<List<ReservationDto>> GetReservationsByDateAsync(DateTime date)
 		{
-			var reservation = new Reservation
-			{
-				Id = updated.Id,
-				UserId = updated.UserId,
-				RoomId = updated.RoomId,
-				StartTime = updated.StartTime,
-				EndTime = updated.EndTime,
-
-			};
-			var filter = Builders<Reservation>.Filter.Eq(r => r.Id, updated.Id);
-			var update = Builders<Reservation>.Update
-				.Set(r => r.StartTime, updated.StartTime)
-				.Set(r => r.EndTime, updated.EndTime);
-
-			var result = await _context.Reservations.UpdateOneAsync(filter, update);
-			return result.ModifiedCount > 0;
-		}
-		public async Task<bool> DeleteReservationAsync(string reservationId)
-		{
-			_logger.LogInformation("Deleting reservation: {ReservationId}", reservationId);
-
 			try
 			{
-				var filter = Builders<Reservation>.Filter.Eq(r => r.Id, reservationId);
-				var result = await _context.Reservations.DeleteOneAsync(filter);
-				return result.DeletedCount > 0;
-				_logger.LogInformation("Reservation deleted successfully: {ReservationId}", reservationId);
+				// Seçilen tarihin başlangıcı ve bitişi (local time)
+				var startOfDay = new DateTime(date.Year, date.Month, date.Day, 0, 0, 0, DateTimeKind.Local);
+				var endOfDay = startOfDay.AddDays(1);
+
+				// UTC'ye çevir
+				var utcStartOfDay = startOfDay.ToUniversalTime();
+				var utcEndOfDay = endOfDay.ToUniversalTime();
+
+				var reservations = await _context.Reservations
+					.Find(r => r.StartTime >= utcStartOfDay &&
+							  r.StartTime < utcEndOfDay &&
+							  r.Status == ReservationStatus.Active)
+					.ToListAsync();
+
+				return reservations.Select(r => new ReservationDto
+				{
+					Id = r.Id,
+					RoomId = r.RoomId,
+					StartTime = r.StartTime,
+					EndTime = r.EndTime,
+					User = r.User,
+					Room = r.Room,
+					Location = r.Location,
+					SelectedDate = r.StartTime.ToLocalTime().Date
+				}).ToList();
 			}
 			catch (Exception ex)
 			{
-				_logger.LogError(ex, "Failed to delete reservation: {ReservationId}", reservationId);
-				throw;
+				_logger.LogError(ex, "Error getting reservations for date: {Date}", date);
+				return new List<ReservationDto>();
 			}
-
 		}
-		public async Task<List<ReservationDto>> GetReservationsByDateAsync(DateTime date)
+
+		public async Task<List<ReservationDto>> GetUserReservationsAsync()
 		{
-			var start = date.Date;
-			var end = start.AddDays(1);
-
-			var filter = Builders<Reservation>.Filter.And(
-				Builders<Reservation>.Filter.Gte(r => r.StartTime, start),
-				Builders<Reservation>.Filter.Lt(r => r.StartTime, end)
-			);
-
-			var reservations = await _context.Reservations.Find(filter).ToListAsync();
-
-			var result = new List<ReservationDto>();
-			foreach (var reservation in reservations)
+			try
 			{
-				string userEmail = null;
-				if (!string.IsNullOrEmpty(reservation.UserId))
+				var currentUser = await GetCurrentUserAsync();
+				if (currentUser == null)
 				{
-					var userFilter = Builders<User>.Filter.Eq("_id", reservation.UserId);
-					var user = await _context.Users.Find(userFilter).FirstOrDefaultAsync();
-					userEmail = user?.Email;
+					_logger.LogWarning("Current user is null in GetUserReservationsAsync");
+					return new List<ReservationDto>();
 				}
 
-				string roomName = null;
-				if (!string.IsNullOrEmpty(reservation.RoomId))
+				_logger.LogInformation("Getting reservations for user: {UserId}", currentUser.Id);
+
+				var reservations = await _context.Reservations
+					.Find(r => r.UserId == currentUser.Id && r.Status == ReservationStatus.Active)
+					.SortByDescending(r => r.StartTime)
+					.ToListAsync();
+
+				_logger.LogInformation("Found {Count} reservations for user {UserId}", reservations.Count, currentUser.Id);
+
+				var result = new List<ReservationDto>();
+
+				foreach (var reservation in reservations)
 				{
-					var roomFilter = Builders<Data.MeetingRoom>.Filter.Eq("_id", reservation.RoomId);
-					var room = await _context.Rooms.Find(roomFilter).FirstOrDefaultAsync();
-					roomName = room?.Name;
+					// MongoDB'den gelen zamanları UTC olarak işaretle
+					var utcStartTime = DateTime.SpecifyKind(reservation.StartTime, DateTimeKind.Utc);
+					var utcEndTime = DateTime.SpecifyKind(reservation.EndTime, DateTimeKind.Utc);
+
+					_logger.LogInformation("Processing reservation: {Id}, StartTime: {StartTime} UTC, EndTime: {EndTime} UTC",
+						reservation.Id, utcStartTime, utcEndTime);
+
+					// Room bilgilerini al
+					string roomName = reservation.Room?.Name ?? "";
+					if (string.IsNullOrEmpty(roomName) && !string.IsNullOrEmpty(reservation.RoomId))
+					{
+						var room = await _context.Rooms.Find(r => r.Id == reservation.RoomId).FirstOrDefaultAsync();
+						roomName = room?.Name ?? "Bilinmeyen Oda";
+					}
+
+					var dto = new ReservationDto
+					{
+						Id = reservation.Id,
+						UserId = reservation.UserId,
+						RoomId = reservation.RoomId,
+						StartTime = utcStartTime,  // UTC olarak döndür
+						EndTime = utcEndTime,      // UTC olarak döndür
+						User = reservation.User,
+						Room = reservation.Room ?? new MeetingRoomDto { Name = roomName },
+						RoomName = roomName,
+						Location = reservation.Location,
+						SelectedDate = utcStartTime.ToLocalTime().Date // Local date için
+					};
+
+					result.Add(dto);
 				}
 
-				result.Add(new ReservationDto
-				{
-					Id = reservation.Id,
-					UserId = reservation.UserId,
-					RoomId = reservation.RoomId,
-					UserEmail = userEmail,
-					RoomName = roomName,
-					StartTime = reservation.StartTime,
-					EndTime = reservation.EndTime
-				});
+				return result;
 			}
-
-			return result;
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error getting user reservations");
+				return new List<ReservationDto>();
+			}
 		}
+
+		public async Task<bool> DeleteReservationAsync(string reservationId)
+		{
+			try
+			{
+				var currentUser = await GetCurrentUserAsync();
+				if (currentUser == null)
+				{
+					return false;
+				}
+
+				// Kullanıcının kendi rezervasyonunu sildiğinden emin ol
+				var reservation = await _context.Reservations
+					.Find(r => r.Id == reservationId && r.UserId == currentUser.Id)
+					.FirstOrDefaultAsync();
+
+				if (reservation == null)
+				{
+					_logger.LogWarning("Reservation not found or user not authorized: {ReservationId}", reservationId);
+					return false;
+				}
+
+				// Soft delete - status'u cancelled yap
+				var update = Builders<Reservation>.Update.Set(r => r.Status, ReservationStatus.Cancelled);
+				var result = await _context.Reservations.UpdateOneAsync(r => r.Id == reservationId, update);
+
+				_logger.LogInformation("Reservation cancelled: {ReservationId} by User: {UserId}",
+					reservationId, currentUser.Id);
+
+				return result.ModifiedCount > 0;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error deleting reservation: {ReservationId}", reservationId);
+				return false;
+			}
+		}
+
+		public async Task<bool> AdminDeleteReservationAsync(string reservationId)
+		{
+			try
+			{
+				var update = Builders<Reservation>.Update.Set(r => r.Status, ReservationStatus.Cancelled);
+				var result = await _context.Reservations.UpdateOneAsync(r => r.Id == reservationId, update);
+
+				_logger.LogInformation("Reservation cancelled by admin: {ReservationId}", reservationId);
+				return result.ModifiedCount > 0;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error admin deleting reservation: {ReservationId}", reservationId);
+				return false;
+			}
+		}
+		public async Task<User?> GetCurrentUserAsync()
+		{
+			try
+			{
+				// Önce HttpContext'ten dene
+				var httpContext = _httpContextAccessor.HttpContext;
+				if (httpContext?.User?.Identity?.IsAuthenticated == true)
+				{
+					var userEmail = httpContext.User.FindFirst(ClaimTypes.Name)?.Value;
+					var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+					_logger.LogInformation("HttpContext - Email: {Email}, UserId: {UserId}", userEmail, userId);
+
+					// Email ile kullanıcıyı bul
+					if (!string.IsNullOrEmpty(userEmail))
+					{
+						var foundUser = await _context.Users
+							.Find(u => u.Email == userEmail)
+							.FirstOrDefaultAsync();
+
+						if (foundUser != null)
+						{
+							_logger.LogInformation("User found by email: {UserId}", foundUser.Id);
+							return foundUser;
+						}
+					}
+
+					// UserId ile kullanıcıyı bul
+					if (!string.IsNullOrEmpty(userId))
+					{
+						var foundUser = await _context.Users
+							.Find(u => u.Id == userId)
+							.FirstOrDefaultAsync();
+
+						if (foundUser != null)
+						{
+							_logger.LogInformation("User found by ID: {UserId}", foundUser.Id);
+							return foundUser;
+						}
+					}
+				}
+
+				// AuthenticationStateProvider'dan dene
+				var authState = await _authStateProvider.GetAuthenticationStateAsync();
+				var user = authState.User;
+
+				_logger.LogInformation("AuthState - IsAuthenticated: {IsAuthenticated}", user.Identity?.IsAuthenticated);
+
+				if (user.Identity?.IsAuthenticated == true)
+				{
+					var userEmail = user.FindFirst(ClaimTypes.Name)?.Value;
+					var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+					_logger.LogInformation("AuthState - Email: {Email}, UserId: {UserId}", userEmail, userId);
+
+					// Email ile kullanıcıyı bul
+					if (!string.IsNullOrEmpty(userEmail))
+					{
+						var foundUser = await _context.Users
+							.Find(u => u.Email == userEmail)
+							.FirstOrDefaultAsync();
+
+						if (foundUser != null)
+						{
+							_logger.LogInformation("User found by email from AuthState: {UserId}", foundUser.Id);
+							return foundUser;
+						}
+					}
+
+					// UserId ile kullanıcıyı bul
+					if (!string.IsNullOrEmpty(userId))
+					{
+						var foundUser = await _context.Users
+							.Find(u => u.Id == userId)
+							.FirstOrDefaultAsync();
+
+						if (foundUser != null)
+						{
+							_logger.LogInformation("User found by ID from AuthState: {UserId}", foundUser.Id);
+							return foundUser;
+						}
+					}
+				}
+
+				_logger.LogWarning("User not found in any method");
+				return null;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error getting current user");
+				return null;
+			}
+		}
+
 
 	}
-
 }

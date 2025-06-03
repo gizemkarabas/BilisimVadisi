@@ -78,13 +78,10 @@
     {
         try
         {
-            // Veritabanından en güncel verileri almak için önbelleği temizle
             Rooms.Clear();
 
-            // Odaları yükle
             Rooms = await RoomService.GetAllRoomsWithOccupancyAsync(SelectedDate);
 
-            // UI'ı güncelle
             await InvokeAsync(StateHasChanged);
         }
         catch (Exception ex)
@@ -97,7 +94,6 @@
 
     private void NavigateToReservation(MeetingRoomDto room)
     {
-        // Only navigate if the room is available
         if (!room.IsAvailable) return;
 
         var dateStr = SelectedDate.ToString("yyyy-MM-dd");

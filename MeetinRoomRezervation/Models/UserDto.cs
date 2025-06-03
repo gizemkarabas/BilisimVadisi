@@ -6,7 +6,7 @@ namespace MeetinRoomRezervation.Models
 	public class UserDto
 	{
 		[BsonId]
-		[BsonRepresentation(BsonType.ObjectId)]
+		[BsonRepresentation(MongoDB.Bson.BsonType.String)]
 		public string Id { get; set; } = string.Empty;
 		[BsonElement("email")]
 		public string Email { get; set; }

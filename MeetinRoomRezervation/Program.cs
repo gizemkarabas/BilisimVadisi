@@ -99,5 +99,6 @@ using (var scope = app.Services.CreateScope())
 	var seedService = scope.ServiceProvider.GetRequiredService<SeedDataService>();
 	await seedService.SeedAdminUserAsync();
 }
+app.MapGet("/", () => Results.Redirect("/login"));
 
 await app.RunAsync();

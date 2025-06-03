@@ -16,7 +16,7 @@
             Toplantı Odası Rezervasyon
         </div>
         <Menu Mode="MenuMode.Horizontal" style="background-color: unset;">
-            <MenuItem Key="1" RouterLink="/" RouterMatch="NavLinkMatch.All" style="color: white!important;">
+            <MenuItem Key="1" RouterLink="/user/roomStatus" RouterMatch="NavLinkMatch.All" style="color: white!important;">
                 <div class="panel-transparent">
                     <Icon Type="home" Theme="IconThemeType.Outline" />
                     Ana Sayfa
@@ -67,31 +67,8 @@
 </Layout>
 
 @code {
-    private User currentUser = null;
-    private bool isAuthenticated = false;
-
-    @code {
-        protected override async Task OnInitializedAsync()
-        {
-            var authState = await AuthProvider.GetAuthenticationStateAsync();
-            var user = authState.User;
-
-            // Debug bilgileri
-            Console.WriteLine($"IsAuthenticated: {user.Identity?.IsAuthenticated}");
-            Console.WriteLine($"Name: {user.Identity?.Name}");
-            Console.WriteLine($"Claims Count: {user.Claims.Count()}");
-
-            foreach (var claim in user.Claims)
-            {
-                Console.WriteLine($"Claim - {claim.Type}: {claim.Value}");
-            }
-        }
-    }
-
-
     private string GetUserDisplayName(ClaimsPrincipal user)
     {
-        // Önce FirstName claim'ini kontrol et
         var firstName = user.FindFirst("FirstName")?.Value;
         if (!string.IsNullOrEmpty(firstName))
         {
@@ -99,14 +76,12 @@
             return !string.IsNullOrEmpty(lastName) ? $"{firstName} {lastName}" : firstName;
         }
 
-        // FirstName yoksa CompanyOfficial'ı kontrol et
         var companyOfficial = user.FindFirst("CompanyOfficial")?.Value;
         if (!string.IsNullOrEmpty(companyOfficial))
         {
             return companyOfficial;
         }
 
-        // Hiçbiri yoksa email'i göster
         var email = user.FindFirst(ClaimTypes.Name)?.Value;
         return email ?? "Kullanıcı";
     }
