@@ -5,107 +5,107 @@
 @inject IRoomService RoomService
 @inject NavigationManager Navigation
 
-<PageTitle>Toplantı Odaları</PageTitle>
+<div class="reservation-panel">
+	<PageTitle>Toplantı Odaları</PageTitle>
 
-<div style="margin-top: 16px; margin-left: 16px;" >
-    <Title Level="4">Lütfen Tarihi Seçin</Title>
-    <div class="filter-bar">
-        <DatePicker @bind-Value="SelectedDate" 
-            DisabledDate="DisablePastDates" />
-    </div>
+	<div class="reservation-panel-header">Lütfen Tarihi Seçin</div>
+	<div>
+		<DatePicker @bind-Value="SelectedDate"
+					DisabledDate="DisablePastDates" />
+	</div>
+
+
+	<Row Gutter="16" Style="margin-top: 16px;">
+		@if (Rooms.Count == 0)
+		{
+			<AntDesign.Col Span="24">
+				<Alert Message="Bu tarihte gösterilecek oda bulunamadı." Type="@AlertType.Info" ShowIcon="true" />
+			</AntDesign.Col>
+		}
+		else
+		{
+			@foreach (var room in Rooms)
+			{
+				<AntDesign.Col Span="6">
+					<div @onclick="@(() => NavigateToReservation(room))">
+						<Card Hoverable Style="margin-bottom: 16px; border-radius: 10px" Class="@(room.IsAvailable ? "available-room" : "unavailable-room")">
+							<CardMeta Title="@room.Name" Description="@room.Location" />
+							<div style="margin-top: 16px;">
+								<p><Icon Type="user" /> Kapasite: @room.Capacity</p>
+								<p><Icon Type="calendar" /> Doluluk: @room.OccupancyRate.ToString("F0")%</p>
+								<Tag Color="@GetStatusColor(room.IsAvailable)">
+									@(room.IsAvailable ? "Müsait" : "Dolu")
+								</Tag>
+							</div>
+						</Card>
+					</div>
+				</AntDesign.Col>
+			}
+		}
+	</Row>
 </div>
-
-<Row Gutter="16" Style="margin-top: 16px;">
-    @if (Rooms.Count == 0)
-    {
-        <AntDesign.Col Span="24">
-            <Alert Message="Bu tarihte gösterilecek oda bulunamadı." Type="@AlertType.Info" ShowIcon="true" />
-        </AntDesign.Col>
-    }
-    else
-    {
-        @foreach (var room in Rooms)
-        {
-            <AntDesign.Col Span="6">
-                <div @onclick="@(() => NavigateToReservation(room))">
-                    <Card Hoverable Style="margin-bottom: 16px; border-radius: 10px" Class="@(room.IsAvailable ? "available-room" : "unavailable-room")">
-                        <CardMeta Title="@room.Name" Description="@room.Location" />
-                        <div style="margin-top: 16px;">
-                            <p><Icon Type="user" /> Kapasite: @room.Capacity</p>
-                            <p><Icon Type="calendar" /> Doluluk: @room.OccupancyRate.ToString("F0")%</p>
-                            <Tag Color="@GetStatusColor(room.IsAvailable)">
-                                @(room.IsAvailable ? "Müsait" : "Dolu")
-                            </Tag>
-                        </div>
-                    </Card>
-                </div>
-            </AntDesign.Col>
-        }
-    }
-</Row>
-
 <style>
-    .unavailable-room {
-        opacity: 0.7;
-        cursor: not-allowed;
-    }
-    
-    .available-room {
-        cursor: pointer;
-    }
+	.unavailable-room {
+		opacity: 0.7;
+		cursor: not-allowed;
+	}
+
+	.available-room {
+		cursor: pointer;
+	}
 </style>
 
 @code {
-    private List<MeetingRoomDto> Rooms = new();
-    private DateTime _selectedDate = DateTime.Today;
+	private List<MeetingRoomDto> Rooms = new();
+	private DateTime _selectedDate = DateTime.Today;
 
-    private DateTime SelectedDate
-    {
-        get => _selectedDate;
-        set
-        {
-            _selectedDate = value;
-            InvokeAsync(LoadRooms);
-        }
-    }
+	private DateTime SelectedDate
+	{
+		get => _selectedDate;
+		set
+		{
+			_selectedDate = value;
+			InvokeAsync(LoadRooms);
+		}
+	}
 
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadRooms();
-    }
-   
-    private async Task LoadRooms()
-    {
-        try
-        {
-            // Veritabanından en güncel verileri almak için önbelleği temizle
-            Rooms.Clear();
+	protected override async Task OnInitializedAsync()
+	{
+		await LoadRooms();
+	}
 
-            // Odaları yükle
-            Rooms = await RoomService.GetAllRoomsWithOccupancyAsync(SelectedDate);
+	private async Task LoadRooms()
+	{
+		try
+		{
+			// Veritabanından en güncel verileri almak için önbelleği temizle
+			Rooms.Clear();
 
-            // UI'ı güncelle
-            await InvokeAsync(StateHasChanged);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error in LoadRooms: {ex.Message}");
-        }
-    }
-    
-    private string GetStatusColor(bool available) => available ? "green" : "red";
+			// Odaları yükle
+			Rooms = await RoomService.GetAllRoomsWithOccupancyAsync(SelectedDate);
 
-    private void NavigateToReservation(MeetingRoomDto room)
-    {
-        // Only navigate if the room is available
-        if (!room.IsAvailable) return;
+			// UI'ı güncelle
+			await InvokeAsync(StateHasChanged);
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error in LoadRooms: {ex.Message}");
+		}
+	}
 
-        var dateStr = SelectedDate.ToString("yyyy-MM-dd");
-        Navigation.NavigateTo($"/user/reserve?roomId={room.Id}&date={dateStr}");
-    }
+	private string GetStatusColor(bool available) => available ? "green" : "red";
 
-    private bool DisablePastDates(DateTime date)
-    {
-        return date.Date < DateTime.Today;
-    }
+	private void NavigateToReservation(MeetingRoomDto room)
+	{
+		// Only navigate if the room is available
+		if (!room.IsAvailable) return;
+
+		var dateStr = SelectedDate.ToString("yyyy-MM-dd");
+		Navigation.NavigateTo($"/user/reserve?roomId={room.Id}&date={dateStr}");
+	}
+
+	private bool DisablePastDates(DateTime date)
+	{
+		return date.Date < DateTime.Today;
+	}
 }
