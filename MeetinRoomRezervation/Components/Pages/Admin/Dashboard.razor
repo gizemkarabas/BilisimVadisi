@@ -8,386 +8,446 @@
 @inject NavigationManager Navigation
 
 <AuthorizeView Roles="Admin" Context="authContext">
-    <Authorized Context="authContext">
-<PageHeader Title="Yönetici Paneli" Style="background-color: unset"/>
+	<Authorized Context="authContext">
+		<div class="admin-panel-buttons">
+			<Button Type="@ButtonType.Link"
+					OnClick="@(() => Navigation.NavigateTo("admin/dashboard"))"
+					Style="display: flex;
+							justify-content:flex-start;
+							width:160px;
+							background-color:#0095ff;
+							align-items:center;
+							padding: 0;
+							border-radius: 8px;
+							margin-bottom: 10px;
+							margin-left: 5px;"
+					Block>
+				<div class="button">
+					<svg width="15" height="15" viewBox="0 0 18 18" fill="white">
+						<path d="M10 6V0H18V6H10ZM0 10V0H8V10H0ZM10 18V8H18V18H10ZM0 18V12H8V18H0Z"/>
+					</svg>
+					<div style="margin-left:8px; color:white; font-size:13px; font-weight:bold;">
+						Dashboard
+					</div>
+				</div>
+			</Button>
+			<Button Type="@ButtonType.Link"
+					OnClick="@(() => Navigation.NavigateTo("/admin/users"))"
+					Style="display: flex;
+							justify-content:flex-start;
+							width:160px;
+							align-items:center;
+							padding: 0;
+							border-radius: 8px;
+							margin-bottom: 10px;
+							margin-left: 5px;"
+					Block>
+				
+				<div class="button" style="margin-left:6px;">
+					<svg width="20" height="20" viewBox="0 0 20 23" fill="#4d4d4d">
+						<path fill-rule="evenodd" clip-rule="evenodd" d="M9.15831 7.6665C9.15831 9.25734 8.04998 10.5415 6.66665 10.5415C5.28331 10.5415 4.16665 9.25734 4.16665 7.6665C4.16665 6.07567 5.28331 4.7915 6.66665 4.7915C8.04998 4.7915 9.15831 6.07567 9.15831 7.6665ZM15.825 7.6665C15.825 9.25734 14.7166 10.5415 13.3333 10.5415C11.95 10.5415 10.8333 9.25734 10.8333 7.6665C10.8333 6.07567 11.95 4.7915 13.3333 4.7915C14.7166 4.7915 15.825 6.07567 15.825 7.6665ZM6.66665 12.4582C4.72498 12.4582 0.833313 13.5794 0.833313 15.8123V17.2498C0.833313 17.7769 1.20831 18.2082 1.66665 18.2082H11.6666C12.125 18.2082 12.5 17.7769 12.5 17.2498V15.8123C12.5 13.5794 8.60831 12.4582 6.66665 12.4582ZM12.525 12.5061C12.8166 12.4773 13.0916 12.4582 13.3333 12.4582C15.275 12.4582 19.1666 13.5794 19.1666 15.8123V17.2498C19.1666 17.7769 18.7916 18.2082 18.3333 18.2082H14.0166C14.1083 17.9111 14.1666 17.5853 14.1666 17.2498V15.8123C14.1666 14.4036 13.5083 13.3398 12.5583 12.5444C12.5558 12.5415 12.5533 12.5377 12.5505 12.5336C12.5442 12.5241 12.5366 12.5128 12.525 12.5061Z" />
+					</svg>
+					<div style="margin-left:8px; color:#4d4d4d; font-size:13px;">
+						User Management
+					</div>
+				</div>
+				
+			</Button>
+			<Button Type="@ButtonType.Link"
+					OnClick="@(() => Navigation.NavigateTo("/admin/halls"))"
+					Style="display: flex;
+							justify-content:flex-start;
+							width:160px;
+							align-items:center;
+							padding: 0;
+							border-radius: 8px;
+							margin-bottom: 10px;
+							margin-left: 5px;"
+					Block>
+				<div class="button" style="margin-left:6px;">
+					<svg width="20" height="16" viewBox="0 0 20 24" fill="#4d4d4d">
+						<path d="M0.8715 10.4H2.614V21.6H5.2285V12H7.843V21.6H10.457V12H13.072V21.6H15.6865V10.4H17.4285C17.91 10.4 18.3005 10.042 18.3005 9.6C18.3005 9.333 18.1565 9.098 17.937 8.953L17.9385 8.9515L17.9255 8.944L17.903 8.9305L9.5855 4.626V3.365C11.1215 4.071 12.386 2.855 14.378 3.586V0.8005C12.385 0.0695 11.121 1.2845 9.5855 0.579V0.4C9.5855 0.1785 9.391 0 9.15 0C8.909 0 8.715 0.1785 8.715 0.4V4.626L0.3975 8.9295L0.375 8.943L0.3625 8.9515V8.953C0.144 9.098 0.000499964 9.3335 0.000499964 9.6C-3.62634e-08 10.042 0.3905 10.4 0.8715 10.4ZM1.7425 22.4005L0 24H18.301L16.5575 22.4005H1.7425Z" />
+					</svg>
+					<div style="margin-left:8px; color:#4d4d4d; font-size:13px;">
+						Hall Management
+					</div>
+				</div>
+			</Button>
+		</div>
+		<div class="container">
+			<div>
+				<div class="admin-panel"></div>
+			</div>
+			<div class="DashboardPanel" style="margin-left: 50px; margin-top: 50px;">
+				<Row Gutter="16" Style="margin-bottom: 30px;">
+					<Col Span="6">
+					<div class="count-panel">
+						<div class="count-panel-title">Toplam Toplantı Odası</div>
+						<div class="count-panel-value">@TotalRoomCount</div>
+					</div>
+					</Col>
+					<Col Span="6">
+					<div class="count-panel">
+						<div class="count-panel-title">Toplam Kullanıcı Sayısı</div>
+						<div class="count-panel-value">@TotalUserCount</div>
+					</div>
+					</Col>
+					<Col Span="6">
+					<div class="count-panel">
+						<div class="count-panel-title">Bugünkü Doluluk</div>
+						<div class="count-panel-value">@TodayOccupancy%</div>
+					</div>
+					</Col>
+					<Col Span="6">
+					<div class="count-panel">
+						<div class="count-panel-title">Haftalık Doluluk Oranı</div>
+						<div class="count-panel-value">@WeeklyOccupancy%</div>
+					</div>
+					</Col>
+				</Row>
+				<div class="last-reservation-panel">
+					<div class="last-reservation-panel-header">Son Rezervasyonlar</div>
+					<div class="table-responsive">
+						<table class="table">
+							<thead class="table">
+								<tr>
+									<th>Konum</th>
+									<th>Salon</th>
+									<th>Tarih</th>
+									<th>Saat</th>
+									<th>Şirket</th>
+									<th>Yetkili</th>
+									<th>Telefon</th>
+									<th>Eylem</th>
+								</tr>
+							</thead>
+							<tbody class="table-header">
+								@foreach (var res in PagedReservations)
+								{
+									<tr>
+										<td>@res.Location</td>
+										<td>@res.Room?.Name</td>
+										<td>@res.StartTime.ToString("dd-MM-yyyy ddd")</td>
+										<td>
+											<Tag Color="TagColor.Blue">
+												@res.StartTime.ToString("HH:mm") - @res.EndTime.ToString("HH:mm")
+											</Tag>
+										</td>
+										<td>@res.User?.Company</td>
+										<td>@res.User?.CompanyOfficial</td>
+										<td>@res.User?.ContactPhone</td>
+										<td>
+											<Space>
+												<Button Icon="edit" Shape="ButtonShape.Circle" OnClick="@(() => OpenEditModal(res))" />
+												<Button Icon="delete" Shape="ButtonShape.Circle" Danger OnClick="@(() => ConfirmDelete(res))" />
+											</Space>
+										</td>
+									</tr>
+								}
+							</tbody>
+						</table>
+					</div>
 
-<Row Gutter="16" Style="margin-bottom: 30px;">
-    <Col Span="6">
-    <Card Style="box-shadow: 5px 5px 10px rgba(87, 87, 87, 0.1);
-                border-radius: 10px;
-                border-color: #d2d2d2;
-                border-style: solid;">
-        <Statistic Title="Toplam Toplantı Odası" Value="@TotalRoomCount"/>
-    </Card>
-    </Col>
-    <Col Span="6">
-    <Card Style="box-shadow: 5px 5px 10px rgba(87, 87, 87, 0.1);
-                border-radius: 10px;
-                border-color: #d2d2d2;
-                border-style: solid;">
-        <Statistic Title="Toplam Kullanıcı Sayısı" Value="@TotalUserCount"/>
-    </Card>
-    </Col>
-    <Col Span="6">
-    <Card Style="box-shadow: 5px 5px 10px rgba(87, 87, 87, 0.1);
-                border-radius: 10px;
-                border-color: #d2d2d2;
-                border-style: solid;">
-        <Statistic Title="Bugünkü Doluluk" Suffix="%" Value="@TodayOccupancy"/>
-    </Card>
-    </Col>
-    <Col Span="6">
-    <Card Style="box-shadow: 5px 5px 10px rgba(87, 87, 87, 0.1);
-                border-radius: 10px;
-                border-color: #d2d2d2;
-                border-style: solid;">
-        <Statistic Title="Haftalık Doluluk Oranı" Suffix="%" Value="@WeeklyOccupancy"/>
-    </Card>
-    </Col>
-</Row>
-<Card Title="Son Rezervasyonlar" Style="margin-top: 30px;box-shadow: 5px 5px 10px rgba(87, 87, 87, 0.1);
-                border-radius: 10px;
-                border-color: #d2d2d2;
-                border-style: solid;">
-    <div class="table-responsive">
-        <table class="table table-bordered table-hover">
-            <thead>
-            <tr>
-                <th>Konum</th>
-                <th>Salon</th>
-                <th>Tarih</th>
-                <th>Saat</th>
-                <th>Şirket</th>
-                <th>Yetkili</th>
-                <th>Telefon</th>
-                <th>Eylem</th>
-            </tr>
-            </thead>
-            <tbody>
-                @foreach (var res in PagedReservations)
-                {
-                    <tr>
-                        <td>@res.Location</td>
-                        <td>@res.Room?.Name</td>
-                        <td>@res.StartTime.ToString("dd-MM-yyyy ddd")</td>
-                        <td>
-                            <Tag Color="TagColor.Blue">
-                                @res.StartTime.ToString("HH:mm") - @res.EndTime.ToString("HH:mm")
-                            </Tag>
-                        </td>
-                        <td>@res.User?.Company</td>
-                        <td>@res.User?.CompanyOfficial</td>
-                        <td>@res.User?.ContactPhone</td>
-                        <td>
-                            <Space>
-                                <Button Icon="edit" Shape="ButtonShape.Circle" OnClick="@(() => OpenEditModal(res))" />
-                                <Button Icon="delete" Shape="ButtonShape.Circle" Danger OnClick="@(() => ConfirmDelete(res))" />
-                            </Space>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-
-    <div style="margin-top: 16px; text-align: right;">
-        <Pagination Total="@TotalReservationCount"
-                    PageSize="@PageSize"
-                    Current="@CurrentPage"
-                    OnChange="@HandlePaginationChange"
-                    ShowSizeChanger="true"
-                    PageSizeOptions="@(new int[] { 5, 10, 20, 50, 100 })"/>
+					<div style="margin-top: 16px; text-align: right;">
+						<Pagination Total="@TotalReservationCount"
+									PageSize="@PageSize"
+									Current="@CurrentPage"
+									OnChange="@HandlePaginationChange"
+									ShowSizeChanger="true"
+									PageSizeOptions="@(new int[] { 5, 10, 20, 50, 100 })" />
 
 
-    </div>
-</Card>
-    </Authorized>
-    <NotAuthorized>
-        <div style="padding: 24px; max-width: 600px; margin: 0 auto;">
-            <Alert Type="@AlertType.Warning"
-                   Message="Yetkisiz Erişim"
-                   Description="Bu sayfaya erişim yetkiniz bulunmamaktadır. Admin yetkisi gereklidir."
-                   ShowIcon="true"
-                   Style="margin-bottom: 16px;" />
+					</div>
+				</div>
+			</div>
+		</div>
+	</Authorized>
+	<NotAuthorized>
+		<div style="padding: 24px; max-width: 600px; margin: 0 auto;">
+			<Alert Type="@AlertType.Warning"
+				   Message="Yetkisiz Erişim"
+				   Description="Bu sayfaya erişim yetkiniz bulunmamaktadır. Admin yetkisi gereklidir."
+				   ShowIcon="true"
+				   Style="margin-bottom: 16px;" />
 
-            <div style="text-align: center;">
-                <Space>
-                    <SpaceItem>
-                        <Button Type="ButtonType.Primary" OnClick="@(() => Navigation.NavigateTo("/login"))" Icon="login">
-                            Giriş Yap
-                        </Button>
-                    </SpaceItem>
-                    <SpaceItem>
-                        <Button Type="ButtonType.Default" OnClick="@(() => Navigation.NavigateTo("/user/roomStatus"))" Icon="home">
-                            Ana Sayfaya Dön
-                        </Button>
-                    </SpaceItem>
-                </Space>
-            </div>
-        </div>
-    </NotAuthorized>
+			<div style="text-align: center;">
+				<Space>
+					<SpaceItem>
+						<Button Type="ButtonType.Primary" OnClick="@(() => Navigation.NavigateTo("/login"))" Icon="login">
+							Giriş Yap
+						</Button>
+					</SpaceItem>
+					<SpaceItem>
+						<Button Type="ButtonType.Default" OnClick="@(() => Navigation.NavigateTo("/user/roomStatus"))" Icon="home">
+							Ana Sayfaya Dön
+						</Button>
+					</SpaceItem>
+				</Space>
+			</div>
+		</div>
+	</NotAuthorized>
 </AuthorizeView>
+
 <Modal Title="Rezervasyonu Düzenle"
-       @bind-Visible="@IsEditModalVisible"
-       OnOk="SubmitEdit"
-       OnCancel="@CloseEditModal">
+	   @bind-Visible="@IsEditModalVisible"
+	   OnOk="SubmitEdit"
+	   OnCancel="@CloseEditModal">
 
-    @if (EditModel != null)
-    {
-        <Form Model="@EditModel">
-            <FormItem Label="Salon">
-                <Input @bind-Value="EditModel.Room.Name" />
-            </FormItem>
-            <FormItem Label="Konum">
-                <Input @bind-Value="EditModel.Location"/>
-            </FormItem>
-            <FormItem Label="Tarih">
-                <DatePicker @bind-Value="EditModel.StartTime"/>
-            </FormItem>
-            <FormItem Label="Saat (başlangıç)">
-                <TimePicker @bind-Value="EditModel.StartTime"/>
-            </FormItem>
-            <FormItem Label="Saat (bitiş)">
-                <TimePicker @bind-Value="EditModel.EndTime"/>
-            </FormItem>
-        </Form>
-    }
+	@if (EditModel != null)
+	{
+		<Form Model="@EditModel">
+			<FormItem Label="Salon">
+				<Input @bind-Value="EditModel.Room.Name" />
+			</FormItem>
+			<FormItem Label="Konum">
+				<Input @bind-Value="EditModel.Location" />
+			</FormItem>
+			<FormItem Label="Tarih">
+				<DatePicker @bind-Value="EditModel.StartTime" />
+			</FormItem>
+			<FormItem Label="Saat (başlangıç)">
+				<TimePicker @bind-Value="EditModel.StartTime" />
+			</FormItem>
+			<FormItem Label="Saat (bitiş)">
+				<TimePicker @bind-Value="EditModel.EndTime" />
+			</FormItem>
+		</Form>
+	}
 </Modal>
-
 <Modal Title="Rezervasyon Detayı"
-       @bind-Visible="@IsDetailModalVisible"
-       OnOk="@CloseDetailModal"
-       OnCancel="@CloseDetailModal">
+	   @bind-Visible="@IsDetailModalVisible"
+	   OnOk="@CloseDetailModal"
+	   OnCancel="@CloseDetailModal">
 
-    @if (SelectedReservation != null)
-    {
-        <Descriptions Title="Bilgiler" Column="1" Size="DescriptionsSize.Small">
-            <DescriptionsItem Label="Salon">@SelectedReservation.Room.Name</DescriptionsItem>
-            <DescriptionsItem Label="Konum">@SelectedReservation.Location</DescriptionsItem>
-            <DescriptionsItem Label="Tarih">@SelectedReservation.StartTime.ToString("dd-MM-yyyy")</DescriptionsItem>
-            <DescriptionsItem Label="Saat">@SelectedReservation.StartTime.ToString("HH:mm") - @SelectedReservation.EndTime.ToString("HH:mm")</DescriptionsItem>
-            <DescriptionsItem Label="Şirket">@SelectedReservation.User.Company</DescriptionsItem>
-            <DescriptionsItem Label="Yetkili">@SelectedReservation.User.CompanyOfficial</DescriptionsItem>
-            <DescriptionsItem Label="Telefon">@SelectedReservation.User.ContactPhone</DescriptionsItem>
-        </Descriptions>
-    }
+	@if (SelectedReservation != null)
+	{
+		<Descriptions Title="Bilgiler" Column="1" Size="DescriptionsSize.Small">
+			<DescriptionsItem Label="Salon">@SelectedReservation.Room.Name</DescriptionsItem>
+			<DescriptionsItem Label="Konum">@SelectedReservation.Location</DescriptionsItem>
+			<DescriptionsItem Label="Tarih">@SelectedReservation.StartTime.ToString("dd-MM-yyyy")</DescriptionsItem>
+			<DescriptionsItem Label="Saat">@SelectedReservation.StartTime.ToString("HH:mm") - @SelectedReservation.EndTime.ToString("HH:mm")</DescriptionsItem>
+			<DescriptionsItem Label="Şirket">@SelectedReservation.User.Company</DescriptionsItem>
+			<DescriptionsItem Label="Yetkili">@SelectedReservation.User.CompanyOfficial</DescriptionsItem>
+			<DescriptionsItem Label="Telefon">@SelectedReservation.User.ContactPhone</DescriptionsItem>
+		</Descriptions>
+	}
 </Modal>
 <Modal Title="Rezervasyonu Sil"
-       @bind-Visible="@IsDeleteConfirmVisible"
-       OnOk="DeleteReservation"
-       OnCancel="CancelDelete"
-       OkText=@okButtonText
-       CancelText=@cancelButtonText
-       OkType="ButtonType.Primary">
+	   @bind-Visible="@IsDeleteConfirmVisible"
+	   OnOk="DeleteReservation"
+	   OnCancel="CancelDelete"
+	   OkText=@okButtonText
+	   CancelText=@cancelButtonText
+	   OkType="ButtonType.Primary">
 
-    <p>@ReservationToDelete?.Room.Name rezervasyonunu silmek istediğinize emin misiniz?</p>
+	<p>@ReservationToDelete?.Room.Name rezervasyonunu silmek istediğinize emin misiniz?</p>
 </Modal>
 
 @code {
-    private int TotalRoomCount = 0;
-    private int TotalUserCount = 0;
-    private double TodayOccupancy = 0;
-    private double WeeklyOccupancy = 0;
-    private bool IsDetailModalVisible = false;
-    private ReservationDto? SelectedReservation;
-    private bool IsEditModalVisible = false;
-    private ReservationDto? EditModel;
-    private bool IsDeleteConfirmVisible = false;
-    private ReservationDto? ReservationToDelete;
-    private string okButtonText = "Evet, sil";
-    private string cancelButtonText = "Vazgeç";
-    private int PageSize = 5;
-    private int CurrentPage = 1;
-    private int TotalReservationCount = 0;
-    private List<ReservationDto> AllReservations = new();
-    private List<ReservationDto> PagedReservations = new();
-    private List<ReservationDto> LastReservations = new();
+	private int TotalRoomCount = 0;
+	private int TotalUserCount = 0;
+	private double TodayOccupancy = 0;
+	private double WeeklyOccupancy = 0;
+	private bool IsDetailModalVisible = false;
+	private ReservationDto? SelectedReservation;
+	private bool IsEditModalVisible = false;
+	private ReservationDto? EditModel;
+	private bool IsDeleteConfirmVisible = false;
+	private ReservationDto? ReservationToDelete;
+	private string okButtonText = "Evet, sil";
+	private string cancelButtonText = "Vazgeç";
+	private int PageSize = 5;
+	private int CurrentPage = 1;
+	private int TotalReservationCount = 0;
+	private List<ReservationDto> AllReservations = new();
+	private List<ReservationDto> PagedReservations = new();
+	private List<ReservationDto> LastReservations = new();
 
-    protected override async Task OnInitializedAsync()
-    {
-        var reservations = await ReservationService.GetAllReservationsAsync();
+	protected override async Task OnInitializedAsync()
+	{
+		var reservations = await ReservationService.GetAllReservationsAsync();
 
-        LastReservations = reservations
-            .OrderByDescending(r => r.StartTime)
-            .Take(10)
-            .ToList();
+		LastReservations = reservations
+			.OrderByDescending(r => r.StartTime)
+			.Take(10)
+			.ToList();
 
-        var allRooms = await RoomService.GetAllRoomsAsync();
-        //var allUsers = await UserService.GetAllUsersAsync();
-        var allReservations = await ReservationService.GetAllReservationsAsync();
+		var allRooms = await RoomService.GetAllRoomsAsync();
+		//var allUsers = await UserService.GetAllUsersAsync();
+		var allReservations = await ReservationService.GetAllReservationsAsync();
 
-        TotalRoomCount = allRooms.Count;
-        TotalUserCount = 1245;
+		TotalRoomCount = allRooms.Count;
+		TotalUserCount = 1245;
 
-        var today = DateTime.Today;
-        var tomorrow = today.AddDays(1);
-        var todayReservations = allReservations
-            .Where(r => r.StartTime >= today && r.StartTime < tomorrow)
-            .ToList();
+		var today = DateTime.Today;
+		var tomorrow = today.AddDays(1);
+		var todayReservations = allReservations
+			.Where(r => r.StartTime >= today && r.StartTime < tomorrow)
+			.ToList();
 
-        TodayOccupancy = CalculateOccupancyPercentage(todayReservations, allRooms.Count);
+		TodayOccupancy = CalculateOccupancyPercentage(todayReservations, allRooms.Count);
 
-        var weekStart = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek);
-        var weekEnd = weekStart.AddDays(7);
-        var weekReservations = allReservations
-            .Where(r => r.StartTime >= weekStart && r.StartTime < weekEnd)
-            .ToList();
+		var weekStart = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek);
+		var weekEnd = weekStart.AddDays(7);
+		var weekReservations = allReservations
+			.Where(r => r.StartTime >= weekStart && r.StartTime < weekEnd)
+			.ToList();
 
-        WeeklyOccupancy = CalculateOccupancyPercentage(weekReservations, allRooms.Count * 7); // tüm haftalık oda/saat kapasitesi
+		WeeklyOccupancy = CalculateOccupancyPercentage(weekReservations, allRooms.Count * 7); // tüm haftalık oda/saat kapasitesi
 
-        AllReservations = await ReservationService.GetAllReservationsAsync();
-        TotalReservationCount = AllReservations.Count;
-        LoadPage();
-    }
+		AllReservations = await ReservationService.GetAllReservationsAsync();
+		TotalReservationCount = AllReservations.Count;
+		LoadPage();
+	}
 
-    private double CalculateOccupancyPercentage(List<ReservationDto> reservations, int totalRoomDays)
-    {
-        double reservedHours = reservations.Count; // 1 saatlik rezervasyon varsayıyoruz
-        double totalHours = totalRoomDays * 9; // 09:00-18:00 → 9 saat
-        if (totalHours == 0) return 0;
+	private double CalculateOccupancyPercentage(List<ReservationDto> reservations, int totalRoomDays)
+	{
+		double reservedHours = reservations.Count; // 1 saatlik rezervasyon varsayıyoruz
+		double totalHours = totalRoomDays * 9; // 09:00-18:00 → 9 saat
+		if (totalHours == 0) return 0;
 
-        return Math.Round((reservedHours / totalHours) * 100, 2);
-    }
-
-
-    private void ShowDetails(ReservationDto res)
-    {
-        SelectedReservation = res;
-        IsDetailModalVisible = true;
-    }
-
-    private void CloseDetailModal()
-    {
-        IsDetailModalVisible = false;
-        SelectedReservation = null;
-    }
-
-    private void OpenEditModal(ReservationDto res)
-    {
-            EditModel = new ReservationDto
-            {
-                Id = res.Id,
-                Room = res.Room,
-                Location = res.Location,
-                StartTime = res.StartTime,
-                EndTime = res.EndTime,
-                User = res.User,
-            };
-
-        IsEditModalVisible = true;
-    }
-
-    private void CloseEditModal()
-    {
-        IsEditModalVisible = false;
-        EditModel = null;
-    }
-
-    private async Task SubmitEdit()
-    {
-        if (EditModel is not null)
-        {
-            await ReservationService.UpdateReservationAsync(EditModel);
-            await RefreshReservations();
-            CloseEditModal();
-        }
-    }
-
-    private void ConfirmDelete(ReservationDto res)
-    {
-        ReservationToDelete = res;
-        IsDeleteConfirmVisible = true;
-    }
-
-    private void CancelDelete()
-    {
-        ReservationToDelete = null;
-        IsDeleteConfirmVisible = false;
-    }
-
-    private async Task DeleteReservation()
-    {
-        if (ReservationToDelete is not null)
-        {
-            await ReservationService.DeleteReservationAsync(ReservationToDelete.Id!);
-            await RefreshReservations();
-            CancelDelete();
-        }
-    }
-
-    private async Task RefreshReservations()
-    {
-        AllReservations = await ReservationService.GetAllReservationsAsync();
-        TotalReservationCount = AllReservations.Count;
-        LoadPage(); 
-    }
-
-    private void HandlePageIndexChange(PaginationEventArgs args)
-    {
-        CurrentPage = args.Page;
-        LoadPage();
-        StateHasChanged();
-    }
-
-    private void HandlePageSizeChange(PaginationEventArgs args)
-    {
-        PageSize = args.PageSize;
-        CurrentPage = 1;
-        LoadPage();
-        StateHasChanged();
-    }
-
-    private void LoadPage()
-    {
-       
-        PagedReservations = AllReservations
-            .OrderByDescending(r => r.StartTime)
-            .Skip((CurrentPage - 1) * PageSize)
-            .Take(PageSize)
-            .ToList();
-    }
+		return Math.Round((reservedHours / totalHours) * 100, 2);
+	}
 
 
-    private async Task OnPageChanged(PaginationEventArgs args)
-    {
-        CurrentPage = args.Page;
-        LoadPage();
-        await Task.CompletedTask; 
-    }
+	private void ShowDetails(ReservationDto res)
+	{
+		SelectedReservation = res;
+		IsDetailModalVisible = true;
+	}
 
-    private void OnPageSizeChanged(int pageSize)
-    {
-        PageSize = pageSize;
-        CurrentPage = 1; 
-        LoadPage();
-    }
+	private void CloseDetailModal()
+	{
+		IsDetailModalVisible = false;
+		SelectedReservation = null;
+	}
 
-    private void HandleTableChange(QueryModel<ReservationDto> queryModel)
-    {
-        CurrentPage = queryModel.PageIndex;
+	private void OpenEditModal(ReservationDto res)
+	{
+		EditModel = new ReservationDto
+			{
+				Id = res.Id,
+				Room = res.Room,
+				Location = res.Location,
+				StartTime = res.StartTime,
+				EndTime = res.EndTime,
+				User = res.User,
+			};
 
-        if (PageSize != queryModel.PageSize)
-        {
-            PageSize = queryModel.PageSize;
-            CurrentPage = 1;
-        }
+		IsEditModalVisible = true;
+	}
 
-        LoadPage();
-    }
+	private void CloseEditModal()
+	{
+		IsEditModalVisible = false;
+		EditModel = null;
+	}
 
-    private void HandlePaginationChange(PaginationEventArgs args)
-    {
-        // args içinde hem sayfa hem de sayfa boyutu bilgisi olabilir
-        CurrentPage = args.Page;
+	private async Task SubmitEdit()
+	{
+		if (EditModel is not null)
+		{
+			await ReservationService.UpdateReservationAsync(EditModel);
+			await RefreshReservations();
+			CloseEditModal();
+		}
+	}
 
-        if (args.PageSize != PageSize)
-        {
-            PageSize = args.PageSize;
-        }
+	private void ConfirmDelete(ReservationDto res)
+	{
+		ReservationToDelete = res;
+		IsDeleteConfirmVisible = true;
+	}
 
-        LoadPage();
-        StateHasChanged();
-    }
+	private void CancelDelete()
+	{
+		ReservationToDelete = null;
+		IsDeleteConfirmVisible = false;
+	}
+
+	private async Task DeleteReservation()
+	{
+		if (ReservationToDelete is not null)
+		{
+			await ReservationService.DeleteReservationAsync(ReservationToDelete.Id!);
+			await RefreshReservations();
+			CancelDelete();
+		}
+	}
+
+	private async Task RefreshReservations()
+	{
+		AllReservations = await ReservationService.GetAllReservationsAsync();
+		TotalReservationCount = AllReservations.Count;
+		LoadPage();
+	}
+
+	private void HandlePageIndexChange(PaginationEventArgs args)
+	{
+		CurrentPage = args.Page;
+		LoadPage();
+		StateHasChanged();
+	}
+
+	private void HandlePageSizeChange(PaginationEventArgs args)
+	{
+		PageSize = args.PageSize;
+		CurrentPage = 1;
+		LoadPage();
+		StateHasChanged();
+	}
+
+	private void LoadPage()
+	{
+
+		PagedReservations = AllReservations
+			.OrderByDescending(r => r.StartTime)
+			.Skip((CurrentPage - 1) * PageSize)
+			.Take(PageSize)
+			.ToList();
+	}
+
+
+	private async Task OnPageChanged(PaginationEventArgs args)
+	{
+		CurrentPage = args.Page;
+		LoadPage();
+		await Task.CompletedTask;
+	}
+
+	private void OnPageSizeChanged(int pageSize)
+	{
+		PageSize = pageSize;
+		CurrentPage = 1;
+		LoadPage();
+	}
+
+	private void HandleTableChange(QueryModel<ReservationDto> queryModel)
+	{
+		CurrentPage = queryModel.PageIndex;
+
+		if (PageSize != queryModel.PageSize)
+		{
+			PageSize = queryModel.PageSize;
+			CurrentPage = 1;
+		}
+
+		LoadPage();
+	}
+
+	private void HandlePaginationChange(PaginationEventArgs args)
+	{
+		// args içinde hem sayfa hem de sayfa boyutu bilgisi olabilir
+		CurrentPage = args.Page;
+
+		if (args.PageSize != PageSize)
+		{
+			PageSize = args.PageSize;
+		}
+
+		LoadPage();
+		StateHasChanged();
+	}
 
 
 }

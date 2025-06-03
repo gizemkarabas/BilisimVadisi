@@ -1,6 +1,91 @@
-﻿.dashboard-container {
+﻿.container {
+    background: #fff;
+    display: flex;
+    flex-wrap: nowrap;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+.admin-panel {
+    width: 15vw;
+    height: 100vh;
+    background-color: #e6e6e6;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.admin-panel-buttons {
+    position: fixed;
+    margin-left: 20px;
+    margin-top: 45px;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.button {
+    display: flex;
+    align-items: center;
+    margin-left: 8px;
+}
+
+.count-panel {
     box-shadow: 5px 5px 10px rgba(87, 87, 87, 0.1);
     border-radius: 10px;
-    border-color: #929292;
-    border-style: solid;
+    border-color: #d2d2d2;
+    border: 1.2px solid #e2dfdf;
+    width: 15vw;
+    height: 130px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
 }
+.count-panel-title {
+    font-size: 12px;
+    color: black;
+    padding: 10px;
+    align-self: flex-start;
+}
+.count-panel-value {
+    font-size: 25px;
+    font-weight: bold;
+    color: #0095ff;
+    padding: 10px;
+    align-self: flex-end;
+    text-align:right;
+}
+.last-reservation-panel {
+    background-color: #e6e6e6;
+    margin-top: 30px;
+    box-shadow: 5px 5px 10px rgba(87, 87, 87, 0.1);
+    border-radius: 10px;
+    border-color: #d2d2d2;
+    border: 1.2px solid #e2dfdf;
+    padding:15px;
+}
+.last-reservation-panel-header {
+    font-size:25px;
+    font-weight:bold;
+}
+.table {
+    display: table;
+    table-layout: fixed;
+    font-size: 15px;
+    font-weight: bold;
+    width: 60vw;
+    height: 10vh;
+}
+.table-header {
+    display: table;
+    table-layout: fixed;
+    font-size: 12px;
+    width: 100%;
+    text-align: center; 
+    vertical-align: middle; 
+}
+
