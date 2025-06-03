@@ -1,0 +1,88 @@
+﻿.containerW {
+    background: #fff;
+    display: flex;
+    flex-wrap: nowrap;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+.date-newreservation-panel {
+    background: #fff;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    padding: 0;
+    margin: 0;
+}
+.containerH {
+    background: #fff;
+    display: flex;
+    flex-direction:column;
+    padding: 0;
+    margin: 30px;
+}
+
+.admin-panel {
+    width: 15vw;
+    height: auto;
+    background-color: #e6e6e6;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.admin-panel-buttons {
+    position: fixed;
+    margin-left: 20px;
+    margin-top: 45px;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.button {
+    display: flex;
+    align-items: center;
+    margin-left: 8px;
+}
+
+
+.calender{
+    display:flex;
+    align-items:flex-start;
+}
+.new-reservation{
+    display:flex;
+    
+}
+.halls-panel {
+    width: 80vw;
+    height: 100%;
+    background-color: #e6e6e6;
+    border-radius:20px;
+    padding: 25px;
+    margin-top: 25px;
+}
+.halls {
+    width: 100%;
+    min-height:400px;
+    height: 100%;
+    background-color: white;
+    border-radius: 20px;
+    border: 1px solid #e2dfdf;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 25px;
+    margin-top: 25px;
+}
+.halls-header {
+    text-align:center;
+    font-size:19px;
+    font-weight:bold;
+}
+.halls-edit {
+    display: flex;
+    justify-content: flex-end;
+}
+

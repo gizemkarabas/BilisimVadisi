@@ -8,8 +8,7 @@
 
 <AuthorizeView Roles="Admin" Context="authContext">
     <Authorized Context="authContext">
-<PageHeader Title="Kullanıcı Yönetimi" />
-<Card>
+<div class="container">
    
     <div class="table-responsive">
         <table class="table table-bordered table-hover">
@@ -135,7 +134,7 @@
         </Form>
     </Modal>
 
-</Card>
+        </div>
     </Authorized>
     <NotAuthorized>
         <div style="padding: 24px; max-width: 600px; margin: 0 auto;">

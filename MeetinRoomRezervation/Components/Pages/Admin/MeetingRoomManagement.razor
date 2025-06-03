@@ -11,100 +11,172 @@
 
 <AuthorizeView Roles="Admin" Context="authContext">
 	<Authorized Context="authContext">
-		<PageHeader Title="Toplantı Salonu Yönetimi" />
-		<Card>
-			<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-				<AntDesign.Col>
-					<Button OnClick="SelectToday">Bugün</Button>
-					<Button OnClick="SelectTomorrow" Style="margin-left: 8px;">Yarın</Button>
-					<DatePicker @bind-Value="SelectedDate" Style="margin-left: 8px;" />
-				</AntDesign.Col>
-				<AntDesign.Col>
-					<Button Type="ButtonType.Primary" OnClick="OpenCreateRoomModal">Yeni Toplantı Odası Oluştur</Button>
-				</AntDesign.Col>
-			</div>
-
-			<Row Gutter="16">
-				@foreach (var room in Rooms)
-				{
-					<AntDesign.Col Span="8">
-						<Card Title="@room.Name">
-							<div style="text-align: right; margin-bottom: 8px;">
-								<Button Size="ButtonSize.Small" OnClick="@(() => OpenEditModal(room))" Icon="edit" />
-							</div>
-							@if (room.Reservations.Any())
-							{
-								foreach (var res in room.Reservations)
-								{
-									<div class="reservation-block">
-										<Tag Color="TagColor.Blue">@res.StartTime.ToString("HH:mm") - @res.EndTime.ToString("HH:mm")</Tag>
-										<p><strong>Şirket:</strong> @res.User.Company</p>
-										<p><strong>Yetkili:</strong> @res.User.CompanyOfficial</p>
-										<p><strong>Telefon:</strong> @res.User.ContactPhone</p>
-										<Button Type="ButtonType.Dashed" OnClick="@(() => CancelReservation(res.Id))">Rezervasyonu İptal</Button>
-									</div>
-								}
-							}
-							else
-							{
-								<Tag Color="TagColor.Green">Bugün için rezervasyon bulunmamaktadır.</Tag>
-							}
-
-							<Divider />
-							<p><strong>Müsait Saatler</strong></p>
-							@foreach (var slot in room.AvailableSlots)
-							{
-								<Tag>@slot</Tag>
-							}
-						</Card>
-					</AntDesign.Col>
-				}
-			</Row>
-			<Button Type="ButtonType.Primary" OnClick="OpenCreateRoomModal">
-				Yeni Toplantı Odası Oluştur
+		<div class="admin-panel-buttons">
+			<Button Type="@ButtonType.Link"
+					OnClick="@(() => Navigation.NavigateTo("admin/dashboard"))"
+					Style="display: flex;
+							justify-content:flex-start;
+							width:160px;
+							align-items:center;
+							padding: 0;
+							border-radius: 8px;
+							margin-bottom: 10px;
+							margin-left: 5px;"
+					Block>
+				<div class="button">
+					<svg width="15" height="15" viewBox="0 0 18 18" fill="#4d4d4d">
+						<path d="M10 6V0H18V6H10ZM0 10V0H8V10H0ZM10 18V8H18V18H10ZM0 18V12H8V18H0Z" />
+					</svg>
+					<div style="margin-left:8px; color:#4d4d4d; font-size:13px; ">
+						Dashboard
+					</div>
+				</div>
 			</Button>
-			<Modal Title="Yeni Toplantı Odası Oluştur"
-			@bind-Visible="@IsCreateModalVisible"
-			OnOk="CreateRoom"
-			OnCancel="CloseCreateModal"
-			OkText="@okButtonText"
-			CancelText="@cancelButtonText">
+			<Button Type="@ButtonType.Link"
+					OnClick="@(() => Navigation.NavigateTo("/admin/users"))"
+					Style="display: flex;
+							justify-content:flex-start;
+							width:160px;
+							align-items:center;
+							padding: 0;
+							border-radius: 8px;
+							margin-bottom: 10px;
+							margin-left: 5px;"
+					Block>
 
-				<Form Model="@NewRoom">
-					<FormItem Label="Oda Adı" Required>
-						<Input @bind-Value="NewRoom.Name" />
-					</FormItem>
-					<FormItem Label="Kapasite" Required>
-						<AntDesign.InputNumber @bind-Value="NewRoom.Capacity" Min="1" />
-					</FormItem>
-				</Form>
-			</Modal>
+				<div class="button" style="margin-left:6px;">
+					<svg width="20" height="20" viewBox="0 0 20 23" fill="#4d4d4d">
+						<path fill-rule="evenodd" clip-rule="evenodd" d="M9.15831 7.6665C9.15831 9.25734 8.04998 10.5415 6.66665 10.5415C5.28331 10.5415 4.16665 9.25734 4.16665 7.6665C4.16665 6.07567 5.28331 4.7915 6.66665 4.7915C8.04998 4.7915 9.15831 6.07567 9.15831 7.6665ZM15.825 7.6665C15.825 9.25734 14.7166 10.5415 13.3333 10.5415C11.95 10.5415 10.8333 9.25734 10.8333 7.6665C10.8333 6.07567 11.95 4.7915 13.3333 4.7915C14.7166 4.7915 15.825 6.07567 15.825 7.6665ZM6.66665 12.4582C4.72498 12.4582 0.833313 13.5794 0.833313 15.8123V17.2498C0.833313 17.7769 1.20831 18.2082 1.66665 18.2082H11.6666C12.125 18.2082 12.5 17.7769 12.5 17.2498V15.8123C12.5 13.5794 8.60831 12.4582 6.66665 12.4582ZM12.525 12.5061C12.8166 12.4773 13.0916 12.4582 13.3333 12.4582C15.275 12.4582 19.1666 13.5794 19.1666 15.8123V17.2498C19.1666 17.7769 18.7916 18.2082 18.3333 18.2082H14.0166C14.1083 17.9111 14.1666 17.5853 14.1666 17.2498V15.8123C14.1666 14.4036 13.5083 13.3398 12.5583 12.5444C12.5558 12.5415 12.5533 12.5377 12.5505 12.5336C12.5442 12.5241 12.5366 12.5128 12.525 12.5061Z" />
+					</svg>
+					<div style="margin-left:8px; color:#4d4d4d; font-size:13px;">
+						User Management
+					</div>
+				</div>
 
-			<Modal Title="Toplantı Odası Düzenle"
-			@bind-Visible="@IsEditModalVisible"
-			OnOk="UpdateRoom"
-			OnCancel="CloseEditModal"
-			OkText="@okButtonText"
-			CancelText="@cancelButtonText">
+			</Button>
+			<Button Type="@ButtonType.Link"
+					OnClick="@(() => Navigation.NavigateTo("/admin/halls"))"
+					Style="display: flex;
+							justify-content:flex-start;
+							width:160px;
+							align-items:center;
+							padding: 0;
+							border-radius: 8px;
+							margin-bottom: 10px;
+							background-color:#0095ff;
+							margin-left: 5px;"
+					Block>
+				<div class="button" style="margin-left:6px;">
+					<svg width="20" height="16" viewBox="0 0 20 24" fill="white">
+						<path d="M0.8715 10.4H2.614V21.6H5.2285V12H7.843V21.6H10.457V12H13.072V21.6H15.6865V10.4H17.4285C17.91 10.4 18.3005 10.042 18.3005 9.6C18.3005 9.333 18.1565 9.098 17.937 8.953L17.9385 8.9515L17.9255 8.944L17.903 8.9305L9.5855 4.626V3.365C11.1215 4.071 12.386 2.855 14.378 3.586V0.8005C12.385 0.0695 11.121 1.2845 9.5855 0.579V0.4C9.5855 0.1785 9.391 0 9.15 0C8.909 0 8.715 0.1785 8.715 0.4V4.626L0.3975 8.9295L0.375 8.943L0.3625 8.9515V8.953C0.144 9.098 0.000499964 9.3335 0.000499964 9.6C-3.62634e-08 10.042 0.3905 10.4 0.8715 10.4ZM1.7425 22.4005L0 24H18.301L16.5575 22.4005H1.7425Z" />
+					</svg>
+					<div style="margin-left:8px; color:white; font-size:13px;font-weight:bold;">
+						Hall Management
+					</div>
+				</div>
+			</Button>
+		</div>
+		<div class="containerW">
+			<div class="admin-panel"></div>
+			<div class="containerH">
+				<div class="date-newreservation-panel">
+					<div class="calender">
+						<AntDesign.Col>
+							<Button OnClick="SelectToday">Bugün</Button>
+							<Button OnClick="SelectTomorrow" Style="margin-left: 8px;">Yarın</Button>
+							<DatePicker @bind-Value="SelectedDate" Style="margin-left: 8px;" />
+						</AntDesign.Col>
+					</div>
+					<div class="new-reservation">
+						<AntDesign.Col>
+							<Button Type="ButtonType.Primary" OnClick="OpenCreateRoomModal">Yeni Toplantı Odası Oluştur</Button>
+						</AntDesign.Col>
+					</div>
+				</div>
+				<div class="halls-panel">
+					<Row Gutter="16">
 
-				<Form Model="@EditingRoom">
-					<FormItem Label="Oda Adı" Required>
-						<Input @bind-Value="EditingRoom.Name" />
-					</FormItem>
-					<FormItem Label="Kapasite" Required>
-						<AntDesign.InputNumber @bind-Value="EditingRoom.Capacity" Min="1" />
-					</FormItem>
-				</Form>
-			</Modal>
-		</Card>
+						@foreach (var room in Rooms)
+						{
+
+							<AntDesign.Col Span="8" Style="padding-left:50px;padding-right:50px;">
+								<div class="halls">
+									<div class="halls-edit">
+										<Button Size="ButtonSize.Small" OnClick="@(() => OpenEditModal(room))" Icon="edit" />
+									</div>
+									<div class="halls-header">@room.Name</div>
+									
+									@if (room.Reservations.Any())
+									{
+										foreach (var res in room.Reservations)
+										{
+											<div class="reservation-block">
+												<Tag Color="TagColor.Blue">@res.StartTime.ToString("HH:mm") - @res.EndTime.ToString("HH:mm")</Tag>
+												<p><strong>Şirket:</strong> @res.User.Company</p>
+												<p><strong>Yetkili:</strong> @res.User.CompanyOfficial</p>
+												<p><strong>Telefon:</strong> @res.User.ContactPhone</p>
+												<Button Type="ButtonType.Dashed" OnClick="@(() => CancelReservation(res.Id))">Rezervasyonu İptal</Button>
+											</div>
+										}
+									}
+									else
+									{
+										<Tag Style="text-align:center" Color="TagColor.Green">Bugün için rezervasyon bulunmamaktadır.</Tag>
+									}
+
+									<Divider />
+									<p style="text-align:center"><strong>Müsait Saatler</strong></p>
+									@foreach (var slot in room.AvailableSlots)
+									{
+										<Tag>@slot</Tag>
+									}
+								</div>
+							</AntDesign.Col>
+						}
+					</Row>
+					<Modal Title="Yeni Toplantı Odası Oluştur"
+						   @bind-Visible="@IsCreateModalVisible"
+						   OnOk="CreateRoom"
+						   OnCancel="CloseCreateModal"
+						   OkText="@okButtonText"
+						   CancelText="@cancelButtonText">
+
+						<Form Model="@NewRoom">
+							<FormItem Label="Oda Adı" Required>
+								<Input @bind-Value="NewRoom.Name" />
+							</FormItem>
+							<FormItem Label="Kapasite" Required>
+								<AntDesign.InputNumber @bind-Value="NewRoom.Capacity" Min="1" />
+							</FormItem>
+						</Form>
+					</Modal>
+					<Modal Title="Toplantı Odası Düzenle"
+						   @bind-Visible="@IsEditModalVisible"
+						   OnOk="UpdateRoom"
+						   OnCancel="CloseEditModal"
+						   OkText="@okButtonText"
+						   CancelText="@cancelButtonText">
+
+						<Form Model="@EditingRoom">
+							<FormItem Label="Oda Adı" Required>
+								<Input @bind-Value="EditingRoom.Name" />
+							</FormItem>
+							<FormItem Label="Kapasite" Required>
+								<AntDesign.InputNumber @bind-Value="EditingRoom.Capacity" Min="1" />
+							</FormItem>
+						</Form>
+					</Modal>
+				</div>
+			</div>
+		</div>
 	</Authorized>
 	<NotAuthorized>
 		<div style="padding: 24px; max-width: 600px; margin: 0 auto;">
 			<Alert Type="@AlertType.Warning"
-			Message="Yetkisiz Erişim"
-			Description="Bu sayfaya erişim yetkiniz bulunmamaktadır. Admin yetkisi gereklidir."
-			ShowIcon="true"
-			Style="margin-bottom: 16px;" />
+				   Message="Yetkisiz Erişim"
+				   Description="Bu sayfaya erişim yetkiniz bulunmamaktadır. Admin yetkisi gereklidir."
+				   ShowIcon="true"
+				   Style="margin-bottom: 16px;" />
 
 			<div style="text-align: center;">
 				<Space>
@@ -138,10 +210,10 @@
 
 	protected override async Task OnInitializedAsync()
 	{
-		var authState = await AuthProvider.GetAuthenticationStateAsync();	
+		var authState = await AuthProvider.GetAuthenticationStateAsync();
 		var user = authState.User;
 		var isAdmin = user.IsInRole("Admin");
-		
+
 		await LoadRoomData();
 	}
 
