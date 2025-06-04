@@ -8,6 +8,7 @@
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthProvider
 
+<div class="reservation-panel">
 <div class="reservation-header">Rezervasyonunuzu Onaylayın</div>
 <div class="reservation-card-center">
     @if (ReservationState.SelectedSlots.Any())
@@ -53,6 +54,7 @@
     {
         <Alert Message="Seçili saat bulunamadı." Type="@AlertType.Warning" ShowIcon="true"/>
     }
+</div>
 </div>
 
 @code {
