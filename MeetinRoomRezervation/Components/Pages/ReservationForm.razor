@@ -25,12 +25,14 @@ else if (SelectedRoom is null)
 }
 else
 {
-    <Card Title="@($"Rezervasyon - {SelectedRoom.Name}")">
+<div class="reservation-panel">
+        <div class="reservation-panel-header">@($"Rezervasyon - {SelectedRoom.Name}")</div>
+    
         <Form Model="this" OnFinish="GoToSummary">
             <FormItem>
-                <h4>Lütfen Tarihi Seçin</h4>
+                <div class="reservation-panel-header">Lütfen Tarihi Seçin</div>
                 <DatePicker @bind-Value="SelectedDate"
-                            DisabledDate="DisablePastDates" />
+                            DisabledDate="DisablePastDates"/>
             </FormItem>
 
             <div class="availability-panel">
@@ -59,6 +61,7 @@ else
                             @slot.StartTime.ToString("HH:mm") - @slot.EndTime.ToString("HH:mm")
                             @if (slot.IsReserved)
                             {
+
                                 <span> (Rezerve)</span>
                             }
                         </Button>
@@ -73,17 +76,16 @@ else
             <div style="margin-top:10px;">
                 <p><b>Toplam @(SelectedSlots?.Count ?? 0) Saatlik Seçim Yapıldı</b></p>
             </div>
-
-            <FormItem>
+            <div style="display:flex;justify-content: flex-end;">
                 <Button Type="ButtonType.Primary"
                         OnClick="GoToSummary"
                         Disabled="@(SelectedSlots == null || !SelectedSlots.Any())"
-                        Style="margin-top: 20px; width: 200px;">
-                    Devam Et
+                        Style="margin-top: 20px; width: 200px;display:flex;justify-content: center;background-color:#0095ff;color:white;">
+                    Rezervasyon Oluştur
                 </Button>
-            </FormItem>
+            </div>
         </Form>
-    </Card>
+</div>
 }
 
 <style>

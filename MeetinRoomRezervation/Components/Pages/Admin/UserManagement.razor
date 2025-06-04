@@ -1,288 +1,358 @@
 ﻿@page "/admin/users"
 @using MeetinRoomRezervation.Models
 @inject IReservationService ReservationService
-@inject IUserService UserService   
+@inject IUserService UserService
+
 @using AntDesign
 @using MeetinRoomRezervation.Services.ReservationService
 @inject NavigationManager Navigation
 
 <AuthorizeView Roles="Admin" Context="authContext">
-    <Authorized Context="authContext">
-<div class="container">
-   
-    <div class="table-responsive">
-        <table class="table table-bordered table-hover">
-            <thead>
-                <tr>
-                    <th>Ad Soyad</th>
-                    <th>Email</th>
-                    <th>Durum</th>
-                    <th>İşlemler</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var user in PagedUsers)
-                {
-                    <tr>
-                        <td>@user.FirstName</td>
-                        <td>@user.LastName</td>
-                        <td>@user.Email</td>
-                        <td>
-                            @if (user.IsActive)
-                            {
-                                <Tag Color="TagColor.Lime">Aktif</Tag>
-                            }
-                            else
-                            {
-                                <Tag Color="TagColor.Red">Pasif</Tag>
-                            }
-                        </td>
-                        <td>
-                            <Space>
-                                <Button Type="ButtonType.Link"
-                                        OnClick="@(() => EditUser(user))">
-                                    Düzenle
-                                </Button>
-                                <Button Type="ButtonType.Link"
-                                OnClick="@(() => ToggleStatus(user))">
-                                    @(user.IsActive ? "Pasifleştir" : "Aktifleştir")
-                                </Button>
-                                <Popconfirm Title="Bu kullanıcı silinsin mi?"
-                                OnConfirm="@(() => DeleteUser(user.Id))">
-                                    <Button Type="ButtonType.Link" Danger>Sil</Button>
-                                </Popconfirm>
-                            </Space>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+	<Authorized Context="authContext">
+		<div class="container">
+			<div class="admin-panel-buttons">
+				<Button Type="@ButtonType.Link"
+						OnClick="@(() => Navigation.NavigateTo("admin/dashboard"))"
+						Style="display: flex;
+							justify-content:flex-start;
+							width:160px;
+							align-items:center;
+							padding: 0;
+							border-radius: 8px;
+							margin-bottom: 10px;
+							margin-left: 5px;"
+						Block>
+					<div class="button">
+						<svg width="15" height="15" viewBox="0 0 18 18" fill="#4d4d4d">
+							<path d="M10 6V0H18V6H10ZM0 10V0H8V10H0ZM10 18V8H18V18H10ZM0 18V12H8V18H0Z" />
+						</svg>
+						<div style="margin-left:8px; color:#4d4d4d; font-size:13px;">
+							Dashboard
+						</div>
+					</div>
+				</Button>
+				<Button Type="@ButtonType.Link"
+						OnClick="@(() => Navigation.NavigateTo("/admin/users"))"
+						Style="display: flex;
+							justify-content:flex-start;
+							width:160px;
+							align-items:center;
+							background-color:#0095ff;
+							padding: 0;
+							border-radius: 8px;
+							margin-bottom: 10px;
+							margin-left: 5px;"
+						Block>
 
-    <div style="margin-top: 16px; text-align: right;">
-        <Pagination Total="@TotalUserCount"
-        PageSize="@PageSize"
-        Current="@CurrentPage"
-        OnChange="@HandlePaginationChange"
-        ShowSizeChanger="true"
-        PageSizeOptions="@(new int[] {5, 10, 20, 50, 100})" />
-    </div>
-    <Button Type="ButtonType.Primary" OnClick="@OpenCreateModal" Style="margin-bottom: 16px;">
-        Yeni Kullanıcı Oluştur
-    </Button>
-    <Modal Title="Yeni Kullanıcı Oluştur" @bind-Visible="@IsCreateModalVisible" OnOk="CreateUser"  OnCancel="CancelCreate">
+					<div class="button" style="margin-left:6px;">
+						<svg width="20" height="20" viewBox="0 0 20 23" fill="white">
+							<path fill-rule="evenodd" clip-rule="evenodd" d="M9.15831 7.6665C9.15831 9.25734 8.04998 10.5415 6.66665 10.5415C5.28331 10.5415 4.16665 9.25734 4.16665 7.6665C4.16665 6.07567 5.28331 4.7915 6.66665 4.7915C8.04998 4.7915 9.15831 6.07567 9.15831 7.6665ZM15.825 7.6665C15.825 9.25734 14.7166 10.5415 13.3333 10.5415C11.95 10.5415 10.8333 9.25734 10.8333 7.6665C10.8333 6.07567 11.95 4.7915 13.3333 4.7915C14.7166 4.7915 15.825 6.07567 15.825 7.6665ZM6.66665 12.4582C4.72498 12.4582 0.833313 13.5794 0.833313 15.8123V17.2498C0.833313 17.7769 1.20831 18.2082 1.66665 18.2082H11.6666C12.125 18.2082 12.5 17.7769 12.5 17.2498V15.8123C12.5 13.5794 8.60831 12.4582 6.66665 12.4582ZM12.525 12.5061C12.8166 12.4773 13.0916 12.4582 13.3333 12.4582C15.275 12.4582 19.1666 13.5794 19.1666 15.8123V17.2498C19.1666 17.7769 18.7916 18.2082 18.3333 18.2082H14.0166C14.1083 17.9111 14.1666 17.5853 14.1666 17.2498V15.8123C14.1666 14.4036 13.5083 13.3398 12.5583 12.5444C12.5558 12.5415 12.5533 12.5377 12.5505 12.5336C12.5442 12.5241 12.5366 12.5128 12.525 12.5061Z" />
+						</svg>
+						<div style="margin-left:8px; color:white; font-size:13px;">
+							User Management
+						</div>
+					</div>
 
-        <Form Model="@NewUser">
-             <FormItem Label="Kullanıcı İsmi">
-                <Input @bind-Value="NewUser.FirstName" />
-            </FormItem>
-             <FormItem Label="Kullanıcı Soyisim">
-                <Input @bind-Value="NewUser.LastName" />
-            </FormItem>
-            <FormItem Label="Kullanıcı Email">
-                <Input @bind-Value="NewUser.Email" />
-            </FormItem>
-            <FormItem Label="Şirket İsmi">
-                <Input @bind-Value="NewUser.Company" />
-            </FormItem>
+				</Button>
+				<Button Type="@ButtonType.Link"
+						OnClick="@(() => Navigation.NavigateTo("/admin/halls"))"
+						Style="display: flex;
+							justify-content:flex-start;
+							width:160px;
+							align-items:center;
+							padding: 0;
+							border-radius: 8px;
+							margin-bottom: 10px;
+							margin-left: 5px;"
+						Block>
+					<div class="button" style="margin-left:6px;">
+						<svg width="20" height="16" viewBox="0 0 20 24" fill="#4d4d4d">
+							<path d="M0.8715 10.4H2.614V21.6H5.2285V12H7.843V21.6H10.457V12H13.072V21.6H15.6865V10.4H17.4285C17.91 10.4 18.3005 10.042 18.3005 9.6C18.3005 9.333 18.1565 9.098 17.937 8.953L17.9385 8.9515L17.9255 8.944L17.903 8.9305L9.5855 4.626V3.365C11.1215 4.071 12.386 2.855 14.378 3.586V0.8005C12.385 0.0695 11.121 1.2845 9.5855 0.579V0.4C9.5855 0.1785 9.391 0 9.15 0C8.909 0 8.715 0.1785 8.715 0.4V4.626L0.3975 8.9295L0.375 8.943L0.3625 8.9515V8.953C0.144 9.098 0.000499964 9.3335 0.000499964 9.6C-3.62634e-08 10.042 0.3905 10.4 0.8715 10.4ZM1.7425 22.4005L0 24H18.301L16.5575 22.4005H1.7425Z" />
+						</svg>
+						<div style="margin-left:8px; color:#4d4d4d; font-size:13px;">
+							Hall Management
+						</div>
+					</div>
+				</Button>
+			</div>
+			<div class="admin-panel"></div>
+			<div class="users-panel">
+				<div class="create-user-button">
+				<Button Type="ButtonType.Primary"
+						OnClick="@OpenCreateModal">
+					Yeni Kullanıcı Oluştur
+				</Button>
+				</div>
+				<div class="table-responsive">
+					<table class="table">
+						<thead>
+							<tr>
+								<th>Ad Soyad</th>
+								<th>Email</th>
+								<th>Durum</th>
+								<th>İşlemler</th>
+							</tr>
+						</thead>
+						<thead style="font-weight:normal">
+							@foreach (var user in PagedUsers)
+							{
+								<tr>
+									<td>@user.FirstName @user.LastName</td>
+									<td>@user.Email</td>
+									<td>
+										@if (user.IsActive)
+										{
+											<Tag Color="TagColor.Lime">Aktif</Tag>
+										}
+										else
+										{
+											<Tag Color="TagColor.Red">Pasif</Tag>
+										}
+									</td>
+									<td>
+										<Space>
+											<Button Type="ButtonType.Link"
+													OnClick="@(() => EditUser(user))">
+												Düzenle
+											</Button>
+											<Button Type="ButtonType.Link"
+													OnClick="@(() => ToggleStatus(user))">
+												@(user.IsActive ? "Pasifleştir" : "Aktifleştir")
+											</Button>
+											<Popconfirm Title="Bu kullanıcı silinsin mi?"
+														OnConfirm="@(() => DeleteUser(user.Id))">
+												<Button Type="ButtonType.Link" Danger>Sil</Button>
+											</Popconfirm>
+										</Space>
+									</td>
+								</tr>
+							}
+						</thead>
+					</table>
+				</div>
+				<div style="margin-top: 16px; text-align: right;">
+					<Pagination Total="@TotalUserCount"
+								PageSize="@PageSize"
+								Current="@CurrentPage"
+								OnChange="@HandlePaginationChange"
+								ShowSizeChanger="true"
+								PageSizeOptions="@(new int[] {5, 10, 20, 50, 100})" />
+				</div>
+				
+				<Modal Title="Yeni Kullanıcı Oluştur" @bind-Visible="@IsCreateModalVisible" OnOk="CreateUser" OnCancel="CancelCreate">
 
-            <FormItem Label="Yetkili">
-                <Input @bind-Value="NewUser.CompanyOfficial" />
-            </FormItem>
+					<Form Model="@NewUser">
+						<FormItem Label="Kullanıcı İsmi">
+							<Input @bind-Value="NewUser.FirstName" />
+						</FormItem>
+						<FormItem Label="Kullanıcı Soyisim">
+							<Input @bind-Value="NewUser.LastName" />
+						</FormItem>
+						<FormItem Label="Kullanıcı Email">
+							<Input @bind-Value="NewUser.Email" />
+						</FormItem>
+						<FormItem Label="Şirket İsmi">
+							<Input @bind-Value="NewUser.Company" />
+						</FormItem>
 
-            <FormItem Label="Telefon">
-                <Input @bind-Value="NewUser.ContactPhone" />
-            </FormItem>
-            <FormItem Label="Aylık Kullanım Hakkı (Saat)">
-                <AntDesign.InputNumber @bind-Value="NewUser.MonthlyUsageLimit" />
-            </FormItem>
-            <FormItem Label="Bu Ay Kullanıldı">
-                <Typography Type="TextElementType.Secondary">
-                    @NewUser.UsedThisMonth Moments
-                </Typography>
-            </FormItem>
-        </Form>
-    </Modal>
-    <Modal Title="Kullanıcı Düzenle" @bind-Visible="@IsEditModalVisible" OnOk="UpdateUser" OnCancel="CancelEdit">
-        <Form Model="@EditingUser">
-            <FormItem Label="Kullanıcı İsmi">
-                <Input @bind-Value="EditingUser.FirstName" />
-            </FormItem>
-            <FormItem Label="Kullanıcı Soyisim">
-                <Input @bind-Value="EditingUser.LastName" />
-            </FormItem>
-            <FormItem Label="Kullanıcı Email">
-                <Input @bind-Value="EditingUser.Email" />
-            </FormItem>
-            <FormItem Label="Şirket İsmi">
-                <Input @bind-Value="EditingUser.Company" />
-            </FormItem>
-            <FormItem Label="Yetkili">
-                <Input @bind-Value="EditingUser.CompanyOfficial" />
-            </FormItem>
-            <FormItem Label="Telefon">
-                <Input @bind-Value="EditingUser.ContactPhone" />
-            </FormItem>
-            <FormItem Label="Aylık Kullanım Hakkı (Saat)">
-                <AntDesign.InputNumber @bind-Value="EditingUser.MonthlyUsageLimit" />
-            </FormItem>
-            <FormItem Label="Bu Ay Kullanıldı">
-                <Typography Type="TextElementType.Secondary">
-                    @EditingUser.UsedThisMonth Saat
-                </Typography>
-            </FormItem>
-        </Form>
-    </Modal>
+						<FormItem Label="Yetkili">
+							<Input @bind-Value="NewUser.CompanyOfficial" />
+						</FormItem>
 
-        </div>
-    </Authorized>
-    <NotAuthorized>
-        <div style="padding: 24px; max-width: 600px; margin: 0 auto;">
-            <Alert Type="@AlertType.Warning"
-                   Message="Yetkisiz Erişim"
-                   Description="Bu sayfaya erişim yetkiniz bulunmamaktadır. Admin yetkisi gereklidir."
-                   ShowIcon="true"
-                   Style="margin-bottom: 16px;" />
+						<FormItem Label="Telefon">
+							<Input @bind-Value="NewUser.ContactPhone" />
+						</FormItem>
+						<FormItem Label="Aylık Kullanım Hakkı (Saat)">
+							<AntDesign.InputNumber @bind-Value="NewUser.MonthlyUsageLimit" />
+						</FormItem>
+						<FormItem Label="Bu Ay Kullanıldı">
+							<Typography Type="TextElementType.Secondary">
+								@NewUser.UsedThisMonth Moments
+							</Typography>
+						</FormItem>
+					</Form>
+				</Modal>
+				<Modal Title="Kullanıcı Düzenle" @bind-Visible="@IsEditModalVisible" OnOk="UpdateUser" OnCancel="CancelEdit">
+					<Form Model="@EditingUser">
+						<FormItem Label="Kullanıcı İsmi">
+							<Input @bind-Value="EditingUser.FirstName" />
+						</FormItem>
+						<FormItem Label="Kullanıcı Soyisim">
+							<Input @bind-Value="EditingUser.LastName" />
+						</FormItem>
+						<FormItem Label="Kullanıcı Email">
+							<Input @bind-Value="EditingUser.Email" />
+						</FormItem>
+						<FormItem Label="Şirket İsmi">
+							<Input @bind-Value="EditingUser.Company" />
+						</FormItem>
+						<FormItem Label="Yetkili">
+							<Input @bind-Value="EditingUser.CompanyOfficial" />
+						</FormItem>
+						<FormItem Label="Telefon">
+							<Input @bind-Value="EditingUser.ContactPhone" />
+						</FormItem>
+						<FormItem Label="Aylık Kullanım Hakkı (Saat)">
+							<AntDesign.InputNumber @bind-Value="EditingUser.MonthlyUsageLimit" />
+						</FormItem>
+						<FormItem Label="Bu Ay Kullanıldı">
+							<Typography Type="TextElementType.Secondary">
+								@EditingUser.UsedThisMonth Saat
+							</Typography>
+						</FormItem>
+					</Form>
+				</Modal>
+			</div>
+		</div>
+	</Authorized>
+	<NotAuthorized>
+		<div style="padding: 24px; max-width: 600px; margin: 0 auto;">
+			<Alert Type="@AlertType.Warning"
+				   Message="Yetkisiz Erişim"
+				   Description="Bu sayfaya erişim yetkiniz bulunmamaktadır. Admin yetkisi gereklidir."
+				   ShowIcon="true"
+				   Style="margin-bottom: 16px;" />
 
-            <div style="text-align: center;">
-                <Space>
-                    <SpaceItem>
-                        <Button Type="ButtonType.Primary" OnClick="@(() => Navigation.NavigateTo("/login"))" Icon="login">
-                            Giriş Yap
-                        </Button>
-                    </SpaceItem>
-                    <SpaceItem>
-                        <Button Type="ButtonType.Default" OnClick="@(() => Navigation.NavigateTo("/user/roomStatus"))" Icon="home">
-                            Ana Sayfaya Dön
-                        </Button>
-                    </SpaceItem>
-                </Space>
-            </div>
-        </div>
-    </NotAuthorized>
+			<div style="text-align: center;">
+				<Space>
+					<SpaceItem>
+						<Button Type="ButtonType.Primary" OnClick="@(() => Navigation.NavigateTo("/login"))" Icon="login">
+							Giriş Yap
+						</Button>
+					</SpaceItem>
+					<SpaceItem>
+						<Button Type="ButtonType.Default" OnClick="@(() => Navigation.NavigateTo("/user/roomStatus"))" Icon="home">
+							Ana Sayfaya Dön
+						</Button>
+					</SpaceItem>
+				</Space>
+			</div>
+		</div>
+	</NotAuthorized>
 </AuthorizeView>
+
 @code {
-    private List<UserDto> AllUsers = new();
-    private List<UserDto> PagedUsers = new();
-    private int PageSize = 5;
-    private int CurrentPage = 1;
-    private int TotalUserCount = 0;
-    private bool IsCreateModalVisible = false;
-    private UserDto NewUser = new();
-    private bool IsEditModalVisible = false;
-    private UserDto EditingUser = new();
+	private List<UserDto> AllUsers = new();
+	private List<UserDto> PagedUsers = new();
+	private int PageSize = 5;
+	private int CurrentPage = 1;
+	private int TotalUserCount = 0;
+	private bool IsCreateModalVisible = false;
+	private UserDto NewUser = new();
+	private bool IsEditModalVisible = false;
+	private UserDto EditingUser = new();
 
-    private void OpenCreateModal()
-    {
-        NewUser = new UserDto
-        {
-                Id = Guid.NewGuid().ToString(),
-                Email = NewUser.Email,
-                FirstName = NewUser.FirstName,
-                LastName = NewUser.LastName,
-                Company = NewUser.Company,
-                CompanyOfficial = NewUser.CompanyOfficial,
-                ContactPhone = NewUser.ContactPhone,
-                MonthlyUsageLimit = NewUser.MonthlyUsageLimit,
-                UsedThisMonth = 0
-            };
-        IsCreateModalVisible = true;
-        StateHasChanged();
-    }
+	private void OpenCreateModal()
+	{
+		NewUser = new UserDto
+			{
+				Id = Guid.NewGuid().ToString(),
+				Email = NewUser.Email,
+				FirstName = NewUser.FirstName,
+				LastName = NewUser.LastName,
+				Company = NewUser.Company,
+				CompanyOfficial = NewUser.CompanyOfficial,
+				ContactPhone = NewUser.ContactPhone,
+				MonthlyUsageLimit = NewUser.MonthlyUsageLimit,
+				UsedThisMonth = 0
+			};
+		IsCreateModalVisible = true;
+		StateHasChanged();
+	}
 
-    private void CancelCreate()
-    {
-        IsCreateModalVisible = false;
-        NewUser = new();
-    }
+	private void CancelCreate()
+	{
+		IsCreateModalVisible = false;
+		NewUser = new();
+	}
 
-    private async Task CreateUser()
-    {
-        await UserService.AddUserAsync(NewUser);
-        await LoadUsers();
-        CancelCreate();
-    }
-    protected override async Task OnInitializedAsync()
-    {
-        await UserService.UpdateMonthlyUsageAsync(); 
-        await LoadUsers();
-    }
+	private async Task CreateUser()
+	{
+		await UserService.AddUserAsync(NewUser);
+		await LoadUsers();
+		CancelCreate();
+	}
+	protected override async Task OnInitializedAsync()
+	{
+		await UserService.UpdateMonthlyUsageAsync();
+		await LoadUsers();
+	}
 
-    private async Task LoadUsers()
-    {
-        AllUsers = await UserService.GetAllUsersAsync();
-        TotalUserCount = AllUsers.Count;
-        LoadPage();
-    }
+	private async Task LoadUsers()
+	{
+		AllUsers = await UserService.GetAllUsersAsync();
+		TotalUserCount = AllUsers.Count;
+		LoadPage();
+	}
 
-    private void LoadPage()
-    {
-        PagedUsers = AllUsers
-            .OrderByDescending(r => r.Id)
-            .Skip((CurrentPage - 1) * PageSize)
-            .Take(PageSize)
-            .ToList();
-    }
+	private void LoadPage()
+	{
+		PagedUsers = AllUsers
+			.OrderByDescending(r => r.Id)
+			.Skip((CurrentPage - 1) * PageSize)
+			.Take(PageSize)
+			.ToList();
+	}
 
-    private async Task ToggleStatus(UserDto user)
-    {
-        user.IsActive = !user.IsActive;
-        await UserService.UpdateUserStatusAsync(user.Id, user.IsActive);
-        await LoadUsers();
-    }
+	private async Task ToggleStatus(UserDto user)
+	{
+		user.IsActive = !user.IsActive;
+		await UserService.UpdateUserStatusAsync(user.Id, user.IsActive);
+		await LoadUsers();
+	}
 
-    private async Task DeleteUser(string id)
-    {
-        await UserService.DeleteUserAsync(id);
-        await LoadUsers();
-    }
+	private async Task DeleteUser(string id)
+	{
+		await UserService.DeleteUserAsync(id);
+		await LoadUsers();
+	}
 
-    private void HandlePaginationChange(PaginationEventArgs args)
-    {
-        // args içinde hem sayfa hem de sayfa boyutu bilgisi olabilir
-        CurrentPage = args.Page;
+	private void HandlePaginationChange(PaginationEventArgs args)
+	{
+		// args içinde hem sayfa hem de sayfa boyutu bilgisi olabilir
+		CurrentPage = args.Page;
 
-        if (args.PageSize != PageSize)
-        {
-            PageSize = args.PageSize;
-        }
+		if (args.PageSize != PageSize)
+		{
+			PageSize = args.PageSize;
+		}
 
-        LoadPage();
-        StateHasChanged();
-    }
-    
+		LoadPage();
+		StateHasChanged();
+	}
 
-    private void EditUser(UserDto user)
-    {
-        EditingUser = new UserDto
-            {
-                Id = user.Id,
-                Email = user.Email,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Company = user.Company,
-                CompanyOfficial = user.CompanyOfficial,
-                ContactPhone = user.ContactPhone,
-                MonthlyUsageLimit = user.MonthlyUsageLimit,
-                UsedThisMonth = user.UsedThisMonth,
-                IsActive = user.IsActive
-            };
 
-        IsEditModalVisible = true;
-    }
+	private void EditUser(UserDto user)
+	{
+		EditingUser = new UserDto
+			{
+				Id = user.Id,
+				Email = user.Email,
+				FirstName = user.FirstName,
+				LastName = user.LastName,
+				Company = user.Company,
+				CompanyOfficial = user.CompanyOfficial,
+				ContactPhone = user.ContactPhone,
+				MonthlyUsageLimit = user.MonthlyUsageLimit,
+				UsedThisMonth = user.UsedThisMonth,
+				IsActive = user.IsActive
+			};
 
-    private void CancelEdit()
-    {
-        IsEditModalVisible = false;
-        EditingUser = new();
-    }
+		IsEditModalVisible = true;
+	}
 
-    private async Task UpdateUser()
-    {
-        await UserService.UpdateUserAsync(EditingUser);
-        await LoadUsers();
-        IsEditModalVisible = false;
-    }
+	private void CancelEdit()
+	{
+		IsEditModalVisible = false;
+		EditingUser = new();
+	}
+
+	private async Task UpdateUser()
+	{
+		await UserService.UpdateUserAsync(EditingUser);
+		await LoadUsers();
+		IsEditModalVisible = false;
+	}
 
 
 }
