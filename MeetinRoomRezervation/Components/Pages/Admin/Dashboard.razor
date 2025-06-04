@@ -3,6 +3,7 @@
 @using MeetinRoomRezervation.Models
 @inject IReservationService ReservationService
 @inject IRoomService RoomService
+@inject IUserService UserService
 @using AntDesign
 @using MeetinRoomRezervation.Services.ReservationService
 @inject NavigationManager Navigation
@@ -268,16 +269,17 @@
 		var reservations = await ReservationService.GetAllReservationsAsync();
 
 		LastReservations = reservations
-			.OrderByDescending(r => r.StartTime)
+			.Where(r => r.StartTime.Date >= DateTime.Now)
+			.OrderBy(r => r.StartTime)
 			.Take(10)
 			.ToList();
 
 		var allRooms = await RoomService.GetAllRoomsAsync();
-		//var allUsers = await UserService.GetAllUsersAsync();
+		var allUsers = await UserService.GetAllUsersAsync();
 		var allReservations = await ReservationService.GetAllReservationsAsync();
 
 		TotalRoomCount = allRooms.Count;
-		TotalUserCount = 1245;
+		TotalUserCount = allUsers.Count;
 
 		var today = DateTime.Today;
 		var tomorrow = today.AddDays(1);
@@ -303,7 +305,7 @@
 	private double CalculateOccupancyPercentage(List<ReservationDto> reservations, int totalRoomDays)
 	{
 		double reservedHours = reservations.Count; // 1 saatlik rezervasyon varsayıyoruz
-		double totalHours = totalRoomDays * 9; // 09:00-18:00 → 9 saat
+		double totalHours = totalRoomDays * 24; 
 		if (totalHours == 0) return 0;
 
 		return Math.Round((reservedHours / totalHours) * 100, 2);
@@ -401,7 +403,7 @@
 	{
 
 		PagedReservations = AllReservations
-			.OrderByDescending(r => r.StartTime)
+			.OrderBy(r => r.StartTime)
 			.Skip((CurrentPage - 1) * PageSize)
 			.Take(PageSize)
 			.ToList();
