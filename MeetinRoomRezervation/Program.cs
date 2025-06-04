@@ -36,6 +36,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddAuthorization();
 builder.Services.AddScoped<IReservationService, ReservationService>();
 builder.Services.AddScoped<IRoomService, RoomService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPasswordResetService, PasswordResetService>();
 
 builder.Services.AddValidatorsFromAssemblyContaining<MeetingRoomValidator>();
@@ -100,6 +101,5 @@ using (var scope = app.Services.CreateScope())
 	var seedService = scope.ServiceProvider.GetRequiredService<SeedDataService>();
 	await seedService.SeedAdminUserAsync();
 }
-app.MapGet("/", () => Results.Redirect("/login"));
 
 await app.RunAsync();
