@@ -80,9 +80,9 @@
 		try
 		{
 			var user = await AuthService.LoginAsync(LoginModel);
+
 			if (user != null)
 			{
-
 				if (AuthProvider is CustomAuthenticationStateProvider customProvider)
 				{
 					customProvider.MarkUserAsAuthenticated(user.Email, user.Role.ToString());
