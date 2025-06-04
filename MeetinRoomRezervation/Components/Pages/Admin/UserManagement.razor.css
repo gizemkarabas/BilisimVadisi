@@ -46,3 +46,12 @@
     justify-content: flex-end;
     align-items: flex-start;
 }
+.table {
+    display: table;
+    table-layout: fixed;
+    font-size: 15px;
+    font-weight: bold;
+    width: 60vw;
+    height: 10vh;
+    text-align:left;
+}
