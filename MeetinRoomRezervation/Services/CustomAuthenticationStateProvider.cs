@@ -32,10 +32,10 @@ namespace MeetinRoomRezervation.Services
         {
             if (!_user.Claims.Any())
             {
-                var token = httpContextAccessor?.HttpContext?.Request?.Cookies[Token];
+                var token = httpContextAccessor?.HttpContext?.Request?.Cookies["Token"];
                 if (token == null)
                 {
-                    token = await cookieService.GetFromCookieAsync(Token);
+                    token = await cookieService.GetFromCookieAsync("Token");
                 }
 
                 if (token != null)
@@ -50,7 +50,10 @@ namespace MeetinRoomRezervation.Services
                             return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
                         }
 
-                        var claims = jwtToken.Claims.Select(c => new Claim(c.Type, c.Value));
+                        var claims = jwtToken.Claims.ToList();
+                        var claim = claims.FirstOrDefault(p => p.Type == "role");
+                        claims.Remove(claim);
+                        claims.Add(new Claim(ClaimTypes.Role, claim?.Value ?? "User"));
                         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                         _user = new ClaimsPrincipal(identity);
                     }
@@ -74,7 +77,9 @@ namespace MeetinRoomRezervation.Services
                     }
                 }
             }
-            return new AuthenticationState(_user);
+            var state = new AuthenticationState(_user);
+            NotifyAuthenticationStateChanged(Task.FromResult(state));
+            return state;
         }
     }
 }
