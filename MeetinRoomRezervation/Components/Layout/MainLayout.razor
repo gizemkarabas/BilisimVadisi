@@ -17,44 +17,44 @@
         </div>
         <Menu Mode="MenuMode.Horizontal" style="background-color: unset;">
         <AuthorizeView>
-            <Authorized>
-                @{
-                    var userRole = context.User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
-                    var homeLink = userRole == "Admin" ? "/admin/dashboard" : "/user/roomStatus";
-                }
-
-                <MenuItem Key="1" RouterLink="@homeLink" RouterMatch="NavLinkMatch.All" style="color: white!important;">
-                    <div class="panel-transparent">
-                        <Icon Type="home" Theme="IconThemeType.Outline" />
-                        Ana Sayfa
-                    </div>
-                </MenuItem>
-            </Authorized>
-            <NotAuthorized>
-                <MenuItem Key="2" RouterLink="/register">
-                    <div class="panel-transparent">
-                        <Icon Type="user-add" Theme="IconThemeType.Outline" />
-                        Kayıt Ol
-                    </div>
-                </MenuItem>
-                <MenuItem Key="3" RouterLink="/login">
-                    <div class="panel-transparent">
-                        <Icon Type="login" Theme="IconThemeType.Outline" />
-                        Giriş Yap
-                    </div>
-                </MenuItem>
-            </NotAuthorized>
+                <NotAuthorized>
+                    
+                    <MenuItem Key="2" RouterLink="/register">
+                        <div class="panel-transparent">
+                            <Icon Type="user-add" Theme="IconThemeType.Outline" />
+                            Kayıt Ol
+                        </div>
+                    </MenuItem>
+                    <MenuItem Key="3" RouterLink="/login">
+                        <div class="panel-transparent">
+                            <Icon Type="login" Theme="IconThemeType.Outline" />
+                            Giriş Yap
+                        </div>
+                    </MenuItem>
+                </NotAuthorized>
                         <Authorized>
+                <MenuItem Key="1">
+                    <div class="panel-transparent" style="color: white;">
+                        <Icon Type="user" Theme="IconThemeType.Outline" />
+                        Hoş geldin, @GetUserDisplayName(context.User)
+                    </div>
+                </MenuItem>
+                    <MenuItem Key="2" RouterLink="/user/roomStatus" RouterMatch="NavLinkMatch.All" style="color: white!important;">
+                        <div class="panel-transparent">
+                            <Icon Type="home" Theme="IconThemeType.Outline" />
+                            Ana Sayfa
+                        </div>
+                    </MenuItem>
+                    <MenuItem Key="3" RouterLink="/user/myReservations" RouterMatch="NavLinkMatch.All" style="color: white!important;">
+                        <div class="panel-transparent">
+                            <Icon Type="home" Theme="IconThemeType.Outline" />
+                            Rezervasyonlarım
+                        </div>
+                    </MenuItem>
                 <MenuItem Key="4">
                     <div class="panel-transparent" style="cursor: pointer; color: white;" @onclick="HandleLogout">
                         <Icon Type="logout" Theme="IconThemeType.Outline" />
                         Çıkış Yap
-                    </div>
-                </MenuItem>
-                <MenuItem Key="5">
-                    <div class="panel-transparent" style="color: white;">
-                        <Icon Type="user" Theme="IconThemeType.Outline" />
-                        Hoş geldin, @GetUserDisplayName(context.User)
                     </div>
                 </MenuItem>
             </Authorized>
