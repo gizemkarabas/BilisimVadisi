@@ -1,0 +1,8 @@
+services:
+  meetingroomrezervation:
+    environment:
+      - ConnectionStrings__MongoDB=mongodb://vadiuser:KNE8aKxCNqfiisqF@mongo:27020
+  mongo:
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=vadiuser
+      - MONGO_INITDB_ROOT_PASSWORD=KNE8aKxCNqfiisqF

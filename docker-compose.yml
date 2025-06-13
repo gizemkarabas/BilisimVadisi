@@ -1,33 +1,29 @@
 services:
   meetingroomrezervation:
+    image: hknyvzz/meetingroomrezervation:latest
     build:
       context: .
       dockerfile: MeetinRoomRezervation/Dockerfile
     ports:
       - "8080:8080"
-      - "8081:8081"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__MongoDB=mongodb://mongodb:27017/BilisimVadisi
     depends_on:
-      - mongodb
+      - mongo
     networks:
-      - bilisimvadisi-network
+      - vadi_network
 
-  mongodb:
-    image: docker.io/library/mongo:7.0
-    container_name: mongodb
+  mongo:
+    image: mongo:latest
+    container_name: mongoDB
+    restart: always
     ports:
       - "27017:27017"
-    volumes:
-      - mongodb_data:/data/db
     networks:
-      - bilisimvadisi-network
-    command: mongod --bind_ip_all
+      - vadi_network
+    volumes:
+       - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo-js:ro
+       - ./volumes/mongo:/data/db
+    command: [--auth]
 
 networks:
-  bilisimvadisi-network:
+  vadi_network:
     driver: bridge
-
-volumes:
-  mongodb_data:
