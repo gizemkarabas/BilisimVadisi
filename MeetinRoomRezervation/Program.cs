@@ -26,9 +26,9 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
 	.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
 	{
-		options.LoginPath = "/login";
+		options.LoginPath = "/";
 		options.LogoutPath = "/logout";
-		options.AccessDeniedPath = "/login";
+		options.AccessDeniedPath = "/";
 		options.ExpireTimeSpan = TimeSpan.FromDays(7);
 		options.SlidingExpiration = true;
 		options.Cookie.HttpOnly = true;

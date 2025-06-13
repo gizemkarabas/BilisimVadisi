@@ -42,7 +42,7 @@
                 <span>Zaten hesabınız var mı?</span>
             </Divider>
             
-            <Button Type="@ButtonType.Link" OnClick="@(() => Navigation.NavigateTo("/login"))" Block>
+            <Button Type="@ButtonType.Link" OnClick="@(() => Navigation.NavigateTo("/"))" Block>
                 Giriş Yap
             </Button>
         </Form>
@@ -65,7 +65,7 @@
 
         if (user!=null)
         {
-            Navigation.NavigateTo("/login");
+            Navigation.NavigateTo("/");
         }
         else
         {

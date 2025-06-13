@@ -95,7 +95,7 @@
     private async Task HandleLogout()
     {
         await AuthService.LogoutAsync();
-        Navigation.NavigateTo("/login", forceLoad:true);
+        Navigation.NavigateTo("/", forceLoad:true);
     }
 }
 

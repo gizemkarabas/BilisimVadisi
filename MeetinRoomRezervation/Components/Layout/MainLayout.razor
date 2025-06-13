@@ -25,7 +25,7 @@
                             Kayıt Ol
                         </div>
                     </MenuItem>
-                    <MenuItem Key="3" RouterLink="/login">
+                    <MenuItem Key="3" RouterLink="/">
                         <div class="panel-transparent">
                             <Icon Type="login" Theme="IconThemeType.Outline" />
                             Giriş Yap
@@ -102,6 +102,6 @@
             Console.WriteLine($"Logout error: {ex.Message}");
         }
 
-        Navigation.NavigateTo("/login", forceLoad: true);
+        Navigation.NavigateTo("/", forceLoad: true);
     }
 }
