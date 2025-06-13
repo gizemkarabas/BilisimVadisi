@@ -3,7 +3,6 @@ using MongoDB.Driver;
 using System.Net;
 using System.Net.Mail;
 using System.Security.Cryptography;
-using System.Text;
 
 namespace MeetinRoomRezervation.Services
 {
@@ -65,7 +64,7 @@ namespace MeetinRoomRezervation.Services
 				}
 
 				// Yeni şifreyi hash'le
-				var hashedPassword = HashPassword(newPassword);
+				var hashedPassword = BCrypt.Net.BCrypt.HashPassword(newPassword);
 
 				// Şifreyi güncelle ve token'ı temizle
 				var update = Builders<User>.Update
@@ -97,14 +96,6 @@ namespace MeetinRoomRezervation.Services
 			var bytes = new byte[32];
 			rng.GetBytes(bytes);
 			return Convert.ToBase64String(bytes).Replace("+", "-").Replace("/", "_").Replace("=", "");
-		}
-
-		private string HashPassword(string password)
-		{
-			using var sha256 = SHA256.Create();
-			var bytes = Encoding.UTF8.GetBytes(password);
-			var hash = sha256.ComputeHash(bytes);
-			return Convert.ToBase64String(hash);
 		}
 
 		private async Task SendResetEmailAsync(string email, string resetToken)
