@@ -5,6 +5,7 @@
 @inject IRoomService RoomService
 @inject NavigationManager Navigation
 
+
 <div class="reservation-panel">
 	<PageTitle>Toplantı Odaları</PageTitle>
 
@@ -26,7 +27,7 @@
 		{
 			@foreach (var room in Rooms)
 			{
-				<AntDesign.Col Span="6">
+				<AntDesign.Col Xs="24" Sm="24" Md="12" Lg="8" Xl="6">
 					<div @onclick="@(() => NavigateToReservation(room))">
 						<Card Hoverable Style="margin-bottom: 16px; border-radius: 10px" Class="@(room.IsAvailable ? "available-room" : "unavailable-room")">
 							<CardMeta Title="@room.Name" Description="@room.Location" />
@@ -69,32 +70,32 @@
 		}
 	}
 
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadRooms();
-    }
-   
-    private async Task LoadRooms()
-    {
-        try
-        {
-            Rooms.Clear();
+	protected override async Task OnInitializedAsync()
+	{
+		await LoadRooms();
+	}
 
-            Rooms = await RoomService.GetAllRoomsWithOccupancyAsync(SelectedDate);
+	private async Task LoadRooms()
+	{
+		try
+		{
+			Rooms.Clear();
 
-            await InvokeAsync(StateHasChanged);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error in LoadRooms: {ex.Message}");
-        }
-    }
-    
-    private string GetStatusColor(bool available) => available ? "green" : "red";
+			Rooms = await RoomService.GetAllRoomsWithOccupancyAsync(SelectedDate);
 
-    private void NavigateToReservation(MeetingRoomDto room)
-    {
-        if (!room.IsAvailable) return;
+			await InvokeAsync(StateHasChanged);
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error in LoadRooms: {ex.Message}");
+		}
+	}
+
+	private string GetStatusColor(bool available) => available ? "green" : "red";
+
+	private void NavigateToReservation(MeetingRoomDto room)
+	{
+		if (!room.IsAvailable) return;
 
 		var dateStr = SelectedDate.ToString("yyyy-MM-dd");
 		Navigation.NavigateTo($"/user/reserve?roomId={room.Id}&date={dateStr}");

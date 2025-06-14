@@ -6,6 +6,27 @@
     margin: 0;
     width: 100%;
 }
+.admin-button-title {
+    margin-left: 5px;
+    margin-right: 2px;
+    color: #4d4d4d;
+    font-size: 12px;
+}
+
+.active-admin-button-title {
+    margin-left: 5px;
+    color: white;
+    font-size: 13px;
+    font-weight: bold;
+}
+.admin-panel-buttons {
+    position: fixed;
+    margin-left: 20px;
+    margin-top: 45px;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
 
 .admin-panel {
     width: 15vw;
@@ -19,14 +40,6 @@
     align-items: center;
 }
 
-.admin-panel-buttons {
-    position: fixed;
-    margin-left: 20px;
-    margin-top: 45px;
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-}
 
 .button {
     display: flex;
@@ -54,4 +67,110 @@
     width: 60vw;
     height: 10vh;
     text-align:left;
+}
+
+@media (max-width: 600px) {
+    .container {
+        display: flex;
+        width: auto;
+        flex-direction: column;
+        margin: 0px;
+    }
+
+    .admin-panel {
+        display: none;
+    }
+    .admin-button-title {
+        margin-left:5px;
+        margin-right:2px;
+        color:#4d4d4d;
+        font-size:12px;
+    }
+    .active-admin-button-title {
+        margin-left:5px;
+        color:white;
+        font-size:13px;
+        font-weight:bold;
+    }
+
+    .admin-panel-buttons {
+        position: static;
+        margin: 0 0 10px 0;
+        margin-top: 20px;
+        flex-direction: row;
+        height: auto;
+        width: 98vw;
+        justify-content: flex-start;
+        align-items: center;
+    }
+
+
+    .count-panel {
+        box-shadow: 5px 5px 10px rgba(87, 87, 87, 0.1);
+        border-radius: 10px;
+        border-color: #d2d2d2;
+        border: 1.2px solid #e2dfdf;
+        width: 22vw;
+        height: 130px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+    }
+
+    .count-panel-title {
+        font-size: 12px;
+        height: 50%;
+        color: black;
+        padding: 10px;
+        align-self: flex-start;
+    }
+
+    .count-panel-value {
+        font-size: 20px;
+        font-weight: bold;
+        height: 35%;
+        color: #0095ff;
+        padding-top: 20px;
+        padding: 10px;
+        align-self: flex-end;
+        text-align: right;
+    }
+
+    .table {
+        width: 140vw;
+        max-width: 140vw;
+        height: auto;
+        font-size: 13px;
+        margin-top:65px;
+    }
+
+    .last-reservation-panel {
+        width: 95vw;
+        max-width: 95vw;
+        height: auto;
+        padding: 5vw 2vw;
+        box-sizing: border-box;
+        overflow-x: auto;
+        overflow-y: hidden;
+        white-space: nowrap;
+    }
+
+    .users-panel {
+        width: 95vw;
+        max-width: 95vw;
+        margin-left: 2vw;
+        margin-top: 2vh;
+        overflow-x: auto;
+        overflow-y: hidden;
+        white-space: nowrap;
+    }
+    .create-user-button {
+        display: flex;
+        position: absolute;
+        margin-left: 200px;
+        justify-content: flex-end;
+        align-items: flex-start;
+        margin-bottom: 25px;
+    }
 }

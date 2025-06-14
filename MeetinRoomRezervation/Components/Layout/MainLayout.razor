@@ -9,9 +9,9 @@
 
 <AntDesign.AntContainer />
 
-<Layout Style="min-height: 100vh; background-color: white;">
-    <Header Style="background: #0095ff; padding: 0 24px; display: flex; align-items: center; justify-content: space-between;">
-        <div class="logo" style="font-size: 18px; font-weight: bold; color: white;">
+<div Style="min-height: 90vh; background-color: white;">
+    <div class="main-layout-bar">
+        <div class="main-layout-log">
             <Icon Type="home" Theme="IconThemeType.Outline" />
             Toplantı Odası Rezervasyon
         </div>
@@ -60,17 +60,17 @@
             </Authorized>
         </AuthorizeView>
         </Menu>
-    </Header>
+    </div>
     <Content>
         <div>
             @Body
         </div>
     </Content>
-    <Footer Style="text-align: center;">
-        Toplantı Odası Rezervasyon Sistemi ©@DateTime.Now.Year
-    </Footer>
-</Layout>
-
+    
+</div>
+<div class="ref">
+    Toplantı Odası Rezervasyon Sistemi ©@DateTime.Now.Year
+</div>
 @code {
     private string GetUserDisplayName(ClaimsPrincipal user)
     {
