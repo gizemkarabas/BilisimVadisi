@@ -1,4 +1,4 @@
-﻿@page "/user/reserve"
+﻿@page "/user/reservationForm"
 @using System.Security.Claims
 @using MeetinRoomRezervation.Models
 @using MeetinRoomRezervation.Services.ReservationService
@@ -19,7 +19,7 @@
 else if (SelectedRoom is null)
 {
     <Alert Message="Toplantı odası bulunamadı." Type="AlertType.Error" ShowIcon="true" />
-    <Button Type="ButtonType.Primary" OnClick="@(() => Navigation.NavigateTo("/user/roomStatus"))">
+    <Button Type="ButtonType.Primary" OnClick="@(() => Navigation.NavigateTo("/user/meetingRooms"))">
         Oda Listesine Dön
     </Button>
 }
