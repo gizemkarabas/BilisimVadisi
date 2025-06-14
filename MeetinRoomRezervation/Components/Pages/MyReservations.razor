@@ -23,13 +23,13 @@
 else
 {
 		<Tabs DefaultActiveKey="1">
-			<TabPane Key="1" Tab="Aktif Rezervasyonlarım">
+			<TabPane Key="1" Tab="Aktif Rezervasyonlarım" Style="min-width:10vw;">
 				@if (FutureReservations.Any())
 				{
 					<Row Gutter="16">
 						@foreach (var reservation in FutureReservations)
 						{
-							<AntDesign.Col Span="8">
+							<AntDesign.Col Xs="24" Sm="24" Md="12" Lg="8" Xl="6">
 								<Card Title="@($"{reservation.StartTime.ToLocalTime().ToString("HH:mm")} - {reservation.EndTime.ToLocalTime().ToString("HH:mm")}")"
 									  Class="reservation-card"
 									  Style="margin-bottom: 16px;
@@ -75,13 +75,13 @@ else
 				}
 			</TabPane>
 
-			<TabPane Key="2" Tab="Geçmiş Rezervasyonlarım">
+			<TabPane Key="2" Tab="Geçmiş Rezervasyonlarım" Style="min-width:10vw;">
 				@if (PastReservations.Any())
 				{
 					<Row Gutter="16">
 						@foreach (var reservation in PastReservations)
 						{
-							<AntDesign.Col Span="8">
+							<AntDesign.Col Xs="24" Sm="24" Md="12" Lg="8" Xl="6">
 								<Card Title="@($"{reservation.StartTime.ToString("HH:mm")} - {reservation.EndTime.ToString("HH:mm")}")"
 									  Style="margin-bottom: 16px;
                                                   border-radius: 6px;

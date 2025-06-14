@@ -14,11 +14,7 @@
     margin-right: 120px;
     height: auto;
 }
-.test-blazor-css {
-    background: red !important;
-    color: white !important;
-    font-size: 30px !important;
-}
+
     
 .reservation-panel-header {
     font-size: 14px;

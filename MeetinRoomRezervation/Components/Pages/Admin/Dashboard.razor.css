@@ -6,7 +6,19 @@
     margin: 0;
     width: 100%;
 }
+.admin-button-title {
+    margin-left: 5px;
+    margin-right: 2px;
+    color: #4d4d4d;
+    font-size: 12px;
+}
 
+.active-admin-button-title {
+    margin-left: 5px;
+    color: white;
+    font-size: 13px;
+    font-weight: bold;
+}
 .admin-panel {
     width: 15vw;
     height: 100vh;
@@ -105,14 +117,27 @@
     .admin-panel {
         display:none;
     }
+    .admin-button-title {
+        margin-left: 5px;
+        margin-right: 2px;
+        color: #4d4d4d;
+        font-size: 12px;
+    }
+
+    .active-admin-button-title {
+        margin-left: 5px;
+        color: white;
+        font-size: 13px;
+        font-weight: bold;
+    }
 
     .admin-panel-buttons {
         position: static;
         margin: 0 0 10px 0;
-        margin-top:20px;
+        margin-top: 20px;
         flex-direction: row;
         height: auto;
-        width: 95vw;
+        width: 98vw;
         justify-content: flex-start;
         align-items: center;
     }
