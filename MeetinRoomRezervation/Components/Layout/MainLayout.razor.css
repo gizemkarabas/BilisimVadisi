@@ -3,19 +3,47 @@
     display: flex;
     flex-direction: column;
 }
-
-
-.main-layout-log {
+.main-layout-logo {
     min-width: 25vw;
     font-size: 13px;
     color: white;
     font-weight: bold;
 }
+.main-layout-bar {
+    background: #0095ff;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
 
-.panel-transparent {
+
+.register {
     background-color: unset;
     color: white !important;
 }
+.login {
+    background-color: unset;
+    color: white !important;
+}
+.wellcome {
+    background-color: unset;
+    color: white !important;
+}
+.rooms {
+    background-color: unset;
+    color: white !important;
+}
+.my-reservations {
+    background-color: unset;
+    color: white !important;
+}
+.exit {
+    background-color: unset;
+    color: white !important;
+}
+
+
 .panel-gray {
     background-color: #e6e6e6;
     border-radius: 10px;
@@ -24,13 +52,6 @@
     margin-right: 75px;
     min-height: 350px;
     box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.05);
-}
-.main-layout-bar {
-    background: #0095ff;
-    padding: 0 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
 }
 .ref {
     background-color: #f0f2f5;
@@ -66,24 +87,62 @@
 
 
 @media (max-width: 600px) {
+    .main {
+        max-height: 50px;
+        display: flex;
+        justify-content: flex-end;
+        flex-direction: row;
+        align-content: stretch;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        margin-left: 50px;
+    }
+    .register {
+        display: none;
+    }
+    .login {
+        display: none;
+    }
+    .wellcome {
+        display:none;
+    }
+    .rooms {
+        display: none;
+    }
+    .my-reservations {
+        display: none;
+    }
+    .exit {
+        background-color: unset;
+        color: white !important;
+        margin-top:0;
+    }
+
+
+
+
     .page {
         flex-direction: row;
     }
-
     .sidebar {
         width: 350px;
         height: 100vh;
         position: sticky;
         top: 0;
     }
-    .panel-transparent {
-        display: none;
-    }
-    main-layout-log {
+    .main-layout-logo {
         min-width: 55vw;
         color: white;
         font-size: 13px;
         font-weight: bold;
+    }
+    .main-layout-bar {
+        background: #0095ff;
+        padding: 0 24px;
+        display: flex;
+        max-height:8vh;
+        align-items: center;
+        justify-content: space-between;
     }
     .ref {
         background-color: #f0f2f5;
@@ -99,13 +158,11 @@
         top: 0;
         z-index: 1;
     }
-
     .top-row.auth ::deep a:first-child {
         flex: 1;
         text-align: right;
         width: 0;
     }
-
     .top-row, article {
         padding-left: 2rem !important;
         padding-right: 1.5rem !important;

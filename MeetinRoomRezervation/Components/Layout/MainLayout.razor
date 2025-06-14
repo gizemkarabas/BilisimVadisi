@@ -10,98 +10,100 @@
 <AntDesign.AntContainer />
 
 <div Style="min-height: 90vh; background-color: white;">
-    <div class="main-layout-bar">
-        <div class="main-layout-log">
-            <Icon Type="home" Theme="IconThemeType.Outline" />
-            Toplantı Odası Rezervasyon
-        </div>
-        <Menu Mode="MenuMode.Horizontal" style="background-color: unset;">
-        <AuthorizeView>
-                <NotAuthorized>
-                    
-                    <MenuItem Key="2" RouterLink="/register">
-                        <div class="panel-transparent">
-                            <Icon Type="user-add" Theme="IconThemeType.Outline" />
-                            Kayıt Ol
-                        </div>
-                    </MenuItem>
-                    <MenuItem Key="3" RouterLink="/">
-                        <div class="panel-transparent">
-                            <Icon Type="login" Theme="IconThemeType.Outline" />
-                            Giriş Yap
-                        </div>
-                    </MenuItem>
-                </NotAuthorized>
-                        <Authorized>
-                <MenuItem Key="1">
-                    <div class="panel-transparent" style="color: white;">
-                        <Icon Type="user" Theme="IconThemeType.Outline" />
-                        Hoş geldin, @GetUserDisplayName(context.User)
-                    </div>
-                </MenuItem>
-                    <MenuItem Key="2" RouterLink="/user/meetingRooms" RouterMatch="NavLinkMatch.All" style="color: white!important;">
-                        <div class="panel-transparent">
-                            <Icon Type="home" Theme="IconThemeType.Outline" />
-                            Toplantı Odaları
-                        </div>
-                    </MenuItem>
-                    <MenuItem Key="3" RouterLink="/user/myReservations" RouterMatch="NavLinkMatch.All" style="color: white!important;">
-                        <div class="panel-transparent">
-                            <Icon Type="home" Theme="IconThemeType.Outline" />
-                            Rezervasyonlarım
-                        </div>
-                    </MenuItem>
-                <MenuItem Key="4">
-                    <div class="panel-transparent" style="cursor: pointer; color: white;" @onclick="HandleLogout">
-                        <Icon Type="logout" Theme="IconThemeType.Outline" />
-                        Çıkış Yap
-                    </div>
-                </MenuItem>
-            </Authorized>
-        </AuthorizeView>
-        </Menu>
-    </div>
-    <Content>
-        <div>
-            @Body
-        </div>
-    </Content>
-    
+	<div class="main-layout-bar">
+		<div class="main-layout-logo">
+			<Icon Type="home" Theme="IconThemeType.Outline" />
+			Toplantı Odası Rezervasyon
+		</div>
+		<Menu Mode="MenuMode.Horizontal" style="background-color: unset;">
+			<AuthorizeView>
+				<NotAuthorized>
+
+					<MenuItem Key="2" RouterLink="/register">
+						<div class="register">
+							<Icon Type="user-add" Theme="IconThemeType.Outline" />
+							Kayıt Ol
+						</div>
+					</MenuItem>
+					<MenuItem Key="3" RouterLink="/">
+						<div class="login">
+							<Icon Type="login" Theme="IconThemeType.Outline" />
+							Giriş Yap
+						</div>
+					</MenuItem>
+				</NotAuthorized>
+				<Authorized>
+					<div class="main" style="max-height:50px; display:flex">
+					<MenuItem Key="1">
+						<div class="wellcome" style="color: white;">
+							<Icon Type="user" Theme="IconThemeType.Outline" />
+							Hoş geldin, @GetUserDisplayName(context.User)
+						</div>
+					</MenuItem>
+					<MenuItem Key="2" RouterLink="/user/meetingRooms" RouterMatch="NavLinkMatch.All" style="color: white!important;">
+						<div class="rooms">
+							<Icon Type="home" Theme="IconThemeType.Outline" />
+							Toplantı Odaları
+						</div>
+					</MenuItem>
+					<MenuItem Key="3" RouterLink="/user/myReservations" RouterMatch="NavLinkMatch.All" style="color: white!important;">
+						<div class="my-reservations">
+							<Icon Type="home" Theme="IconThemeType.Outline" />
+							Rezervasyonlarım
+						</div>
+					</MenuItem>
+					<MenuItem Key="4">
+						<div class="exit" style="cursor: pointer; color: white;" @onclick="HandleLogout">
+							<Icon Type="logout" Theme="IconThemeType.Outline" />
+							Çıkış Yap
+						</div>
+					</MenuItem>
+					</div>
+				</Authorized>
+			</AuthorizeView>
+		</Menu>
+	</div>
+	<Content>
+		<div>
+			@Body
+		</div>
+	</Content>
+
 </div>
 <div class="ref">
-    Toplantı Odası Rezervasyon Sistemi ©@DateTime.Now.Year
+	Toplantı Odası Rezervasyon Sistemi ©@DateTime.Now.Year
 </div>
 @code {
-    private string GetUserDisplayName(ClaimsPrincipal user)
-    {
-        var firstName = user.FindFirst("FirstName")?.Value;
-        if (!string.IsNullOrEmpty(firstName))
-        {
-            var lastName = user.FindFirst("LastName")?.Value;
-            return !string.IsNullOrEmpty(lastName) ? $"{firstName} {lastName}" : firstName;
-        }
+	private string GetUserDisplayName(ClaimsPrincipal user)
+	{
+		var firstName = user.FindFirst("FirstName")?.Value;
+		if (!string.IsNullOrEmpty(firstName))
+		{
+			var lastName = user.FindFirst("LastName")?.Value;
+			return !string.IsNullOrEmpty(lastName) ? $"{firstName} {lastName}" : firstName;
+		}
 
-        var companyOfficial = user.FindFirst("CompanyOfficial")?.Value;
-        if (!string.IsNullOrEmpty(companyOfficial))
-        {
-            return companyOfficial;
-        }
+		var companyOfficial = user.FindFirst("CompanyOfficial")?.Value;
+		if (!string.IsNullOrEmpty(companyOfficial))
+		{
+			return companyOfficial;
+		}
 
-        var email = user.FindFirst(ClaimTypes.Name)?.Value;
-        return email ?? "Kullanıcı";
-    }
+		var email = user.FindFirst(ClaimTypes.Name)?.Value;
+		return email ?? "Kullanıcı";
+	}
 
-    private async Task HandleLogout()
-    {
-        try
-        {
-            await AuthService.LogoutAsync();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Logout error: {ex.Message}");
-        }
+	private async Task HandleLogout()
+	{
+		try
+		{
+			await AuthService.LogoutAsync();
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Logout error: {ex.Message}");
+		}
 
-        Navigation.NavigateTo("/", forceLoad: true);
-    }
+		Navigation.NavigateTo("/", forceLoad: true);
+	}
 }
