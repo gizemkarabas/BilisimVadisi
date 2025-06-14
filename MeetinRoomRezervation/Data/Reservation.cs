@@ -34,13 +34,18 @@ namespace MeetinRoomRezervation.Data
 
 		[BsonElement("location")]
 		public string Location { get; set; } = "";
+		public bool ReminderSent { get; set; } = false;
+		public string MeetingTitle { get; set; } = "Test Toplantısı";
 	}
 
 	public enum ReservationStatus
 	{
 		Active,
+		Pending,
+		Confirmed,
 		Cancelled,
 		Completed
+
 	}
 }
 
