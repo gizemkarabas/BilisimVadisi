@@ -1,0 +1,129 @@
+﻿@page "/admin/test-reminder"
+@using MeetinRoomRezervation.Services
+@using MeetinRoomRezervation.Services.Services
+@inject IMeetingReminderService ReminderService
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Hatırlatma Testi</PageTitle>
+
+<div style="padding: 20px;">
+    <h3>📧 Toplantı Hatırlatma Testi</h3>
+
+    <Card>
+        <div style="margin-bottom: 16px;">
+            <Button Type="@ButtonType.Primary"
+                    Loading="@isChecking"
+                    OnClick="CheckReminders"
+                    Style="margin-right: 10px;">
+                @(isChecking ? "Kontrol Ediliyor..." : "Hatırlatmaları Kontrol Et")
+            </Button>
+
+            <Button Type="@ButtonType.Default"
+                    Loading="@isSendingTest"
+                    OnClick="SendTestReminder">
+                @(isSendingTest ? "Gönderiliyor..." : "Test Maili Gönder")
+            </Button>
+        </div>
+
+        @if (!string.IsNullOrEmpty(resultMessage))
+        {
+            <Alert Message="@resultMessage"
+                   Type="@(isSuccess ? AlertType.Success : AlertType.Error)"
+                   ShowIcon="true" />
+        }
+
+        <div style="margin-top: 20px;">
+            <h4>Test Email Gönder</h4>
+            <Form Model="@testModel" Layout="@FormLayout.Vertical">
+                <FormItem Label="Email">
+                    <Input @bind-Value="@testModel.Email" Placeholder="test@example.com" />
+                </FormItem>
+                <FormItem Label="Kullanıcı Adı">
+                    <Input @bind-Value="@testModel.UserName" Placeholder="Test Kullanıcı" />
+                </FormItem>
+                <FormItem Label="Oda Adı">
+                    <Input @bind-Value="@testModel.RoomName" Placeholder="Toplantı Odası 1" />
+                </FormItem> 
+                <FormItem Label="Toplantı Başlığı">
+                    <Input @bind-Value="@testModel.MeetingTitle" Placeholder="Toplantı Başlığı" />
+                </FormItem>
+            </Form>
+        </div>
+    </Card>
+</div>
+
+@code {
+    private bool isChecking = false;
+    private bool isSendingTest = false;
+    private string resultMessage = "";
+    private bool isSuccess = false;
+
+    private TestReminderModel testModel = new();
+
+    private async Task CheckReminders()
+    {
+        isChecking = true;
+        resultMessage = "";
+
+        try
+        {
+            await ReminderService.CheckAndSendRemindersAsync();
+            resultMessage = "Hatırlatmalar başarıyla kontrol edildi ve gönderildi!";
+            isSuccess = true;
+        }
+        catch (Exception ex)
+        {
+            resultMessage = $"Hata: {ex.Message}";
+            isSuccess = false;
+        }
+        finally
+        {
+            isChecking = false;
+        }
+    }
+
+    private async Task SendTestReminder()
+    {
+        if (string.IsNullOrEmpty(testModel.Email))
+        {
+            resultMessage = "Lütfen test email adresini girin!";
+            isSuccess = false;
+            return;
+        }
+
+        isSendingTest = true;
+        resultMessage = "";
+
+        try
+        {
+            var testMeetingTime = DateTime.Now.AddMinutes(5);
+            await ReminderService.SendReminderEmailAsync(
+                testModel.Email,
+                testModel.UserName,
+                testModel.RoomName,
+                testMeetingTime,
+                testModel.MeetingTitle
+            );
+
+            resultMessage = $"Test hatırlatma maili {testModel.Email} adresine gönderildi!";
+            isSuccess = true;
+        }
+        catch (Exception ex)
+        {
+            resultMessage = $"Hata: {ex.Message}";
+            isSuccess = false;
+        }
+        finally
+        {
+            isSendingTest = false;
+        }
+    }
+
+    public class TestReminderModel
+    {
+        public string Email { get; set; } = "";
+        public string UserName { get; set; } = "Test Kullanıcı";
+        public string RoomName { get; set; } = "Toplantı Odası 1";
+        public string MeetingTitle { get; set; } = "Test Toplantısı";
+    }
+}

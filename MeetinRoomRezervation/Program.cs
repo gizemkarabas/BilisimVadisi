@@ -3,7 +3,9 @@ using MeetinRoomRezervation.Components;
 using MeetinRoomRezervation.Data;
 using MeetinRoomRezervation.Models;
 using MeetinRoomRezervation.Services;
+using MeetinRoomRezervation.Services.BackgroundServices;
 using MeetinRoomRezervation.Services.ReservationService;
+using MeetinRoomRezervation.Services.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components.Authorization;
 using MongoDB.Bson.Serialization.Conventions;
@@ -61,6 +63,10 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddAntDesign();
 builder.Services.AddScoped<ReservationDto>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IEmailTemplateService, EmailTemplateService>();
+builder.Services.AddScoped<IMeetingReminderService, MeetingReminderService>();
+builder.Services.AddHostedService<MeetingReminderBackgroundService>();
+
 
 // Add services to the container.
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();

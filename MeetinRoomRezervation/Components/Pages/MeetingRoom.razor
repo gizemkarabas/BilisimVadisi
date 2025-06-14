@@ -1,4 +1,4 @@
-﻿@page "/user/roomStatus"
+﻿@page "/user/meetingRooms"
 @using AntDesign
 @using MeetinRoomRezervation.Models
 @using MeetinRoomRezervation.Services.ReservationService
@@ -140,7 +140,7 @@
 		if (!room.IsAvailable) return;
 
 		var dateStr = SelectedDate.ToString("yyyy-MM-dd");
-		Navigation.NavigateTo($"/user/reserve?roomId={room.Id}&date={dateStr}");
+		Navigation.NavigateTo($"/user/reservationForm?roomId={room.Id}&date={dateStr}");
 	}
 
 	private bool DisablePastDates(DateTime date)
