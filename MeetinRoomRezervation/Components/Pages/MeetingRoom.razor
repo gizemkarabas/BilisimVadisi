@@ -26,7 +26,7 @@
 		{
 			@foreach (var room in Rooms)
 			{
-				<AntDesign.Col Span="6">
+				<AntDesign.Col Xs="24" Sm="24" Md="12" Lg="8" Xl="6">
 					<div @onclick="@(() => NavigateToReservation(room))">
 						<Card Hoverable Style="margin-bottom: 16px; border-radius: 10px" Class="@(room.IsAvailable ? "available-room" : "unavailable-room")">
 							<CardMeta Title="@room.Name" Description="@room.Location" />
