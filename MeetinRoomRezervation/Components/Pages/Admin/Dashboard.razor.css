@@ -66,7 +66,8 @@
     border-radius: 10px;
     border-color: #d2d2d2;
     border: 1.2px solid #e2dfdf;
-    padding:15px;
+    padding: 15px;
+    
 }
 .last-reservation-panel-header {
     font-size:25px;
@@ -88,68 +89,88 @@
     text-align: center; 
     vertical-align: middle; 
 }
+.dashboard-panel {
+    margin-left: 50px;
+    margin-top: 50px;
+}
 
-@media (max-width: 900px) {
+@media (max-width: 600px) {
     .container {
+        display:flex;
+        width:auto;
         flex-direction: column;
-        padding: 0 5vw;
+        margin: 0px;
     }
 
     .admin-panel {
-        width: 100vw;
-        height: auto;
-        min-height: 60px;
-        flex-direction: row;
-        box-shadow: none;
-        margin-bottom: 20px;
+        display:none;
     }
 
     .admin-panel-buttons {
         position: static;
-        margin: 0 0 20px 0;
+        margin: 0 0 10px 0;
+        margin-top:20px;
         flex-direction: row;
         height: auto;
-        width: 100vw;
+        width: 95vw;
         justify-content: flex-start;
         align-items: center;
-        gap: 10px;
     }
-
     .count-panel {
-        width: 90vw;
-        min-width: 0;
-        margin-bottom: 15px;
-        height: auto;
+        box-shadow: 5px 5px 10px rgba(87, 87, 87, 0.1);
+        border-radius: 10px;
+        border-color: #d2d2d2;
+        border: 1.2px solid #e2dfdf;
+        width: 22vw;
+        height: 130px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
     }
-
-    .table {
-        width: 100vw;
-        font-size: 13px;
-        overflow-x: auto;
-        display: block;
-    }
-
-    .last-reservation-panel {
-        width: 100vw;
-        padding: 5vw 2vw;
-        box-sizing: border-box;
-    }
-}
-
-@media (max-width: 600px) {
     .count-panel-title {
-        font-size: 10px;
+        font-size: 12px;
+        height: 50%;
+        color: black;
+        padding: 10px;
+        align-self: flex-start;
     }
 
     .count-panel-value {
-        font-size: 18px;
-    }
-
-    .last-reservation-panel-header {
-        font-size: 18px;
+        font-size: 20px;
+        font-weight: bold;
+        height: 35%;
+        color: #0095ff;
+        padding-top:20px;
+        padding: 10px;
+        align-self: flex-end;
+        text-align: right;
     }
 
     .table {
-        font-size: 11px;
+        width: 140vw;
+        max-width: 140vw;
+        height: auto;
+        font-size: 13px;
+       
     }
+
+    .last-reservation-panel {
+        width: 95vw;
+        max-width: 95vw;
+        height: auto;
+        padding: 5vw 2vw;
+        box-sizing: border-box;
+        overflow-x: auto;
+        overflow-y: hidden;
+        white-space: nowrap;
+    }
+    .dashboard-panel {
+        width: 95vw;
+        max-width: 95vw;
+        margin-left: 2vw;
+        margin-top: 2vh;
+
+    }
+
 }
