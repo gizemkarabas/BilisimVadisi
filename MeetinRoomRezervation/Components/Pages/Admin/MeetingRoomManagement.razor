@@ -89,17 +89,18 @@
 					</div>
 					<div class="new-reservation">
 						<AntDesign.Col>
-							<Button Type="ButtonType.Primary" OnClick="OpenCreateRoomModal">Yeni Toplantı Odası Oluştur</Button>
+							<Button Type="ButtonType.Primary" OnClick="OpenCreateRoomModal"><div class="new-reservation">Yeni Toplantı Odası Oluştur</div></Button>
 						</AntDesign.Col>
 					</div>
 				</div>
+					
 				<div class="halls-panel">
 					<Row Gutter="16">
 
 						@foreach (var room in Rooms)
 						{
 
-							<AntDesign.Col Xs="24" Sm="24" Md="12" Lg="8" Xl="6" Style="padding-left:2%;padding-right:2%;">
+							<AntDesign.Col Xs="24" Sm="24" Md="12" Lg="8" Xl="6" Style="padding-left:1%;padding-right:1%;">
 								<div class="halls">
 									<div class="halls-edit">
 										<Button Size="ButtonSize.Small" OnClick="@(() => OpenEditModal(room))" Icon="edit" />
@@ -110,25 +111,28 @@
 									{
 										foreach (var res in room.Reservations)
 										{
-											<div class="reservation-block">
-												<Tag Color="TagColor.Blue">@res.StartTime.ToString("HH:mm") - @res.EndTime.ToString("HH:mm")</Tag>
+											<div class="halls">
 												<p><strong>Şirket:</strong> @res.User.Company</p>
 												<p><strong>Yetkili:</strong> @res.User.CompanyOfficial</p>
 												<p><strong>Telefon:</strong> @res.User.ContactPhone</p>
-												<Button Type="ButtonType.Dashed" OnClick="@(() => CancelReservation(res.Id))">Rezervasyonu İptal</Button>
+												<div>
+													<Tag Color="TagColor.Blue" Style="width: 100%;height:3.5vh; display: flex;justify-content: center; align-items: center;">@res.StartTime.ToString("HH:mm") - @res.EndTime.ToString("HH:mm")</Tag>
+												</div>
+												<Button Type="ButtonType.Dashed" Style="margin-top:10px; width: 100%;background-color:unset;color:red; border-color:red" OnClick="@(() => CancelReservation(res.Id))">Rezervasyonu İptal</Button>
 											</div>
 										}
 									}
 									else
 									{
-										<Tag Style="text-align:center" Color="TagColor.Green">Bugün için rezervasyon bulunmamaktadır.</Tag>
+										<Tag Style="width: 100%;height:4.5vh; display: flex;justify-content: center; align-items: center;" Color="TagColor.Green">Bugün için rezervasyon bulunmamaktadır.</Tag>
 									}
 
 									<Divider />
 									<p style="text-align:center"><strong>Müsait Saatler</strong></p>
+									
 									@foreach (var slot in room.AvailableSlots)
 									{
-										<Tag>@slot</Tag>
+										<Tag Style="width: 100%;height:3.5vh;margin-bottom:5px; display: flex;justify-content: center; align-items: center;">@slot</Tag>
 									}
 								</div>
 							</AntDesign.Col>
