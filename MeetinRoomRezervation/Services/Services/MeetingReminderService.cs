@@ -88,7 +88,7 @@ namespace MeetinRoomRezervation.Services
 			try
 			{
 				var now = DateTime.UtcNow.AddHours(3);
-				var reminderTime = now.AddHours(3).AddMinutes(5); // 5 dakika sonrası
+				var reminderTime = now.AddMinutes(5); // 5 dakika sonrası
 
 				// 5 dakika sonra başlayacak toplantıları bul
 				var upcomingMeetings = await _context.Reservations
