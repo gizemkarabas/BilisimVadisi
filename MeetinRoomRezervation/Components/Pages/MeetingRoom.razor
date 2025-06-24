@@ -75,7 +75,7 @@
 							<CardMeta Title="@room.Name" Description="@room.Location" />
 							<div style="margin-top: 16px;">
 								<p><Icon Type="user" /> Kapasite: @room.Capacity</p>
-								<p><Icon Type="calendar" /> Doluluk: @room.OccupancyRate.ToString("F0")%</p>
+								@* <p><Icon Type="calendar" /> Doluluk: @room.OccupancyRate.ToString("F0")%</p> *@
 								<Tag Color="@GetStatusColor(room.IsAvailable)">
 									@(room.IsAvailable ? "Müsait" : "Dolu")
 								</Tag>
