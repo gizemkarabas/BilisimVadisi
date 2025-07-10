@@ -1,7 +1,9 @@
 ﻿@page "/user/meetingRooms"
 @using AntDesign
+@using MeetinRoomRezervation.Components.PartialComponents.Rooms
 @using MeetinRoomRezervation.Models
 @using MeetinRoomRezervation.Services.ReservationService
+@using static MeetinRoomRezervation.Components.PartialComponents.Rooms.WeeklyDayPicker
 @inject IRoomService RoomService
 @inject NavigationManager Navigation
 
@@ -57,7 +59,7 @@
 					DisabledDate="DisablePastDates" />
 	</div>
 
-
+    <WeeklyDayPicker @bind-SelectedDate="SelectedDateItem" />
 	<Row Gutter="16" Style="margin-top: 16px;">
 		@if (Rooms.Count == 0)
 		{
@@ -101,6 +103,22 @@
 @code {
 	private List<MeetingRoomDto> Rooms = new();
 	private DateTime _selectedDate = DateTime.Today;
+    
+    private DateItem SelectedDateItem
+    {
+        get => new DateItem(
+            SelectedDate == DateTime.Today ? "Bugün" :
+            SelectedDate == DateTime.Today.AddDays(1) ? "Yarın" :
+            SelectedDate.ToString("dd.MM.yyyy dddd", new System.Globalization.CultureInfo("tr-TR")),
+            SelectedDate);
+        set
+        {
+            if (SelectedDate != value.Date)
+            {
+                SelectedDate = value.Date;
+            }
+        }
+    }
 
 	private DateTime SelectedDate
 	{

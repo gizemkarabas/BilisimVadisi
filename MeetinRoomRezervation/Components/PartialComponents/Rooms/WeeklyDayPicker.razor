@@ -1,0 +1,48 @@
+﻿@using AntDesign
+
+<div class="date-selector">
+    <Space>
+        @foreach (var date in Dates)
+        {
+            <Button Type="ButtonType.Default"
+                    @onclick="() => OnDateSelected(date)"
+                    class="@(SelectedDate == date ? "selected-date" : "")">
+                @date.Label
+            </Button>
+        }
+    </Space>
+</div>
+
+@code {
+    [Parameter] public EventCallback<DateItem> DateSelected { get; set; }
+    [Parameter] public EventCallback<DateItem> SelectedDateChanged { get; set; }
+    [Parameter] public DateItem SelectedDate { get; set; }
+
+    private readonly List<DateItem> Dates = Enumerable.Range(0, 5)
+    .Select(i =>
+    {
+        var date = DateTime.Today.AddDays(i);
+        string label = i switch
+        {
+            0 => "Bugün",
+            1 => "Yarın",
+            _ => date.ToString("dd.MM.yyyy dddd", new System.Globalization.CultureInfo("tr-TR"))
+        };
+        return new DateItem(label, date);
+    })
+    .ToList();
+
+
+    private async Task OnDateSelected(DateItem date)
+    {
+        await SelectedDateChanged.InvokeAsync(date);
+        await DateSelected.InvokeAsync(date);
+    }
+
+    public class DateItem
+    {
+        public string Label { get; }
+        public DateTime Date { get; }
+        public DateItem(string label, DateTime date) { Label = label; Date = date; }
+    }
+}
