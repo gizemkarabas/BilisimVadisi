@@ -4,6 +4,7 @@
     flex-direction: column;
     align-content: center;
     justify-content: center;
+    justify-self: center;
     background-color: #e6e6e6;
     margin-top: 30px;
     box-shadow: 5px 5px 10px rgba(87, 87, 87, 0.1);
@@ -11,21 +12,32 @@
     border-color: #d2d2d2;
     border: 1.2px solid #e2dfdf;
     padding: 15px;
-    margin-left: 120px;
-    margin-right: 120px;
     height: auto;
+    width: 85vw;
+}
+::deep .weekly-day-picker {
+    background-color: transparent !important;
+    background: transparent !important;
 }
 .reservation-panel-header {
     font-size: 14px;
     font-weight: bold;
-    margin-bottom: 8px;
+    margin-bottom: 20px;
 }
 .my-reservation {
     font-size: 14px;
     font-weight: bold;
     margin-bottom: 8px;
 }
-
+.calender {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+    margin-top: 30px;
+}
+.weekly-no-bg ::deep .weekly-day-picker {
+    background: unset !important;
+}
 
 
 .reservation-panel-buttons {

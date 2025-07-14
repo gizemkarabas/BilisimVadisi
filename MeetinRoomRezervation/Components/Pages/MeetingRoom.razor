@@ -7,6 +7,10 @@
 @inject IRoomService RoomService
 @inject NavigationManager Navigation
 
+<div class="calender">
+	<DatePicker Style="width:85vw; height:41px; border-radius:10px" @bind-Value="SelectedDate"
+				DisabledDate="DisablePastDates" />
+</div>
 <div class="reservation-panel-buttons">
 	<Button Type="@ButtonType.Link"
 			OnClick="@(() => Navigation.NavigateTo("/user/meetingRooms"))"
@@ -54,13 +58,12 @@
 	<PageTitle>Toplantı Odaları</PageTitle>
 
 	<div class="reservation-panel-header">Lütfen Tarihi Seçin</div>
-	<div>
-		<DatePicker @bind-Value="SelectedDate"
-					DisabledDate="DisablePastDates" />
+	<div class="weekly-no-bg" style="background:unset">
+		<WeeklyDayPicker @bind-SelectedDate="SelectedDateItem" />
 	</div>
 
-    <WeeklyDayPicker @bind-SelectedDate="SelectedDateItem" />
-	<Row Gutter="16" Style="margin-top: 16px;">
+
+	<Row Gutter="16" Style="margin-top: 15px;">
 		@if (Rooms.Count == 0)
 		{
 			<AntDesign.Col Span="24">
@@ -78,7 +81,7 @@
 							<div style="margin-top: 16px;">
 								<p><Icon Type="user" /> Kapasite: @room.Capacity</p>
 								@* <p><Icon Type="calendar" /> Doluluk: @room.OccupancyRate.ToString("F0")%</p> *@
-								<Tag Color="@GetStatusColor(room.IsAvailable)">
+								<Tag Style="display:flex; justify-self: end;" Color="@GetStatusColor(room.IsAvailable)">
 									@(room.IsAvailable ? "Müsait" : "Dolu")
 								</Tag>
 							</div>

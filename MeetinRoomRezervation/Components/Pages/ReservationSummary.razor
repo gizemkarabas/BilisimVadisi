@@ -14,7 +14,7 @@
         @if (ReservationState.SelectedSlots.Any())
         {
             <div class="reservation-card">
-                <div class="slots-list" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content:center;">
+                <div class="slots-list" style="overflow-y: scroll;max-height: 18vh; display: flex; flex-wrap: wrap; gap: 10px; justify-content:center;">
                     @foreach (var slot in ReservationState.SelectedSlots)
                     {
                         <div style="background-color: #1890ff;text-align:left; color: white;width:100%; padding: 8px 16px; border-radius: 5px; min-width: 100px;">
@@ -54,15 +54,15 @@
                     </div>
                     <div>
                         <dl class="descriptions">
-                            <div>
+                            <div style="height:33%">
                                 <dt>📍 Konum</dt>
                                 <dd>@ReservationState.Location</dd>
                             </div>
-                            <div>
+                            <div style="height:33%">
                                 <dt>🏢 Bölge</dt>
                                 <dd>@ReservationState.Room.Name</dd>
                             </div>
-                            <div>
+                            <div style="height:33%">
                                 <dt>📅 Tarih</dt>
                                 <dd>@ReservationState.SelectedDate.ToString("dd.MM.yyyy dddd", turkishCulture)</dd>
                             </div>

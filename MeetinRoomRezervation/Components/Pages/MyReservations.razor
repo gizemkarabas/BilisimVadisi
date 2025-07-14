@@ -53,18 +53,18 @@
 </div>
 
 
-	<div class="reservation-panel">
-<PageHeader Style="background-color: unset" Title="Rezervasyonlarım" />
+<div class="reservation-panel">
+	<PageHeader Style="background-color: unset" Title="Rezervasyonlarım" />
 
-@if (isLoading)
-{
-	<div style="text-align: center; padding: 50px;">
-		<Spin Size="SpinSize.Large" />
-		<p>Yükleniyor...</p>
-	</div>
-}
-else
-{
+	@if (isLoading)
+	{
+		<div style="text-align: center; padding: 50px;">
+			<Spin Size="SpinSize.Large" />
+			<p>Yükleniyor...</p>
+		</div>
+	}
+	else
+	{
 		<Tabs DefaultActiveKey="1">
 			<TabPane Key="1" Tab="Aktif Rezervasyonlarım" Style="min-width:10vw;">
 				@if (FutureReservations.Any())
@@ -80,33 +80,65 @@ else
                                                 background-color: unset;
                                                 color: #333;
                                                 box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);">
-									<p>
-										<Icon Type="calendar" />
-										Tarih: @reservation.StartTime.ToString("dd.MM.yyyy dddd", turkishCulture)
-									</p>
-									<p>
-										<Icon Type="home" />
-										Oda: @(reservation.Room?.Name ?? reservation.RoomName ?? "Bilinmiyor")
-									</p>
-									<p>
-										<Icon Type="environment" />
-										Konum: @(reservation.Location ?? "")
-									</p>
-									<p>
-										<Icon Type="user" />
-										Yetkili: @(reservation.User?.Email ?? reservation.UserEmail ?? "")
-									</p>
-									<p>
-										<Icon Type="phone" />
-										Telefon: @(reservation.User?.ContactPhone ?? "")
-									</p>
+									<div class="reservation-detail-panel">
+										<div class="icon-bar">
+											<div>
+												<svg width="15" height="15" viewBox="0 0 18 18" fill="white">
+													<path d="M8.61111 15.0003L7.94444 15.5003L8.65114 16.4426L9.30448 15.4626L8.61111 15.0003ZM9.27777 14.5003L5.66667 9.68551L4.33333 10.6855L7.94444 15.5003L9.27777 14.5003ZM15.14 3.70474L7.91773 14.5381L9.30448 15.4626L16.5267 4.62924L15.14 3.70474Z" fill="white" />
+												</svg>
+											</div>
+											<div>
+												<svg width="20" height="20" viewBox="0 0 20 20" fill="white">
+													<g clip-path="url(#clip0_51543_1059)">
+														<path d="M5.41699 13.333L6.25033 5.41634C6.87215 4.68983 8.30709 4.16634 10.0003 4.16634M14.5837 13.333L13.7503 5.41634C13.1285 4.68983 11.6936 4.16634 10.0003 4.16634M10.0003 4.16634L10.0003 2.49968" stroke="white" stroke-width="1.66667" stroke-linecap="square" stroke-linejoin="round" />
+														<path d="M4.16699 14.167H7.85765M15.8337 14.167H12.1434M12.1434 14.167L12.0387 14.8994C11.8937 15.9136 11.025 16.667 10.0005 16.667V16.667C8.97577 16.667 8.10702 15.9135 7.96218 14.8991L7.85765 14.167M12.1434 14.167H7.85765" stroke="white" stroke-width="1.66667" stroke-linecap="square" stroke-linejoin="round" />
+													</g>
+													<defs>
+														<clipPath id="clip0_51543_1059">
+															<rect width="20" height="20" fill="white" />
+														</clipPath>
+													</defs>
+												</svg>
 
-									<Button Danger Type="ButtonType.Primary"
-											OnClick="() => CancelReservation(reservation.Id)"
-											Style="margin-top:10px; width: 100%;background-color:unset;color:red;"
-											Loading="@isCancelling">
-										Rezervasyonu İptal Et
-									</Button>
+											</div>
+											<div>
+												<svg width="20" height="20" viewBox="0 0 20 20" fill="white">
+													<path d="M9.99967 3.33301L12.1157 7.08721L16.34 7.93956L13.4235 11.1121L13.9182 15.3931L9.99967 13.5997L6.08111 15.3931L6.57587 11.1121L3.6593 7.93956L7.88365 7.08721L9.99967 3.33301Z" stroke="white" stroke-width="1.66667" />
+												</svg>
+											</div>
+											</div>
+											<div>
+												<dl class="descriptions">
+													<p>
+														<Icon Type="calendar" />
+														Tarih: @reservation.StartTime.ToString("dd.MM.yyyy dddd", turkishCulture)
+													</p>
+													<p>
+														<Icon Type="home" />
+														Oda: @(reservation.Room?.Name ?? reservation.RoomName ?? "Bilinmiyor")
+													</p>
+													<p>
+														<Icon Type="environment" />
+														Konum: @(reservation.Location ?? "")
+													</p>
+													<p>
+														<Icon Type="user" />
+														Yetkili: @(reservation.User?.Email ?? reservation.UserEmail ?? "")
+													</p>
+													<p>
+														<Icon Type="phone" />
+														Telefon: @(reservation.User?.ContactPhone ?? "")
+													</p>
+												</dl>
+											</div>
+
+										</div>
+										<Button Danger Type="ButtonType.Primary"
+												OnClick="() => CancelReservation(reservation.Id)"
+												Style="margin-top:10px; width: 100%;background-color:unset;color:red;"
+												Loading="@isCancelling">
+											Rezervasyonu İptal Et
+										</Button>
 								</Card>
 							</AntDesign.Col>
 						}
@@ -160,8 +192,8 @@ else
 												align-items: center;
 												font-size:12px;
 												font-weight:bold;
-												color:darkgray;" 
-										Color="TagColor.Default">Tamamlandı</Tag>
+												color:darkgray;"
+										 Color="TagColor.Default">Tamamlandı</Tag>
 								</Card>
 							</AntDesign.Col>
 						}
@@ -173,8 +205,8 @@ else
 				}
 			</TabPane>
 		</Tabs>
-}
-	</div>
+	}
+</div>
 @*  </Authorized>
 
     <NotAuthorized>
