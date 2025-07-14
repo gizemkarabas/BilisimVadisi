@@ -2,7 +2,7 @@
     display: flex;
     flex-direction: column;
     align-content: center;
-    justify-content: center;
+    justify-content: flex-start;
     background-color: #e6e6e6;
     margin-top: 30px;
     box-shadow: 5px 5px 10px rgba(87, 87, 87, 0.1);
@@ -10,9 +10,10 @@
     border-color: #d2d2d2;
     border: 1.2px solid #e2dfdf;
     padding: 15px;
+    padding-top: 55px;
     margin-left: 120px;
     margin-right: 120px;
-    height: auto;
+    height: 80vh;
 }
 
     
@@ -83,6 +84,29 @@
     margin-left: 10px;
     width: 20px;
     height: 20px;
+}
+.test {
+    width: 12px;
+    height: 12px;
+    background-color: #1890ff;
+    border-radius: 50%;
+}
+.button-circle {
+    background-color: unset;
+    border-radius: 100%;
+    width: 10px;
+    height: 10px;
+}
+.button-circle-border {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: unset;
+    border-radius: 100%;
+    border: 1px solid;
+    border-color: #9B9B9B;
+    width: 16px;
+    height: 16px;
 }
 
 

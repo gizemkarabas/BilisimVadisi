@@ -28,9 +28,7 @@ else
         
 
     <div class="reservation-panel">
-        <div class="reservation-panel-header">@($"Rezervasyon - {SelectedRoom.Name}")
-
-        </div>
+        
         <Form Model="this" OnFinish="GoToSummary">
             <FormItem>
                 <div class="reservation-panel-header">Lütfen Tarihi Seçin</div>
@@ -45,7 +43,7 @@ else
                         <span>Müsait</span>
                     </div>
                     <div style="display: flex; align-items: center;">
-                        <div style="width: 12px; height: 12px; background-color: #d9d9d9; border-radius: 50%; margin-right: 8px;"></div>
+                        <div style="width: 12px; height: 12px; background-color: #9B9B9B; border-radius: 50%; margin-right: 8px;"></div>
                         <span>Dolu</span>
                     </div>
                 </div>
@@ -71,11 +69,18 @@ else
                     @foreach (var slot in AvailableSlots)
                     {
                         <Button Type="@GetButtonType(slot)"
+                                Style="border:0.5px solid;border-color:#9B9B9B;border-radius:7px;background-color:unset;"
                                 OnClick="() => ToggleSlot(slot)">
+                            <div style="display: flex;align-items: center;justify-content: center;">
                             @slot.StartTime.ToString("HH:mm") - @slot.EndTime.ToString("HH:mm")
+                            <div class="button-circle-border" style="margin-left:8px" >
+                                <div class="button-circle"></div>
+                            </div>
+                        </div>
                         </Button>
                     }
                 </div>
+                            
             }
             else
             {

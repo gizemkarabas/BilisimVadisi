@@ -21,6 +21,28 @@
     justify-items: center;
 }
 
+.icon-bar {
+    width: 24px;
+    height: 212px;
+    background-color: #0A6FFA;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.descriptions {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height:100%;
+    margin-left: 15px;
+}
+
+.reservation-detail-panel {
+    display: flex;
+    margin-top: 15px;
+}
+
 .reservation-panel {
     display: flex;
     flex-direction: column;
