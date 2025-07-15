@@ -4,7 +4,6 @@
     flex-direction: column;
 }
 .main-layout-logo {
-    min-width: 25vw;
     font-size: 13px;
     color: white;
     font-weight: bold;

@@ -14,7 +14,7 @@
         @if (ReservationState.SelectedSlots.Any())
         {
             <div class="reservation-card">
-                <div class="slots-list" style="overflow-y: scroll;max-height: 18vh; display: flex; flex-wrap: wrap; gap: 10px; justify-content:center;">
+                <div class="slots-list" style="overflow-y: auto;max-height: 18vh; display: flex; flex-wrap: wrap; gap: 10px; justify-content:center;">
                     @foreach (var slot in ReservationState.SelectedSlots)
                     {
                         <div style="background-color: #1890ff;text-align:left; color: white;width:100%; padding: 8px 16px; border-radius: 5px; min-width: 100px;">
@@ -31,39 +31,33 @@
                             </svg>
                         </div>
                         <div>
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="white">
-                                <g clip-path="url(#clip0_51543_1059)">
-                                    <path d="M5.41699 13.333L6.25033 5.41634C6.87215 4.68983 8.30709 4.16634 10.0003 4.16634M14.5837 13.333L13.7503 5.41634C13.1285 4.68983 11.6936 4.16634 10.0003 4.16634M10.0003 4.16634L10.0003 2.49968" stroke="white" stroke-width="1.66667" stroke-linecap="square" stroke-linejoin="round" />
-                                    <path d="M4.16699 14.167H7.85765M15.8337 14.167H12.1434M12.1434 14.167L12.0387 14.8994C11.8937 15.9136 11.025 16.667 10.0005 16.667V16.667C8.97577 16.667 8.10702 15.9135 7.96218 14.8991L7.85765 14.167M12.1434 14.167H7.85765" stroke="white" stroke-width="1.66667" stroke-linecap="square" stroke-linejoin="round" />
-                                </g>
-                                <defs>
-                                    <clipPath id="clip0_51543_1059">
-                                        <rect width="20" height="20" fill="white" />
-                                    </clipPath>
-                                </defs>
+                            <svg width="14" height="17" viewBox="0 0 14 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M2.41699 12.333L3.25033 4.41634C3.87215 3.68983 5.30709 3.16634 7.00034 3.16634M11.5837 12.333L10.7503 4.41634C10.1285 3.68983 8.69359 3.16634 7.00034 3.16634M7.00034 3.16634L7.00033 1.49968" stroke="white" stroke-width="1.66667" stroke-linecap="square" stroke-linejoin="round" />
+                                <path d="M1.16699 13.167H4.85765M12.8337 13.167H9.14337M9.14337 13.167L9.03869 13.8994C8.89372 14.9136 8.02504 15.667 7.00046 15.667V15.667C5.97577 15.667 5.10702 14.9135 4.96218 13.8991L4.85765 13.167M9.14337 13.167H4.85765" stroke="white" stroke-width="1.66667" stroke-linecap="square" stroke-linejoin="round" />
                             </svg>
+
+
 
                         </div>
                         <div>
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="white">
-                                <path d="M9.99967 3.33301L12.1157 7.08721L16.34 7.93956L13.4235 11.1121L13.9182 15.3931L9.99967 13.5997L6.08111 15.3931L6.57587 11.1121L3.6593 7.93956L7.88365 7.08721L9.99967 3.33301Z" stroke="white" stroke-width="1.66667" />
+                            <svg width="24" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M7.99967 2.33301L10.1157 6.08721L14.34 6.93956L11.4235 10.1121L11.9182 14.3931L7.99967 12.5997L4.08111 14.3931L4.57587 10.1121L1.6593 6.93956L5.88365 6.08721L7.99967 2.33301Z" stroke="white" stroke-width="1.66667" />
                             </svg>
-
 
                         </div>
                     </div>
                     <div>
                         <dl class="descriptions">
                             <div style="height:33%">
-                                <dt>📍 Konum</dt>
+                                <dt>Konum</dt>
                                 <dd>@ReservationState.Location</dd>
                             </div>
                             <div style="height:33%">
-                                <dt>🏢 Bölge</dt>
+                                <dt>Bölge</dt>
                                 <dd>@ReservationState.Room.Name</dd>
                             </div>
                             <div style="height:33%">
-                                <dt>📅 Tarih</dt>
+                                <dt>Tarih</dt>
                                 <dd>@ReservationState.SelectedDate.ToString("dd.MM.yyyy dddd", turkishCulture)</dd>
                             </div>
                         </dl>
@@ -135,7 +129,7 @@
 
     private void GoBack()
     {
-        Navigation.NavigateTo("/user/reservationForm");
+        Navigation.NavigateTo("/user/meetingRooms"); 
     }
 
 }
