@@ -10,7 +10,7 @@
 <AuthorizeView Roles="Admin" Context="authContext">
 	<Authorized Context="authContext">
 		<div class="container">
-			<div class="admin-panel"></div>
+			<div class="admin-panel">
 			<div class="admin-panel-buttons">
 				<Button Type="@ButtonType.Link"
 				OnClick="@(() => Navigation.NavigateTo("admin/dashboard"))"
@@ -76,7 +76,7 @@
 					</div>
 				</Button>
 			</div>
-
+			</div>
 			<Modal 
 			@bind-Visible="@IsCreateModalVisible"
 			Footer="null"
