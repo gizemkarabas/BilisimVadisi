@@ -60,22 +60,15 @@
 								}
 							</div>
 						</MenuItem>
-						<MenuItem Key="2" RouterLink="/user/meetingRooms" RouterMatch="NavLinkMatch.All" style="color: white!important;">
-							<div class="rooms">
-								<Icon Type="home" Theme="IconThemeType.Outline" />
-								Toplantı Odaları
-							</div>
-						</MenuItem>
-						<MenuItem Key="3" RouterLink="/user/myReservations" RouterMatch="NavLinkMatch.All" style="color: white!important;">
+						<MenuItem Key="2" RouterLink="/user/myReservations" RouterMatch="NavLinkMatch.All" style="color: white!important;">
 							<div class="my-reservations">
-								<Icon Type="home" Theme="IconThemeType.Outline" />
+								<Icon Type="home" Theme="IconThemeType.Outline" Style="margin-right:5px" />
 								Rezervasyonlarım
 							</div>
 						</MenuItem>
-						<MenuItem Key="4">
+						<MenuItem Key="3">
 							<div class="exit" style="cursor: pointer; color: white;" @onclick="HandleLogout">
-								<Icon Type="logout" Theme="IconThemeType.Outline" />
-								Çıkış Yap
+								<img src="Exit-Icon.png" alt="Açıklama" style="width: 30px" />
 							</div>
 						</MenuItem>
 					</div>

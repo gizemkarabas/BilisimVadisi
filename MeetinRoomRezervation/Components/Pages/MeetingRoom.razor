@@ -8,7 +8,7 @@
 @inject NavigationManager Navigation
 
 <div class="calender">
-	<DatePicker Style="width:85vw; height:41px; border-radius:10px" @bind-Value="SelectedDate"
+	<DatePicker DefaultValue=@TodayDate Style="width:85vw; height:41px; border-radius:10px" @bind-Value="SelectedDate"
 				DisabledDate="DisablePastDates" />
 </div>
 <div class="reservation-panel-buttons">
@@ -106,7 +106,7 @@
 @code {
 	private List<MeetingRoomDto> Rooms = new();
 	private DateTime _selectedDate = DateTime.Today;
-    
+	private DateTime TodayDate = DateTime.Today;
     private DateItem SelectedDateItem
     {
         get => new DateItem(
@@ -164,8 +164,5 @@
 		Navigation.NavigateTo($"/user/reservationForm?roomId={room.Id}&date={dateStr}");
 	}
 
-	private bool DisablePastDates(DateTime date)
-	{
-		return date.Date < DateTime.Today;
-	}
+	private bool DisablePastDates(DateTime date) => date < DateTime.Today;
 }

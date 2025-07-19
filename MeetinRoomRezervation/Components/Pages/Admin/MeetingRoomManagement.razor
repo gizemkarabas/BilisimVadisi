@@ -86,7 +86,7 @@
 						<AntDesign.Col>
 							<Button OnClick="SelectToday">Bugün</Button>
 							<Button OnClick="SelectTomorrow" Style="margin-left: 8px;">Yarın</Button>
-							<DatePicker @bind-Value="SelectedDate" Style="margin-left: 8px;" />
+							<DatePicker DefaultValue=@TodayDate @bind-Value="SelectedDate" Style="margin-left: 8px;" />
 						</AntDesign.Col>
 					</div>
 					<div class="new-reservation">
@@ -99,96 +99,102 @@
 				<div class="halls-panel">
 					<Row Gutter="16">
 
-							@foreach (var room in Rooms)
-							{
-								<AntDesign.Col Xs="24" Sm="24" Md="12" Lg="8" Xl="6" Style="padding-left:1%;padding-right:1%;">
-									<div class="halls">
-										<div style="display:flex;justify-content:end">	
-											<Button Size="ButtonSize.Small" Style="align-self:end;margin-bottom: 20px; margin-right: 5px;" OnClick="@(() => OpenEditModal(room))" Icon="edit" />
-											<Button Size="ButtonSize.Small" Style="align-self:end;margin-bottom: 20px;" OnClick="@(() => DeleteRoom(room.Id))" Icon="delete" Danger />
-										</div>
-										<div class="halls-header">@room.Name</div>
-										@if (room.Reservations.Any())
-										{
-											var firstRes = room.Reservations.First();
+						@foreach (var room in Rooms)
+						{
+							<AntDesign.Col Xs="24" Sm="24" Md="12" Lg="8" Xl="6" Style="padding-left:1%;padding-right:1%;">
+								<div class="halls">
+									<div style="display:flex;justify-content:end">
+										<Button Size="ButtonSize.Small" Style="align-self:end;margin-bottom: 20px; margin-right: 5px;" OnClick="@(() => OpenEditModal(room))" Icon="edit" />
+										<Button Size="ButtonSize.Small" Style="align-self:end;margin-bottom: 20px;" OnClick="@(() => DeleteRoom(room.Id))" Icon="delete" Danger />
+									</div>
+									<div class="halls-header">@room.Name</div>
+									@if (room.Reservations.Any())
+									{
+										var firstRes = room.Reservations.First();
 										<div style="display:flex ;margin-top: 20px;margin-bottom: 20px;">
 											<div class="icon-bar">
-											<div>
-												<svg width="15" height="15" viewBox="0 0 18 18" fill="white">
-													<path d="M8.61111 15.0003L7.94444 15.5003L8.65114 16.4426L9.30448 15.4626L8.61111 15.0003ZM9.27777 14.5003L5.66667 9.68551L4.33333 10.6855L7.94444 15.5003L9.27777 14.5003ZM15.14 3.70474L7.91773 14.5381L9.30448 15.4626L16.5267 4.62924L15.14 3.70474Z" fill="white" />
-												</svg>
+												<div>
+													<svg width="15" height="15" viewBox="0 0 18 18" fill="white">
+														<path d="M8.61111 15.0003L7.94444 15.5003L8.65114 16.4426L9.30448 15.4626L8.61111 15.0003ZM9.27777 14.5003L5.66667 9.68551L4.33333 10.6855L7.94444 15.5003L9.27777 14.5003ZM15.14 3.70474L7.91773 14.5381L9.30448 15.4626L16.5267 4.62924L15.14 3.70474Z" fill="white" />
+													</svg>
+												</div>
+												<div>
+													<svg width="14" height="17" viewBox="0 0 14 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+														<path d="M2.41699 12.333L3.25033 4.41634C3.87215 3.68983 5.30709 3.16634 7.00034 3.16634M11.5837 12.333L10.7503 4.41634C10.1285 3.68983 8.69359 3.16634 7.00034 3.16634M7.00034 3.16634L7.00033 1.49968" stroke="white" stroke-width="1.66667" stroke-linecap="square" stroke-linejoin="round" />
+														<path d="M1.16699 13.167H4.85765M12.8337 13.167H9.14337M9.14337 13.167L9.03869 13.8994C8.89372 14.9136 8.02504 15.667 7.00046 15.667V15.667C5.97577 15.667 5.10702 14.9135 4.96218 13.8991L4.85765 13.167M9.14337 13.167H4.85765" stroke="white" stroke-width="1.66667" stroke-linecap="square" stroke-linejoin="round" />
+													</svg>
+
+
+
+												</div>
+												<div>
+													<svg width="24" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+														<path d="M7.99967 2.33301L10.1157 6.08721L14.34 6.93956L11.4235 10.1121L11.9182 14.3931L7.99967 12.5997L4.08111 14.3931L4.57587 10.1121L1.6593 6.93956L5.88365 6.08721L7.99967 2.33301Z" stroke="white" stroke-width="1.66667" />
+													</svg>
+
+												</div>
 											</div>
-											<div>
-												<svg width="14" height="17" viewBox="0 0 14 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-													<path d="M2.41699 12.333L3.25033 4.41634C3.87215 3.68983 5.30709 3.16634 7.00034 3.16634M11.5837 12.333L10.7503 4.41634C10.1285 3.68983 8.69359 3.16634 7.00034 3.16634M7.00034 3.16634L7.00033 1.49968" stroke="white" stroke-width="1.66667" stroke-linecap="square" stroke-linejoin="round" />
-													<path d="M1.16699 13.167H4.85765M12.8337 13.167H9.14337M9.14337 13.167L9.03869 13.8994C8.89372 14.9136 8.02504 15.667 7.00046 15.667V15.667C5.97577 15.667 5.10702 14.9135 4.96218 13.8991L4.85765 13.167M9.14337 13.167H4.85765" stroke="white" stroke-width="1.66667" stroke-linecap="square" stroke-linejoin="round" />
-												</svg>
-
-
-
-											</div>
-											<div>
-												<svg width="24" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-													<path d="M7.99967 2.33301L10.1157 6.08721L14.34 6.93956L11.4235 10.1121L11.9182 14.3931L7.99967 12.5997L4.08111 14.3931L4.57587 10.1121L1.6593 6.93956L5.88365 6.08721L7.99967 2.33301Z" stroke="white" stroke-width="1.66667" />
-												</svg>
-
+											<div class="descriptions">
+												<div>
+													<div style="font-weight:bold; font-size:16px;">Şirket :</div>
+													<div>@firstRes.User.Company</div>
+												</div>
+												<div>
+													<div style="font-weight:bold; margin-top:8px;">Yetkili :</div>
+													<div>@firstRes.User.CompanyOfficial</div>
+												</div>
+												<div>
+													<div style="font-weight:bold; margin-top:8px;">Telefon :</div>
+													<div>@firstRes.User.ContactPhone</div>
+												</div>
 											</div>
 										</div>
-											<div class="descriptions">
-												<div style="font-weight:bold; font-size:16px; margin-bottom:8px;">Şirket :</div>
-												<div>@firstRes.User.Company</div>
-												<div style="font-weight:bold; margin-top:8px;">Yetkili :</div>
-												<div>@firstRes.User.CompanyOfficial</div>
-												<div style="font-weight:bold; margin-top:8px;">Telefon :</div>
-												<div>@firstRes.User.ContactPhone</div>
-											</div>
-											</div>
 
 										<div class="reservation-slots-panel">
-												@foreach (var res in room.Reservations)
-												{
-													<div class="reservation-slot" style="margin-bottom:8px;">
-														<Button Type="ButtonType.Default" Style="width:100%;
+											@foreach (var res in room.Reservations)
+											{
+												<div class="reservation-slot" style="margin-bottom:8px;">
+													<Button Type="ButtonType.Default" Style="width:100%;
 																								height:4.5vh;
 																								background-color:#e6f7ff;
 																								border:1px solid #1890ff;
 																								border-radius:10px;
 																								color:#1890ff;">
-															@res.StartTime.ToString("HH:mm") - @res.EndTime.ToString("HH:mm")
-														</Button>
-													</div>
-												}
-											</div>
-											<Button Type="ButtonType.Dashed"
-													Style="margin-top:10px; 
+														@res.StartTime.ToString("HH:mm") - @res.EndTime.ToString("HH:mm")
+													</Button>
+												</div>
+											}
+										</div>
+										<Button Type="ButtonType.Dashed"
+												Style="margin-top:10px;
 															width: 100%;
 															height:4.5vh;
 															background-color:unset;
 															border-radius:10px;
 															color:red;
 															border-color:red"
-													OnClick="@(() => CancelReservation(room.Reservations.First().Id))">
-												Rezervasyonu İptal
-											</Button>
+												OnClick="@(() => CancelReservation(room.Reservations.First().Id))">
+											Rezervasyonu İptal
+										</Button>
 
-										}
-										else
-										{
+									}
+									else
+									{
 										<Tag Style="width: vw10px;
 													height:auto;
-													text-align:center; 
+													text-align:center;
 													white-space: normal;
 													display: flex;
 													justify-content: center;
 													align-items: center;
 													margin-top:10px;
-													padding:5px;" 
-										Color="TagColor.Green">
-												Bugün için rezervasyon bulunmamaktadır.
-											</Tag>
-										}
+													padding:5px;"
+											 Color="TagColor.Green">
+											Bugün için rezervasyon bulunmamaktadır.
+										</Tag>
+									}
 
-										<Divider />
+									<Divider />
 									<Collapse DefaultActiveKey="@(new[]{"2"})" OnChange="Callback" Animation>
 										<Panel Header="Müsait Saatler" Key="1">
 											<p>
@@ -208,12 +214,12 @@
 												}
 											</p>
 										</Panel>
-										
+
 									</Collapse>
-										
-									</div>
-								</AntDesign.Col>
-							}
+
+								</div>
+							</AntDesign.Col>
+						}
 
 					</Row>
 					<Modal Title="Yeni Toplantı Odası Oluştur"
@@ -248,8 +254,7 @@
 							</FormItem>
 						</Form>
 					</Modal>
-					<Modal 
-						   @bind-Visible="@IsDeleteModalVisible"
+					<Modal @bind-Visible="@IsDeleteModalVisible"
 						   OnOk="ConfirmDeleteRoom"
 						   OnCancel="CloseDeleteModal"
 						   OkText="deleteButtonText"
@@ -268,8 +273,7 @@
 						</div>
 					</Modal>
 
-					<Modal 
-						   @bind-Visible="@IsCancelModalVisible"
+					<Modal @bind-Visible="@IsCancelModalVisible"
 						   OnOk="ConfirmCancelReservation"
 						   OnCancel="CloseCancelModal"
 						   OkText="@deleteButtonText"
@@ -310,7 +314,7 @@
 	</NotAuthorized>
 </AuthorizeView>
 @code {
-void Callback(string[] keys)
+	void Callback(string[] keys)
 	{
 		Console.WriteLine(string.Join(',', keys));
 	}
@@ -336,6 +340,9 @@ void Callback(string[] keys)
 	private bool IsDeleteModalVisible = false;
 	private string RoomToDelete = "";
 	private string RoomToDeleteName = "";
+
+	private DateTime TodayDate = DateTime.Today;
+	private bool DisablePastDates(DateTime date) => date < DateTime.Today;
 
 	protected override async Task OnInitializedAsync()
 	{

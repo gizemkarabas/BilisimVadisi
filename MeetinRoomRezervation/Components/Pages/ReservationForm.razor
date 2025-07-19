@@ -32,7 +32,7 @@ else
 		<Form Model="this" OnFinish="GoToSummary">
 			<FormItem>
 				<div class="reservation-panel-header">Lütfen Tarihi Seçin</div>
-				<DatePicker @bind-Value="SelectedDate"
+				<DatePicker DefaultValue=@TodayDate @bind-Value="SelectedDate"
 							DisabledDate="DisablePastDates" />
 			</FormItem>
 
@@ -145,6 +145,10 @@ else
 
 
 	private DateTime _selectedDate = DateTime.Today;
+	private DateTime TodayDate = DateTime.Today;
+
+	private bool DisablePastDates(DateTime date) => date < DateTime.Today;
+
 
 	private DateTime SelectedDate
 	{
@@ -320,8 +324,5 @@ else
 		}
 	}
 
-		private bool DisablePastDates(DateTime date)
-		{
-	return date.Date < DateTime.Today;
-		}
+	
 }
