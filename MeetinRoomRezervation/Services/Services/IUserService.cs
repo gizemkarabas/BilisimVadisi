@@ -10,6 +10,10 @@ namespace MeetinRoomRezervation.Services.ReservationService
 		Task AddUserAsync(UserDto userDto);
 		Task UpdateMonthlyUsageAsync();
 		Task<bool> UpdateUserAsync(UserDto userDto);
+		Task<bool> IsUserActiveAsync(string userId);
+		Task<bool> CanUserMakeReservationAsync(string userId, int requestedHours);
+		Task<int> GetRemainingHoursAsync(string userId);
+
 
 	}
 }

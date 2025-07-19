@@ -7,6 +7,7 @@
 @inject IReservationService ReservationService
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthProvider
+@inject IMessageService MessageService
 
 <div class="reservation-panel">
     <div class="reservation-header">Rezervasyonunuzu Onaylayın</div>
@@ -14,6 +15,15 @@
         @if (ReservationState.SelectedSlots.Any())
         {
             <div class="reservation-card">
+                <!-- Hata mesajı gösterimi -->
+                @if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    <div style="margin-bottom: 20px;">
+                        <Alert Message="@errorMessage" Type="@AlertType.Error" ShowIcon="true" Closable="true"
+                               OnClose="() => errorMessage = string.Empty" />
+                    </div>
+                }
+
                 <div class="slots-list" style="overflow-y: auto;max-height: 18vh; display: flex; flex-wrap: wrap; gap: 10px; justify-content:center;">
                     @foreach (var slot in ReservationState.SelectedSlots)
                     {
@@ -35,15 +45,11 @@
                                 <path d="M2.41699 12.333L3.25033 4.41634C3.87215 3.68983 5.30709 3.16634 7.00034 3.16634M11.5837 12.333L10.7503 4.41634C10.1285 3.68983 8.69359 3.16634 7.00034 3.16634M7.00034 3.16634L7.00033 1.49968" stroke="white" stroke-width="1.66667" stroke-linecap="square" stroke-linejoin="round" />
                                 <path d="M1.16699 13.167H4.85765M12.8337 13.167H9.14337M9.14337 13.167L9.03869 13.8994C8.89372 14.9136 8.02504 15.667 7.00046 15.667V15.667C5.97577 15.667 5.10702 14.9135 4.96218 13.8991L4.85765 13.167M9.14337 13.167H4.85765" stroke="white" stroke-width="1.66667" stroke-linecap="square" stroke-linejoin="round" />
                             </svg>
-
-
-
                         </div>
                         <div>
                             <svg width="24" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M7.99967 2.33301L10.1157 6.08721L14.34 6.93956L11.4235 10.1121L11.9182 14.3931L7.99967 12.5997L4.08111 14.3931L4.57587 10.1121L1.6593 6.93956L5.88365 6.08721L7.99967 2.33301Z" stroke="white" stroke-width="1.66667" />
                             </svg>
-
                         </div>
                     </div>
                     <div>
@@ -62,7 +68,6 @@
                             </div>
                         </dl>
                     </div>
-
                 </div>
 
                 <h4 style="text-align:center; margin-top:20px;">
@@ -71,11 +76,21 @@
                 </h4>
 
                 <div style="margin-top: 20px; text-align:center;">
-                    <Button Type="ButtonType.Primary" OnClick="ConfirmReservation" Style="width: 200px;">Onayla</Button>
+                    <Button Type="ButtonType.Primary" OnClick="ConfirmReservation"
+                            Style="width: 200px;" Loading="@isLoading">
+                        @if (isLoading)
+                        {
+                            <span>Onaylanıyor...</span>
+                        }
+                        else
+                        {
+                            <span>Onayla</span>
+                        }
+                    </Button>
                 </div>
 
                 <div style="margin-top: 10px; text-align:center;">
-                    <Button Type="ButtonType.Default" OnClick="GoBack" Style="width: 200px;">Geri</Button>
+                    <Button Type="ButtonType.Default" OnClick="GoBack" Style="width: 200px;" Disabled="@isLoading">Geri</Button>
                 </div>
             </div>
         }
@@ -88,6 +103,8 @@
 
 @code {
     private static readonly CultureInfo turkishCulture = new CultureInfo("tr-TR");
+    private string errorMessage = string.Empty;
+    private bool isLoading = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -106,11 +123,16 @@
     {
         try
         {
+            isLoading = true;
+            errorMessage = string.Empty;
+            StateHasChanged();
+
             Console.WriteLine($"ConfirmReservation - SelectedSlots count: {ReservationState?.SelectedSlots?.Count ?? 0}");
 
             if (ReservationState?.SelectedSlots == null || !ReservationState.SelectedSlots.Any())
             {
                 Console.WriteLine("No slots to reserve!");
+                errorMessage = "Seçili saat bulunamadı.";
                 return;
             }
 
@@ -118,18 +140,31 @@
 
             if (!string.IsNullOrEmpty(result))
             {
+                MessageService.Success("Rezervasyonunuz başarıyla oluşturuldu!");
+
                 Navigation.NavigateTo("/user/myreservations");
             }
         }
+        catch (InvalidOperationException ex)
+        {
+            errorMessage = ex.Message;
+            Console.WriteLine($"Reservation error: {ex.Message}");
+        }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error confirming reservation: {ex.Message}");
+            errorMessage = "Rezervasyon oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.";
+            Console.WriteLine($"Unexpected error confirming reservation: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
         }
     }
 
+
     private void GoBack()
     {
-        Navigation.NavigateTo("/user/meetingRooms"); 
+        Navigation.NavigateTo("/user/meetingRooms");
     }
-
 }

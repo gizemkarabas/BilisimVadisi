@@ -8,10 +8,12 @@ namespace MeetinRoomRezervation.Services.ReservationService
 	public class UserService : IUserService
 	{
 		private readonly MongoDbContext _context;
+		private readonly IHttpContextAccessor _httpContextAccessor;
 
-		public UserService(MongoDbContext context)
+		public UserService(MongoDbContext context, IHttpContextAccessor httpContextAccessor)
 		{
 			_context = context;
+			_httpContextAccessor = httpContextAccessor;
 		}
 		public async Task<List<UserDto>> GetAllUsersAsync()
 		{
@@ -53,6 +55,21 @@ namespace MeetinRoomRezervation.Services.ReservationService
 			catch (Exception ex)
 			{
 				Console.WriteLine($"Error in UpdateUserStatusAsync: {ex.Message}");
+				return false;
+			}
+		}
+
+		public async Task<bool> IsUserActiveAsync(string userId)
+		{
+			try
+			{
+				var filter = Builders<User>.Filter.Eq("_id", userId);
+				var user = await _context.Users.Find(filter).FirstOrDefaultAsync();
+				return user?.IsActive ?? false;
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine($"Error in IsUserActiveAsync: {ex.Message}");
 				return false;
 			}
 		}
@@ -167,5 +184,49 @@ namespace MeetinRoomRezervation.Services.ReservationService
 				return false;
 			}
 		}
+
+		public async Task<bool> CanUserMakeReservationAsync(string userId, int requestedHours)
+		{
+			try
+			{
+				var filter = Builders<User>.Filter.Eq("_id", userId);
+				var user = await _context.Users.Find(filter).FirstOrDefaultAsync();
+
+				if (user == null || !user.IsActive)
+				{
+					return false;
+				}
+
+				// Kullanıcının kalan kullanım hakkını kontrol et
+				var remainingHours = user.MonthlyUsageLimit - user.UsedThisMonth;
+				return remainingHours >= requestedHours;
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine($"Error in CanUserMakeReservationAsync: {ex.Message}");
+				return false;
+			}
+		}
+		public async Task<int> GetRemainingHoursAsync(string userId)
+		{
+			try
+			{
+				var filter = Builders<User>.Filter.Eq("_id", userId);
+				var user = await _context.Users.Find(filter).FirstOrDefaultAsync();
+
+				if (user == null)
+				{
+					return 0;
+				}
+
+				return Math.Max(0, user.MonthlyUsageLimit - user.UsedThisMonth);
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine($"Error in GetRemainingHoursAsync: {ex.Message}");
+				return 0;
+			}
+		}
+
 	}
 }

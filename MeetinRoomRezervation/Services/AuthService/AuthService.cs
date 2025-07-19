@@ -36,7 +36,7 @@ namespace MeetinRoomRezervation.Services
 			_logger.LogInformation("Login attempt for email: {Email}", model.Email);
 
 			var user = await _context.Users.Find(u => u.Email == model.Email).FirstOrDefaultAsync();
-			if (user != null && BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash))
+			if (user != null && user.IsActive && BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash))
 			{
 				var claims = new List<Claim>
 				{
@@ -166,5 +166,6 @@ namespace MeetinRoomRezervation.Services
 
 			return null;
 		}
+
 	}
 }

@@ -103,7 +103,10 @@
 							{
 								<AntDesign.Col Xs="24" Sm="24" Md="12" Lg="8" Xl="6" Style="padding-left:1%;padding-right:1%;">
 									<div class="halls">
-									<Button Size="ButtonSize.Small" Style="align-self:end;margin-bottom: 20px;" OnClick="@(() => OpenEditModal(room))" Icon="edit" />
+										<div style="display:flex;justify-content:end">	
+											<Button Size="ButtonSize.Small" Style="align-self:end;margin-bottom: 20px; margin-right: 5px;" OnClick="@(() => OpenEditModal(room))" Icon="edit" />
+											<Button Size="ButtonSize.Small" Style="align-self:end;margin-bottom: 20px;" OnClick="@(() => DeleteRoom(room.Id))" Icon="delete" Danger />
+										</div>
 										<div class="halls-header">@room.Name</div>
 										@if (room.Reservations.Any())
 										{
@@ -236,6 +239,38 @@
 							</FormItem>
 						</Form>
 					</Modal>
+					<Modal 
+						   @bind-Visible="@IsDeleteModalVisible"
+						   OnOk="ConfirmDeleteRoom"
+						   OnCancel="CloseDeleteModal"
+						   OkText="deleteButtonText"
+						   CancelText="@cancelButtonText"
+						   OkType="@ButtonType.Primary"
+						   OkButtonProps="@(new ButtonProps { Danger = true })">
+
+						<div style="text-align: center; padding: 20px;">
+							<Icon Type="exclamation-circle" Theme="IconThemeType.Outline" Style="font-size: 48px; color: #ff4d4f; margin-bottom: 16px;" />
+							<p style="font-size: 16px; margin-bottom: 8px;">Bu toplantı odasını silmek istediğinizden emin misiniz?</p>
+							<p style="color: #666; font-size: 14px;">Bu işlem geri alınamaz ve odaya ait tüm rezervasyonlar silinecektir.</p>
+							@if (!string.IsNullOrEmpty(RoomToDeleteName))
+							{
+								<p style="font-weight: bold; color: #ff4d4f; margin-top: 12px;">Silinecek Oda: @RoomToDeleteName</p>
+							}
+						</div>
+					</Modal>
+
+					<Modal 
+						   @bind-Visible="@IsCancelModalVisible"
+						   OnOk="ConfirmCancelReservation"
+						   OnCancel="CloseCancelModal"
+						   OkText="@deleteButtonText"
+						   CancelText="@cancelButtonText"
+						   OkType="@ButtonType.Primary">
+
+						<div style="text-align: center; padding: 20px;">
+							<p style="font-size: 16px; margin-bottom: 8px;">Bu rezervasyonu iptal etmek istediğinizden emin misiniz?</p>
+						</div>
+					</Modal>
 				</div>
 			</div>
 		</div>
@@ -277,6 +312,7 @@ void Callback(string[] keys)
 @code {
 	private DateTime SelectedDate = DateTime.Today;
 	private string okButtonText = "Kaydet";
+	private string deleteButtonText = "Sil";
 	private string cancelButtonText = "İptal";
 	private void SelectToday() => SelectedDate = DateTime.Today;
 	private void SelectTomorrow() => SelectedDate = DateTime.Today.AddDays(1);
@@ -286,6 +322,11 @@ void Callback(string[] keys)
 	private MeetingRoomDto NewRoom = new();
 	private MeetingRoomDto EditingRoom = new();
 	private bool isAdmin = false;
+	private bool IsCancelModalVisible = false;
+	private string ReservationToCancel = "";
+	private bool IsDeleteModalVisible = false;
+	private string RoomToDelete = "";
+	private string RoomToDeleteName = "";
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -334,11 +375,28 @@ void Callback(string[] keys)
 		return slots;
 	}
 
-	private async Task CancelReservation(string reservationId)
+	private void CancelReservation(string reservationId)
 	{
-		await ReservationService.DeleteReservationAsync(reservationId);
-		await LoadRoomData();
+		ReservationToCancel = reservationId;
+		IsCancelModalVisible = true;
 	}
+
+	private void CloseCancelModal()
+	{
+		IsCancelModalVisible = false;
+		ReservationToCancel = "";
+	}
+
+	private async Task ConfirmCancelReservation()
+	{
+		if (!string.IsNullOrEmpty(ReservationToCancel))
+		{
+			await ReservationService.DeleteReservationAsync(ReservationToCancel);
+			await LoadRoomData();
+		}
+		CloseCancelModal();
+	}
+
 
 	private void OpenCreateRoomModal()
 	{
@@ -400,5 +458,32 @@ void Callback(string[] keys)
 	{
 		return user.FindFirst("Company")?.Value ?? "";
 	}
+	private void DeleteRoom(string roomId)
+	{
+		var room = Rooms.FirstOrDefault(r => r.Id == roomId);
+		if (room != null)
+		{
+			RoomToDelete = roomId;
+			RoomToDeleteName = room.Name;
+			IsDeleteModalVisible = true;
+		}
+	}
 
+	private void CloseDeleteModal()
+	{
+		IsDeleteModalVisible = false;
+		RoomToDelete = "";
+		RoomToDeleteName = "";
+	}
+
+	private async Task ConfirmDeleteRoom()
+	{
+		if (!string.IsNullOrEmpty(RoomToDelete))
+		{
+			await RoomService.DeleteRoomAsync(RoomToDelete);
+			await LoadRoomData();
+		}
+		CloseDeleteModal();
+	}
+}
 }

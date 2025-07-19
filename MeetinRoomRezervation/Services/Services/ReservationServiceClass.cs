@@ -12,17 +12,19 @@ namespace MeetinRoomRezervation.Services.ReservationService
 		private readonly IHttpContextAccessor _httpContextAccessor;
 		private readonly AuthenticationStateProvider _authStateProvider;
 		private readonly ILogger<ReservationService> _logger;
+		private readonly IUserService _userService;
 
 		public ReservationService(
 			MongoDbContext context,
 			IHttpContextAccessor httpContextAccessor,
 			AuthenticationStateProvider authStateProvider,
-			ILogger<ReservationService> logger)
+			ILogger<ReservationService> logger, IUserService userService)
 		{
 			_context = context;
 			_httpContextAccessor = httpContextAccessor;
 			_authStateProvider = authStateProvider;
 			_logger = logger;
+			_userService = userService;
 		}
 
 		public async Task<string> AddReservationAsync(ReservationDto reservationDto)
@@ -108,7 +110,14 @@ namespace MeetinRoomRezervation.Services.ReservationService
 						Room = reservationDto.Room ?? new MeetingRoomDto(),
 						Location = reservationDto.Location ?? ""
 					};
+					// Rezervasyon oluşturulmadan önce kontrol
+					var reservationHours = (int)Math.Ceiling((reservation.EndTime - reservation.StartTime).TotalHours);
+					var canMakeReservation = await _userService.CanUserMakeReservationAsync(reservation.UserId, reservationHours);
 
+					if (!canMakeReservation)
+					{
+						throw new InvalidOperationException("Aylık kullanım limitinizi aştınız. Rezervasyon yapılamaz.");
+					}
 					await _context.Reservations.InsertOneAsync(reservation);
 					reservationIds.Add(reservation.Id);
 
