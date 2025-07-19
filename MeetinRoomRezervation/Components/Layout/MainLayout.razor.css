@@ -35,10 +35,19 @@
     color: white !important;
 }
 .my-reservations {
-    background-color: unset;
-    color: white !important;
+    display: flex;
+    border: 0px solid;
+    border-radius: 10px;
+    background-color: #D9D9D9;
+    color: #000000;
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
 }
 .exit {
+    filter: invert(100);
     background-color: unset;
     color: white !important;
 }

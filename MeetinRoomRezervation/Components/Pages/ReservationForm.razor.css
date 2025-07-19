@@ -79,10 +79,8 @@
 .slot-grid {
     width: 84vw;
     display: flex;
-    justify-self: center;
     flex-wrap: wrap;
     gap: 10px;
-    justify-content: space-evenly;
 }
 
 .gray-circle {
