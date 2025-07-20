@@ -7,6 +7,7 @@
     font-size: 13px;
     color: white;
     font-weight: bold;
+    display: flex;
 }
 .main-layout-bar {
     background: #0095ff;
@@ -45,6 +46,7 @@
     flex-wrap: nowrap;
     align-items: center;
     justify-content: center;
+    margin-right:10px;
 }
 .exit {
     filter: invert(100);

@@ -11,11 +11,18 @@
     border-color: #d2d2d2;
     border: 1.2px solid #e2dfdf;
     padding: 15px;
-    padding-top: 55px;
+    padding-top: 15px;
     height: 80vh;
     width: 85vw;
 }
-
+.calender {
+    display: flex;
+    justify-content: start;
+    margin-bottom: 15px;
+    margin-top: 30px;
+    margin-left: 7vw;
+    width:25vw;
+}
     
 .reservation-panel-header {
     font-size: 14px;
@@ -41,7 +48,7 @@
 }
 .availability-panel {
     margin-top: 15px;
-    margin-left: 15px;
+    margin-bottom: 25px;
 }
 
 .time-button {

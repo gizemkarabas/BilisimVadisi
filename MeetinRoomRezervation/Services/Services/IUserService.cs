@@ -13,7 +13,7 @@ namespace MeetinRoomRezervation.Services.ReservationService
 		Task<bool> IsUserActiveAsync(string userId);
 		Task<bool> CanUserMakeReservationAsync(string userId, int requestedHours);
 		Task<int> GetRemainingHoursAsync(string userId);
+		Task<List<UserDto>> GetUsersInfoAsync();
 
-
-	}
+    }
 }

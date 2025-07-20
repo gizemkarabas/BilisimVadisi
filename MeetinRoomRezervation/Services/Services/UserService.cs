@@ -227,6 +227,39 @@ namespace MeetinRoomRezervation.Services.ReservationService
 				return 0;
 			}
 		}
+        public async Task<List<UserDto>> GetUsersInfoAsync()
+        {
+            try
+            {
+                // MongoDB kullanarak tüm aktif kullanıcıları al
+                var users = await _context.Users
+                    .Find(u => u.IsActive == true) // Sadece aktif kullanıcılar
+                    .ToListAsync();
 
-	}
+                Console.WriteLine($"Found {users.Count} active users in database");
+
+                return users.Select(user => new UserDto
+                {
+                    Id = user.Id,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Email = user.Email,
+                    Company = user.Company,
+                    CompanyOfficial = user.CompanyOfficial,
+                    ContactPhone = user.ContactPhone,
+                    MonthlyUsageLimit = user.MonthlyUsageLimit,
+                    UsedThisMonth = user.UsedThisMonth,
+                    IsActive = user.IsActive
+                }).ToList();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetUsersInfoAsync: {ex.Message}");
+                return new List<UserDto>();
+            }
+        }
+
+
+
+    }
 }

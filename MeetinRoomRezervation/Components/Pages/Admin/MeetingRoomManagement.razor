@@ -1,6 +1,7 @@
 ﻿@page "/admin/halls"
 @inject IReservationService ReservationService
  @inject IRoomService RoomService
+ @inject IUserService UserService
 @inject IAuthService AuthService
 @inject AuthenticationStateProvider AuthProvider
 @using AntDesign
@@ -16,8 +17,8 @@
 			<div class="admin-panel">
 				<div class="admin-panel-buttons">
 					<Button Type="@ButtonType.Link"
-							OnClick="@(() => Navigation.NavigateTo("admin/dashboard"))"
-							Style="display: flex;
+					OnClick="@(() => Navigation.NavigateTo("admin/dashboard"))"
+					Style="display: flex;
 							justify-content:flex-start;
 							width:160px;
 							align-items:center;
@@ -25,7 +26,7 @@
 							border-radius: 8px;
 							margin-bottom: 10px;
 							margin-left: 5px;"
-							Block>
+					Block>
 						<div class="button">
 							<svg width="15" height="15" viewBox="0 0 18 18" fill="#4d4d4d">
 								<path d="M10 6V0H18V6H10ZM0 10V0H8V10H0ZM10 18V8H18V18H10ZM0 18V12H8V18H0Z" />
@@ -36,8 +37,8 @@
 						</div>
 					</Button>
 					<Button Type="@ButtonType.Link"
-							OnClick="@(() => Navigation.NavigateTo("/admin/users"))"
-							Style="display: flex;
+					OnClick="@(() => Navigation.NavigateTo("/admin/users"))"
+					Style="display: flex;
 							justify-content:flex-start;
 							width:160px;
 							align-items:center;
@@ -45,7 +46,7 @@
 							border-radius: 8px;
 							margin-bottom: 10px;
 							margin-left: 5px;"
-							Block>
+					Block>
 
 						<div class="button" style="margin-left:6px;">
 							<svg width="20" height="20" viewBox="0 0 20 23" fill="#4d4d4d">
@@ -58,8 +59,8 @@
 
 					</Button>
 					<Button Type="@ButtonType.Link"
-							OnClick="@(() => Navigation.NavigateTo("/admin/halls"))"
-							Style="display: flex;
+					OnClick="@(() => Navigation.NavigateTo("/admin/halls"))"
+					Style="display: flex;
 							justify-content:flex-start;
 							width:160px;
 							align-items:center;
@@ -68,7 +69,7 @@
 							margin-bottom: 10px;
 							background-color:#0095ff;
 							margin-left: 5px;"
-							Block>
+					Block>
 						<div class="button" style="margin-left:6px;">
 							<svg width="20" height="16" viewBox="0 0 20 24" fill="white">
 								<path d="M0.8715 10.4H2.614V21.6H5.2285V12H7.843V21.6H10.457V12H13.072V21.6H15.6865V10.4H17.4285C17.91 10.4 18.3005 10.042 18.3005 9.6C18.3005 9.333 18.1565 9.098 17.937 8.953L17.9385 8.9515L17.9255 8.944L17.903 8.9305L9.5855 4.626V3.365C11.1215 4.071 12.386 2.855 14.378 3.586V0.8005C12.385 0.0695 11.121 1.2845 9.5855 0.579V0.4C9.5855 0.1785 9.391 0 9.15 0C8.909 0 8.715 0.1785 8.715 0.4V4.626L0.3975 8.9295L0.375 8.943L0.3625 8.9515V8.953C0.144 9.098 0.000499964 9.3335 0.000499964 9.6C-3.62634e-08 10.042 0.3905 10.4 0.8715 10.4ZM1.7425 22.4005L0 24H18.301L16.5575 22.4005H1.7425Z" />
@@ -123,29 +124,33 @@
 														<path d="M2.41699 12.333L3.25033 4.41634C3.87215 3.68983 5.30709 3.16634 7.00034 3.16634M11.5837 12.333L10.7503 4.41634C10.1285 3.68983 8.69359 3.16634 7.00034 3.16634M7.00034 3.16634L7.00033 1.49968" stroke="white" stroke-width="1.66667" stroke-linecap="square" stroke-linejoin="round" />
 														<path d="M1.16699 13.167H4.85765M12.8337 13.167H9.14337M9.14337 13.167L9.03869 13.8994C8.89372 14.9136 8.02504 15.667 7.00046 15.667V15.667C5.97577 15.667 5.10702 14.9135 4.96218 13.8991L4.85765 13.167M9.14337 13.167H4.85765" stroke="white" stroke-width="1.66667" stroke-linecap="square" stroke-linejoin="round" />
 													</svg>
-
-
-
 												</div>
 												<div>
 													<svg width="24" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
 														<path d="M7.99967 2.33301L10.1157 6.08721L14.34 6.93956L11.4235 10.1121L11.9182 14.3931L7.99967 12.5997L4.08111 14.3931L4.57587 10.1121L1.6593 6.93956L5.88365 6.08721L7.99967 2.33301Z" stroke="white" stroke-width="1.66667" />
 													</svg>
-
 												</div>
 											</div>
 											<div class="descriptions">
 												<div>
 													<div style="font-weight:bold; font-size:16px;">Şirket :</div>
-													<div>@firstRes.User.Company</div>
+													<div>
+														@{
+															var reservationUser = UsersInfo.FirstOrDefault(u => u.Id == firstRes.UserId);
+														}
+														@(reservationUser?.Company ?? firstRes.User?.Company ?? "Bilinmiyor")
+													</div>
 												</div>
 												<div>
 													<div style="font-weight:bold; margin-top:8px;">Yetkili :</div>
-													<div>@firstRes.User.CompanyOfficial</div>
+													@{
+														var slotUser = UsersInfo.FirstOrDefault(u => u.Id == firstRes.UserId);
+													}
+													@(slotUser?.CompanyOfficial ?? firstRes.User?.CompanyOfficial ?? firstRes.UserEmail ?? "Bilinmiyor")
 												</div>
 												<div>
 													<div style="font-weight:bold; margin-top:8px;">Telefon :</div>
-													<div>@firstRes.User.ContactPhone</div>
+													<div>@(reservationUser?.ContactPhone ?? firstRes.User?.ContactPhone ?? "")</div>
 												</div>
 											</div>
 										</div>
@@ -155,29 +160,18 @@
 											{
 												<div class="reservation-slot" style="margin-bottom:8px;">
 													<Button Type="ButtonType.Default" Style="width:100%;
-																								height:4.5vh;
-																								background-color:#e6f7ff;
-																								border:1px solid #1890ff;
-																								border-radius:10px;
-																								color:#1890ff;">
+                                                    height:4.5vh;
+                                                    background-color:#e6f7ff;
+                                                    border:1px solid #1890ff;
+                                                    border-radius:10px;
+                                                    color:#1890ff;">
 														@res.StartTime.ToString("HH:mm") - @res.EndTime.ToString("HH:mm")
 													</Button>
 												</div>
 											}
 										</div>
-										<Button Type="ButtonType.Dashed"
-												Style="margin-top:10px;
-															width: 100%;
-															height:4.5vh;
-															background-color:unset;
-															border-radius:10px;
-															color:red;
-															border-color:red"
-												OnClick="@(() => CancelReservation(room.Reservations.First().Id))">
-											Rezervasyonu İptal
-										</Button>
-
 									}
+
 									else
 									{
 										<Tag Style="width: vw10px;
@@ -189,7 +183,7 @@
 													align-items: center;
 													margin-top:10px;
 													padding:5px;"
-											 Color="TagColor.Green">
+										Color="TagColor.Green">
 											Bugün için rezervasyon bulunmamaktadır.
 										</Tag>
 									}
@@ -223,11 +217,11 @@
 
 					</Row>
 					<Modal Title="Yeni Toplantı Odası Oluştur"
-						   @bind-Visible="@IsCreateModalVisible"
-						   OnOk="CreateRoom"
-						   OnCancel="CloseCreateModal"
-						   OkText="@okButtonText"
-						   CancelText="@cancelButtonText">
+					@bind-Visible="@IsCreateModalVisible"
+					OnOk="CreateRoom"
+					OnCancel="CloseCreateModal"
+					OkText="@okButtonText"
+					CancelText="@cancelButtonText">
 
 						<Form Model="@NewRoom">
 							<FormItem Label="Oda Adı" Required>
@@ -239,11 +233,11 @@
 						</Form>
 					</Modal>
 					<Modal Title="Toplantı Odası Düzenle"
-						   @bind-Visible="@IsEditModalVisible"
-						   OnOk="UpdateRoom"
-						   OnCancel="CloseEditModal"
-						   OkText="@okButtonText"
-						   CancelText="@cancelButtonText">
+					@bind-Visible="@IsEditModalVisible"
+					OnOk="UpdateRoom"
+					OnCancel="CloseEditModal"
+					OkText="@okButtonText"
+					CancelText="@cancelButtonText">
 
 						<Form Model="@EditingRoom">
 							<FormItem Label="Oda Adı" Required>
@@ -255,12 +249,12 @@
 						</Form>
 					</Modal>
 					<Modal @bind-Visible="@IsDeleteModalVisible"
-						   OnOk="ConfirmDeleteRoom"
-						   OnCancel="CloseDeleteModal"
-						   OkText="deleteButtonText"
-						   CancelText="@cancelButtonText"
-						   OkType="@ButtonType.Primary"
-						   OkButtonProps="@(new ButtonProps { Danger = true })">
+					OnOk="ConfirmDeleteRoom"
+					OnCancel="CloseDeleteModal"
+					OkText="deleteButtonText"
+					CancelText="@cancelButtonText"
+					OkType="@ButtonType.Primary"
+					OkButtonProps="@(new ButtonProps { Danger = true })">
 
 						<div style="text-align: center; padding: 20px;">
 							<Icon Type="exclamation-circle" Theme="IconThemeType.Outline" Style="font-size: 48px; color: #ff4d4f; margin-bottom: 16px;" />
@@ -274,11 +268,11 @@
 					</Modal>
 
 					<Modal @bind-Visible="@IsCancelModalVisible"
-						   OnOk="ConfirmCancelReservation"
-						   OnCancel="CloseCancelModal"
-						   OkText="@deleteButtonText"
-						   CancelText="@cancelButtonText"
-						   OkType="@ButtonType.Primary">
+					OnOk="ConfirmCancelReservation"
+					OnCancel="CloseCancelModal"
+					OkText="@deleteButtonText"
+					CancelText="@cancelButtonText"
+					OkType="@ButtonType.Primary">
 
 						<div style="text-align: center; padding: 20px;">
 							<p style="font-size: 16px; margin-bottom: 8px;">Bu rezervasyonu iptal etmek istediğinizden emin misiniz?</p>
@@ -291,10 +285,10 @@
 	<NotAuthorized>
 		<div style="padding: 24px; max-width: 600px; margin: 0 auto;">
 			<Alert Type="@AlertType.Warning"
-				   Message="Yetkisiz Erişim"
-				   Description="Bu sayfaya erişim yetkiniz bulunmamaktadır. Admin yetkisi gereklidir."
-				   ShowIcon="true"
-				   Style="margin-bottom: 16px;" />
+			Message="Yetkisiz Erişim"
+			Description="Bu sayfaya erişim yetkiniz bulunmamaktadır. Admin yetkisi gereklidir."
+			ShowIcon="true"
+			Style="margin-bottom: 16px;" />
 
 			<div style="text-align: center;">
 				<Space>
@@ -321,7 +315,6 @@
 
 }
 
-
 @code {
 	private DateTime SelectedDate = DateTime.Today;
 	private string okButtonText = "Kaydet";
@@ -340,6 +333,9 @@
 	private bool IsDeleteModalVisible = false;
 	private string RoomToDelete = "";
 	private string RoomToDeleteName = "";
+	private UserDto User = new();
+	private List<UserDto> UsersInfo = new();
+	private UserDto CurrentUser => UsersInfo.FirstOrDefault();
 
 	private DateTime TodayDate = DateTime.Today;
 	private bool DisablePastDates(DateTime date) => date < DateTime.Today;
@@ -355,21 +351,49 @@
 
 	private async Task LoadRoomData()
 	{
-		var allRooms = await RoomService.GetAllRoomsAsync();
-		var reservations = await ReservationService.GetReservationsByDateAsync(SelectedDate);
-
-		foreach (var room in allRooms)
+		try
 		{
-			var roomReservations = reservations
-				.Where(r => r.RoomId == room.Id)
-				.OrderBy(r => r.StartTime)
-				.ToList();
+			var allRooms = await RoomService.GetAllRoomsAsync();
+			var reservations = await ReservationService.GetReservationsByDateAsync(SelectedDate);
 
-			room.Reservations = roomReservations;
-			room.AvailableSlots = GenerateAvailableSlots(roomReservations);
+			// Tüm kullanıcı bilgilerini yükle (admin sayfası olduğu için tüm kullanıcılar)
+			UsersInfo = await UserService.GetUsersInfoAsync();
+
+			// Debug: Kullanıcı bilgilerini kontrol et
+			Console.WriteLine($"Total users loaded: {UsersInfo.Count}");
+			foreach (var user in UsersInfo.Take(5))
+			{
+				Console.WriteLine($"User: {user.Id} - {user.Email} - {user.Company}");
+			}
+
+			// Debug: Rezervasyon bilgilerini kontrol et
+			Console.WriteLine($"Total reservations for {SelectedDate:yyyy-MM-dd}: {reservations.Count}");
+			foreach (var res in reservations.Take(5))
+			{
+				Console.WriteLine($"Reservation: {res.Id} - UserId: {res.UserId} - UserEmail: {res.UserEmail}");
+				var matchedUser = UsersInfo.FirstOrDefault(u => u.Id == res.UserId);
+				Console.WriteLine($"  Matched user: {(matchedUser != null ? matchedUser.Email : "NOT FOUND")}");
+			}
+
+			foreach (var room in allRooms)
+			{
+				var roomReservations = reservations
+					.Where(r => r.RoomId == room.Id)
+					.OrderBy(r => r.StartTime)
+					.ToList();
+
+				room.Reservations = roomReservations;
+				room.AvailableSlots = GenerateAvailableSlots(roomReservations);
+			}
+
+			Rooms = allRooms;
+			Console.WriteLine($"Users info loaded: {UsersInfo.Count}");
 		}
-
-		Rooms = allRooms;
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error in LoadRoomData: {ex.Message}");
+			Console.WriteLine($"Stack trace: {ex.StackTrace}");
+		}
 	}
 
 	private List<string> GenerateAvailableSlots(List<ReservationDto> reservations)

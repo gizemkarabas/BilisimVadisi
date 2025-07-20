@@ -9,11 +9,12 @@
 @inject AuthenticationStateProvider AuthProvider
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
+@inject IUserService UserService
 
 <div class="reservation-panel-buttons">
 	<Button Type="@ButtonType.Link"
-			OnClick="@(() => Navigation.NavigateTo("/user/meetingRooms"))"
-			Style="display: flex;
+	OnClick="@(() => Navigation.NavigateTo("/user/meetingRooms"))"
+	Style="display: flex;
 							justify-content:flex-start;
 							width:200px;
 							justify-content: center;
@@ -24,7 +25,7 @@
 							margin-bottom: 10px;
 							margin-right: 15px;
 							margin-left: 15px;"
-			Block>
+	Block>
 		<div class="reservation-button">
 			<div class="reservation-button-title">
 				Toplantı Odaları
@@ -32,8 +33,8 @@
 		</div>
 	</Button>
 	<Button Type="@ButtonType.Link"
-			OnClick="@(() => Navigation.NavigateTo("/user/myreservations"))"
-			Style="display: flex;
+	OnClick="@(() => Navigation.NavigateTo("/user/myreservations"))"
+	Style="display: flex;
 							width:200px;
 							background-color:#0095ff;
 							justify-content: center;
@@ -44,7 +45,7 @@
 							margin-bottom: 10px;
 							margin-right: 15px;
 							margin-left: 15px;"
-			Block>
+	Block>
 		<div class="reservation-button" style="margin-left:6px;">
 			<div class="active-reservation-button-title">
 				Rezervasyonlarım
@@ -74,8 +75,8 @@
 						{
 							<AntDesign.Col Xs="24" Sm="24" Md="12" Lg="8" Xl="6">
 								<Card Title="@($"{reservation.StartTime.ToLocalTime().ToString("HH:mm")} - {reservation.EndTime.ToLocalTime().ToString("HH:mm")}")"
-									  Class="reservation-card"
-									  Style="margin-bottom: 16px;
+								Class="reservation-card"
+								Style="margin-bottom: 16px;
                                                 border-radius: 6px;
                                                 background-color: unset;
                                                 color: #333;
@@ -103,32 +104,34 @@
 											<dl class="descriptions">
 												<div>
 													<p>
-														Şirket :<br>
+														Şirket :
 														@{
-															var user = UsersInfo.FirstOrDefault(u => u.Id == reservation.UserId);
+															// Current user bilgilerini al (UsersInfo listesinde sadece 1 kullanıcı var)
+															var currentUser = UsersInfo.FirstOrDefault();
 														}
-														@(user?.Company ?? "Bilinmiyor")
+														@(currentUser?.Company ?? "Bilinmiyor")
 													</p>
 												</div>
 												<div>
 													<p>
 														Yetkili :
-														@(reservation.User?.Email ?? reservation.UserEmail ?? "")
+														@(currentUser?.CompanyOfficial ?? currentUser?.Email ?? "Bilinmiyor")
 													</p>
 												</div>
 												<div>
 													<p>
 														Telefon:
-														@(reservation.User?.ContactPhone ?? "")
+														@(currentUser?.ContactPhone ?? "")
 													</p>
 												</div>
+
 											</dl>
 										</div>
 									</div>
 									<Button Danger Type="ButtonType.Primary"
-											OnClick="() => ShowCancelConfirmation(reservation.Id)"
-											Style="margin-top:30px; width: 100%;background-color:unset;color:red;"
-											Loading="@isCancelling">
+									OnClick="() => ShowCancelConfirmation(reservation.Id)"
+									Style="margin-top:30px; width: 100%;background-color:unset;color:red;"
+									Loading="@isCancelling">
 										Rezervasyonu İptal Et
 									</Button>
 								</Card>
@@ -150,7 +153,7 @@
 						{
 							<AntDesign.Col Xs="24" Sm="24" Md="12" Lg="8" Xl="6">
 								<Card Title="@($"{reservation.StartTime.ToString("HH:mm")} - {reservation.EndTime.ToString("HH:mm")}")"
-									  Style="margin-bottom: 16px;
+								Style="margin-bottom: 16px;
                                                   border-radius: 6px;
                                                   background-color: unset;
                                                   color: #666;
@@ -210,7 +213,7 @@
 												font-size:12px;
 												font-weight:bold;
 												color:darkgray;"
-										 Color="TagColor.Default">Tamamlandı</Tag>
+									Color="TagColor.Default">Tamamlandı</Tag>
 								</Card>
 							</AntDesign.Col>
 						}
@@ -264,25 +267,25 @@
 
 			var allReservations = await ReservationService.GetUserReservationsAsync();
 
-			// Şu anki zamanı UTC olarak al
+			var currentUser = await ReservationService.GetCurrentUserAsync();
+			if (currentUser != null)
+			{
+				UsersInfo = new List<UserDto>
+			{
+				new UserDto
+				{
+					Id = currentUser.Id,
+					FirstName = currentUser.FirstName,
+					LastName = currentUser.LastName,
+					Email = currentUser.Email,
+					Company = currentUser.Company,
+					CompanyOfficial = currentUser.CompanyOfficial,
+					ContactPhone = currentUser.ContactPhone
+				}
+			};
+			}
 			var nowUtc = DateTime.UtcNow;
 
-			Console.WriteLine($"Current time (UTC): {nowUtc}");
-			Console.WriteLine($"Current time (Local): {nowUtc.ToLocalTime()}");
-			Console.WriteLine($"Total reservations found: {allReservations.Count}");
-
-			// Debug: Tüm rezervasyonları logla
-			foreach (var res in allReservations)
-			{
-				Console.WriteLine($"Reservation ID: {res.Id}");
-				Console.WriteLine($"  UTC: {res.StartTime} - {res.EndTime}");
-				Console.WriteLine($"  Local: {res.StartTime.ToLocalTime()} - {res.EndTime.ToLocalTime()}");
-				Console.WriteLine($"  End time > now? {res.EndTime > nowUtc}");
-				Console.WriteLine($"  Is future? {res.EndTime > nowUtc}");
-				Console.WriteLine($"  ---");
-			}
-
-			// UTC zamanlarla karşılaştır
 			FutureReservations = allReservations
 				.Where(r => r.EndTime > nowUtc)
 				.OrderBy(r => r.StartTime)
@@ -292,29 +295,13 @@
 				.Where(r => r.EndTime <= nowUtc)
 				.OrderByDescending(r => r.StartTime)
 				.ToList();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error in LoadReservations: {ex.Message}");
+    }
+}
 
-			Console.WriteLine($"Future reservations: {FutureReservations.Count}");
-			Console.WriteLine($"Past reservations: {PastReservations.Count}");
-
-			// Debug: Kategorilere ayrılan rezervasyonları logla
-			Console.WriteLine("FUTURE RESERVATIONS:");
-			foreach (var res in FutureReservations)
-			{
-				Console.WriteLine($"  {res.Id}: {res.StartTime.ToLocalTime()} - {res.EndTime.ToLocalTime()}");
-			}
-
-			Console.WriteLine("PAST RESERVATIONS:");
-			foreach (var res in PastReservations)
-			{
-				Console.WriteLine($"  {res.Id}: {res.StartTime.ToLocalTime()} - {res.EndTime.ToLocalTime()}");
-			}
-		}
-		catch (Exception ex)
-		{
-			Console.WriteLine($"Error in LoadReservations: {ex.Message}");
-			Console.WriteLine($"Stack trace: {ex.StackTrace}");
-		}
-	}
 
 	private async Task ShowCancelConfirmation(string reservationId)
 	{

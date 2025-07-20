@@ -14,5 +14,6 @@ namespace MeetinRoomRezervation.Services.ReservationService
 		Task<bool> UpdateReservationAsync(ReservationDto reservation);
 		Task<bool> AdminDeleteReservationAsync(string reservationId);
 		Task<User?> GetCurrentUserAsync();
-	}
+
+    }
 }

@@ -10,6 +10,14 @@
 <AntDesign.AntContainer />
 
 <div Style="min-height: 90vh; background-color: white;">
+
+		<Menu Mode="MenuMode.Horizontal" style="background-color: unset;border-bottom:unset;">
+			<AuthorizeView>
+				<NotAuthorized>
+
+					
+				</NotAuthorized>
+				<Authorized>
 	<div class="main-layout-bar">
 		<a href="/user/meetingRooms">
 
@@ -26,25 +34,6 @@
 				</svg>
 			</div>
 		</a>
-
-		<Menu Mode="MenuMode.Horizontal" style="background-color: unset;border-bottom:unset;">
-			<AuthorizeView>
-				<NotAuthorized>
-
-					<MenuItem Key="2" RouterLink="/register">
-						<div class="register">
-							<Icon Type="user-add" Theme="IconThemeType.Outline" />
-							Kayıt Ol
-						</div>
-					</MenuItem>
-					<MenuItem Key="3" RouterLink="/">
-						<div class="login">
-							<Icon Type="login" Theme="IconThemeType.Outline" />
-							Giriş Yap
-						</div>
-					</MenuItem>
-				</NotAuthorized>
-				<Authorized>
 
 					<div class="main" style="max-height:50px; display:flex">
 						<MenuItem Key="1">
@@ -72,10 +61,10 @@
 							</div>
 						</MenuItem>
 					</div>
+	</div>
 				</Authorized>
 			</AuthorizeView>
 		</Menu>
-	</div>
 	<Content>
 		<div>
 			@Body
@@ -115,26 +104,8 @@
 	private string GetUserDisplayName(ClaimsPrincipal user)
 	{
 		var company = user.FindFirst("Company")?.Value;
-		if (!string.IsNullOrEmpty(company))
-		{
-			return company;
-		}
+		return company ?? "Kullanıcı";
 
-		var firstName = user.FindFirst("FirstName")?.Value;
-		if (!string.IsNullOrEmpty(firstName))
-		{
-			var lastName = user.FindFirst("LastName")?.Value;
-			return !string.IsNullOrEmpty(lastName) ? $"{firstName} {lastName}" : firstName;
-		}
-
-		var companyOfficial = user.FindFirst("CompanyOfficial")?.Value;
-		if (!string.IsNullOrEmpty(companyOfficial))
-		{
-			return companyOfficial;
-		}
-
-		var email = user.FindFirst(ClaimTypes.Name)?.Value;
-		return email ?? "Kullanıcı";
 	}
 
 

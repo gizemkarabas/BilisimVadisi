@@ -90,7 +90,7 @@ namespace MeetinRoomRezervation.Services.ReservationService
 					{
 						Id = Guid.NewGuid().ToString(),
 						UserId = currentUser.Id,
-						RoomId = reservationDto.RoomId,
+                        RoomId = reservationDto.RoomId,
 						StartTime = utcStartTime,
 						EndTime = utcEndTime,
 						CreatedAt = DateTime.UtcNow,
@@ -196,44 +196,80 @@ namespace MeetinRoomRezervation.Services.ReservationService
 			return result;
 
 		}
-		public async Task<List<ReservationDto>> GetReservationsByDateAsync(DateTime date)
-		{
-			try
-			{
-				// Seçilen tarihin başlangıcı ve bitişi (local time)
-				var startOfDay = new DateTime(date.Year, date.Month, date.Day, 0, 0, 0, DateTimeKind.Local);
-				var endOfDay = startOfDay.AddDays(1);
+        // ReservationService.cs içinde
+        public async Task<List<ReservationDto>> GetReservationsByDateAsync(DateTime date)
+        {
+            try
+            {
+                var startOfDay = date.Date;
+                var endOfDay = startOfDay.AddDays(1);
 
-				// UTC'ye çevir
-				var utcStartOfDay = startOfDay.ToUniversalTime();
-				var utcEndOfDay = endOfDay.ToUniversalTime();
+                var reservations = await _context.Reservations
+                    .Find(r => r.StartTime >= startOfDay && r.StartTime < endOfDay)
+                    .ToListAsync();
 
-				var reservations = await _context.Reservations
-					.Find(r => r.StartTime >= utcStartOfDay &&
-							  r.StartTime < utcEndOfDay &&
-							  r.Status == ReservationStatus.Active)
-					.ToListAsync();
+                var reservationDtos = new List<ReservationDto>();
 
-				return reservations.Select(r => new ReservationDto
-				{
-					Id = r.Id,
-					RoomId = r.RoomId,
-					StartTime = r.StartTime,
-					EndTime = r.EndTime,
-					User = r.User,
-					Room = r.Room,
-					Location = r.Location,
-					SelectedDate = r.StartTime.ToLocalTime().Date
-				}).ToList();
-			}
-			catch (Exception ex)
-			{
-				_logger.LogError(ex, "Error getting reservations for date: {Date}", date);
-				return new List<ReservationDto>();
-			}
-		}
+                foreach (var reservation in reservations)
+                {
+                    // Eğer UserId null ise UserEmail'den user'ı bul
+                    User user = null;
+                    if (!string.IsNullOrEmpty(reservation.UserId))
+                    {
+                        user = await _context.Users
+                            .Find(u => u.Id == reservation.UserId)
+                            .FirstOrDefaultAsync();
+                    }
+                    else if (!string.IsNullOrEmpty(reservation.User.Email))
+                    {
+                        user = await _context.Users
+                            .Find(u => u.Email == reservation.User.Email)
+                            .FirstOrDefaultAsync();
 
-		public async Task<List<ReservationDto>> GetUserReservationsAsync()
+                        // UserId'yi güncelle
+                        if (user != null)
+                        {
+                            var filter = Builders<Reservation>.Filter.Eq(r => r.Id, reservation.Id);
+                            var update = Builders<Reservation>.Update.Set(r => r.UserId, user.Id);
+                            await _context.Reservations.UpdateOneAsync(filter, update);
+                            reservation.UserId = user.Id;
+                        }
+                    }
+
+                    var reservationDto = new ReservationDto
+                    {
+                        Id = reservation.Id,
+                        UserId = reservation.UserId ?? user?.Id,
+                        UserEmail = reservation.User.Email ?? user?.Email,
+                        RoomId = reservation.RoomId,
+                        StartTime = reservation.StartTime,
+                        EndTime = reservation.EndTime,
+                        CreateDate = reservation.CreatedAt,
+                        User = user != null ? new UserDto
+                        {
+                            Id = user.Id,
+                            Email = user.Email,
+                            Company = user.Company,
+                            CompanyOfficial = user.CompanyOfficial,
+                            ContactPhone = user.ContactPhone,
+                            FirstName = user.FirstName,
+                            LastName = user.LastName
+                        } : null
+                    };
+
+                    reservationDtos.Add(reservationDto);
+                }
+
+                return reservationDtos;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetReservationsByDateAsync: {ex.Message}");
+                return new List<ReservationDto>();
+            }
+        }
+
+        public async Task<List<ReservationDto>> GetUserReservationsAsync()
 		{
 			try
 			{
@@ -508,5 +544,5 @@ namespace MeetinRoomRezervation.Services.ReservationService
 		}
 
 
-	}
+    }
 }

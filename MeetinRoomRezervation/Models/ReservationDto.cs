@@ -14,6 +14,7 @@
 		public DateTime SelectedDate { get; set; } = DateTime.Today;
 		public DateTime StartTime { get; set; }
 		public DateTime EndTime { get; set; }
+		public DateTime CreateDate { get; set; }
 	}
 	public class SlotDto
 	{
