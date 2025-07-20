@@ -146,74 +146,23 @@
 				   Footer="null"
 				   Style="width:50vw;height:74vh;">
 				<div style="display:flex;justify-content: center">
-					<Form Style="gap:8px; width:450px; display:flex; flex-direction:column;align-items: flex-start; font-size:16px;"
-						  Model="@EditingUser">
-
-						<FormItem Label="Şirket İsmi" Required>
-							<Input @bind-Value="@EditingUser.Company"
-								   Placeholder="Şirket ismini giriniz"
-								   MaxLength="100"
-								   Style="background-color:#D9D9D9; border-radius:6px; height:48px" />
-							@if (!string.IsNullOrEmpty(editCompanyValidationMessage))
-							{
-								<div style="color: red; font-size: 12px; margin-top: 4px;">@editCompanyValidationMessage</div>
-							}
-						</FormItem>
-
-						<FormItem Label="Yetkili">
-							<Input @bind-Value="@EditingUser.CompanyOfficial"
-								   Placeholder="Yetkili kişi adını giriniz"
-								   Style="background-color:#D9D9D9; border-radius:6px; height:48px" />
-						</FormItem>
-
-						<FormItem Label="Telefon" Required>
-							<Input @bind-Value="@EditingUser.ContactPhone"
-								   Placeholder="5XXXXXXXXX"
-								   Type="InputType.Tel"
-								   MaxLength="10"
-								   @* AddonBefore="+90" *@
-								   Style="background-color:#D9D9D9; border-radius:6px; height:48px"
-								   OnInput="@((e) => ValidatePhoneInput(e.Value?.ToString(), false))" />
-							@if (!string.IsNullOrEmpty(editPhoneValidationMessage))
-							{
-								<div style="color: red; font-size: 12px; margin-top: 4px;">@editPhoneValidationMessage</div>
-							}
-							<div style="font-size: 12px; color: #666; margin-top: 4px;">
-								Format: 5XXXXXXXXX (10 haneli, 5 ile başlamalı)
-							</div>
-						</FormItem>
-
-						<FormItem Label="Aylık Kullanım Hakkı (Saat)" Required>
-							<AntDesign.InputNumber Style="background-color:#D9D9D9; border-radius:6px; height:48px; width:450px; display:flex; align-items:center; font-size: 16px"
-												   @bind-Value="EditingUser.MonthlyUsageLimit"
-												   Min="@EditingUser.UsedThisMonth"
-												   OnChange="@((int value) => OnMonthlyLimitChange(value))" />
-						</FormItem>
-
-						<FormItem Label="Bu Ay Kullanıldı">
-							<Typography Style="font-size: 20px;font-weight:bold" Type="TextElementType.Secondary">
-								@EditingUser.UsedThisMonth Saat
-							</Typography>
-						</FormItem>
-
-						<!-- Kalan kullanım hakkı gösterimi -->
-						<div style="display: flex; justify-content: space-between; width: 100%; margin-top: 8px;">
-							<Typography Style="font-size: 16px; font-weight: bold;">
-								Kalan Hak:
-							</Typography>
-							<Typography Style="@($"font-size: 16px; font-weight: bold; color: {GetRemainingHoursColor()};")">
-								@GetRemainingHours() Saat
-							</Typography>
-						</div>
+					<Form Style="gap:8px; width:450px; display:flex; flex-direction:column;align-items: flex-start; font-size:16px; " Model="@EditingUser">
+						<b>Şirket İsmi</b>
+						<Input Style="background-color:#D9D9D9; border-radius:6px; height:48px" @bind-Value="EditingUser.Company" />
+						<b>Yetkili</b>
+						<Input Style="background-color:#D9D9D9; border-radius:6px; height:48px" @bind-Value="EditingUser.CompanyOfficial" />
+						<b>Telefon</b>
+						<Input Style="background-color:#D9D9D9; border-radius:6px; height:48px" @bind-Value="EditingUser.ContactPhone" />
+						<b>Aylık Kullanım Hakkı (Saat)</b>
+						<AntDesign.InputNumber Style="background-color:#D9D9D9; border-radius:6px; height:48px; width:450px; display:flex; align-items:center; font-size: 16px " @bind-Value="EditingUser.MonthlyUsageLimit" />
+						<b>Bu Ay Kullanıldı</b>
+						<Typography Style="font-size: 20px;font-weight:bold" Type="TextElementType.Secondary">
+							@EditingUser.UsedThisMonth Saat
+						</Typography>
 					</Form>
 				</div>
 				<div style="display:flex; justify-content: center;margin-top:15px">
-					<Button Style="background-color:#0095FF;border-radius:6px;width:30%;height:48px"
-							Type="ButtonType.Primary"
-							OnClick="UpdateUser"
-							Disabled="@(!IsEditFormValid())">
-						Güncelle
-					</Button>
+					<Button Style="background-color:#0095FF;border-radius:6px;width:30%;height:48px" Type="ButtonType.Primary" OnClick="UpdateUser">Güncelle</Button>
 				</div>
 			</Modal>
 
@@ -478,18 +427,9 @@
 
 	private async Task UpdateUser()
 	{
-		if (!IsEditFormValid()) return;
-
-		try
-		{
-			await UserService.UpdateUserAsync(EditingUser);
-			await LoadUsers();
-			IsEditModalVisible = false;
-		}
-		catch (Exception ex)
-		{
-			Console.WriteLine($"Error updating user: {ex.Message}");
-		}
+		await UserService.UpdateUserAsync(EditingUser);
+		await LoadUsers();
+		IsEditModalVisible = false;
 	}
 
 	// Validation Methods
