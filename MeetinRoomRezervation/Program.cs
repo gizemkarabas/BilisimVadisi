@@ -50,6 +50,8 @@ builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStat
 builder.Services.AddAuthorizationCore();
 builder.Services.AddValidatorsFromAssemblyContaining<LoginModelValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterInputModelValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<UserValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<ReservationValidator>();
 builder.Services.AddSingleton<IMongoClient>(serviceProvider =>
 {
 	var clientSettings = MongoClientSettings.FromConnectionString(builder.Configuration.GetConnectionString("MongoDb"));
