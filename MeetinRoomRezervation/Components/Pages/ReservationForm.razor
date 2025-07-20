@@ -25,7 +25,6 @@ else if (SelectedRoom is null)
 }
 else
 {
-
 	<div class="calender">
 		<DatePicker DefaultValue=@TodayDate Style="width:85vw; height:41px; border-radius:10px" @bind-Value="SelectedDate"
 					DisabledDate="DisablePastDates" />
@@ -33,11 +32,9 @@ else
 	<div class="reservation-panel">
 
 		<Form Model="this" OnFinish="GoToSummary">
-			
-				<b>Lütfen Tarihi Seçin</b>
-			
-
-			<div class="availability-panel">
+    		<b>Lütfen Tarihi Seçin</b>
+	
+            <div class="availability-panel">
 				<div style="display: flex; gap: 20px;">
 					<div style="display: flex; align-items: center;">
 						<div style="width: 12px; height: 12px; background-color: #1890ff; border-radius: 50%; margin-right: 8px;"></div>
@@ -55,28 +52,16 @@ else
 			@if (Slots != null && Slots.Any())
 			{
 				<div class="slot-grid">
-					@*  @foreach (var slot in Slots)
-                    {
-                        <Button Type="@GetButtonType(slot)"
-                                Disabled="@(slot.IsReserved || slot.IsDisabled)"
-                                OnClick="() => ToggleSlot(slot)">
-                            @slot.StartTime.ToString("HH:mm") - @slot.EndTime.ToString("HH:mm")
-                            @if (slot.IsReserved)
-                            {
-                                <span> (Rezerve)</span>
-                            }
-                        </Button>
-                    } *@
 					@foreach (var slot in AvailableSlots)
 					{
 						<Button Type="@GetButtonType(slot)"
-								class="@(SelectedSlots.Contains(slot) ? "selected-slot" : "unselected-slot")"
-								OnClick="() => ToggleSlot(slot)">
+							class="@(SelectedSlots.Contains(slot) ? "selected-slot" : "unselected-slot")"
+							OnClick="() => ToggleSlot(slot)"
+							Style="padding: 0;">
 							<div class="button-detail">
 								<div>
 									@slot.StartTime.ToString("HH:mm") - @slot.EndTime.ToString("HH:mm")
 								</div>
-
 								<div>
 									<div class="@(SelectedSlots.Contains(slot) ? "selected-button-circle-border" : "button-circle-border")">
 										<div class="@(SelectedSlots.Contains(slot) ? "button-circle" : "")"></div>
@@ -84,10 +69,8 @@ else
 								</div>
 							</div>
 						</Button>
-
 					}
 				</div>
-
 			}
 			else
 			{
@@ -108,32 +91,6 @@ else
 		</Form>
 	</div>
 }
-
-<style>
-	.selected-slot {
-		width: 20vw;
-		height: 5vh;
-		border: 1.4px solid;
-		border-color: #1890ff;
-		border-radius: 7px;
-		background-color: unset;
-		color: #1890ff;
-	}
-	
-	.unselected-slot {
-		display: flex;
-		align-items:center;
-		justify-content: space-between;
-		width: 20vw;
-		height:5vh;
-		border: 1.4px solid;
-		border-color: #9B9B9B;
-		border-radius: 7px;
-		background-color: unset;
-	}
-
-	
-</style>
 
 @code {
 	private List<SlotDto> Slots = new();

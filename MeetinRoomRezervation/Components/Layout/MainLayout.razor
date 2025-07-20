@@ -39,9 +39,9 @@
 						<MenuItem Key="1">
 							<div class="wellcome" style="color: white;">
 								<Icon Type="user" Theme="IconThemeType.Outline" />
-								@if (!string.IsNullOrEmpty(currentUserCompany))
+                                @if (!string.IsNullOrEmpty(CurrentUserCompany))
 								{
-									<span>Hoş geldin, @currentUserCompany</span>
+                                    <span>Hoş geldin, @CurrentUserCompany</span>
 								}
 								else
 								{
@@ -77,7 +77,7 @@
 </div>
 
 @code {
-	private string currentUserCompany = "";
+    [Parameter] public string CurrentUserCompany { get; set; }
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -91,7 +91,7 @@
 			var currentUser = await AuthService.GetCurrentUserAsync();
 			if (currentUser != null && !string.IsNullOrEmpty(currentUser.Company))
 			{
-				currentUserCompany = currentUser.Company;
+                CurrentUserCompany = currentUser.Company;
 				StateHasChanged();
 			}
 		}

@@ -1,8 +1,10 @@
-html, body {
+html,
+body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
-a, .btn-link {
+a,
+.btn-link {
     color: #006bb7;
 }
 
@@ -12,8 +14,12 @@ a, .btn-link {
     border-color: #1861ac;
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 .content {
@@ -42,19 +48,109 @@ h1:focus {
     color: white;
 }
 
-    .blazor-error-boundary::after {
-        content: "An error has occurred."
-    }
+.blazor-error-boundary::after {
+    content: "An error has occurred."
+}
 
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+.form-floating>.form-control-plaintext::placeholder,
+.form-floating>.form-control::placeholder {
     color: var(--bs-secondary-color);
     text-align: end;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+.form-floating>.form-control-plaintext:focus::placeholder,
+.form-floating>.form-control:focus::placeholder {
     text-align: start;
+}
+
+.main span {
+    font-feature-settings: 'liga' off, 'clig' off;
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    font-style: normal;
+}
+
+/* Global Button Styles */
+.ant-btn {
+    border-radius: 8px !important;
+}
+
+.ant-btn-primary {
+    border-radius: 8px !important;
+}
+
+.ant-btn-default {
+    border-radius: 8px !important;
+}
+
+.ant-btn-link {
+    border-radius: 8px !important;
+}
+
+.ant-btn-text {
+    border-radius: 8px !important;
+}
+
+.ant-btn-ghost {
+    border-radius: 8px !important;
+}
+
+.ant-btn-dashed {
+    border-radius: 8px !important;
+}
+
+/* Date Picker Border Radius */
+.ant-picker {
+    border-radius: 10px !important;
+}
+
+/* Card Border Radius */
+.ant-card {
+    border-radius: 10px !important;
+}
+
+/* General Button Classes for Custom Buttons */
+.custom-button {
+    border-radius: 8px;
+}
+
+.reservation-button {
+    border-radius: 8px;
+}
+
+.selected-slot {
+    border: 1.4px solid;
+    border-color: #1890ff;
+    border-radius: 7px;
+    background-color: unset;
+    color: #1890ff;
+    width: 100%;
+    min-height: 50px;
+    padding: 0;
+    font-weight: 500;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.unselected-slot {
+    background-color: unset;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.4px solid;
+    border-color: #9B9B9B;
+    border-radius: 7px;
+    background-color: unset;
+    color: #333;
+    width: 100%;
+    min-height: 50px;
+    padding: 0;
+    font-weight: 500;
+    text-align: center;
 }

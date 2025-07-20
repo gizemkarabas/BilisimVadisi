@@ -8,44 +8,36 @@
 @inject NavigationManager Navigation
 
 <div class="calender">
-	<DatePicker DefaultValue=@TodayDate Style="width:85vw; height:41px; border-radius:10px" @bind-Value="SelectedDate"
-				DisabledDate="DisablePastDates" />
+	<DatePicker DefaultValue="@TodayDate" Style="width:85vw; height:41px" @bind-Value="SelectedDate"
+		DisabledDate="DisablePastDates" Format="dd.MM.yyyy" />
 </div>
 <div class="reservation-panel-buttons">
-	<Button Type="@ButtonType.Link"
-			OnClick="@(() => Navigation.NavigateTo("/user/meetingRooms"))"
-			Style="display: flex;
+	<Button Type="@ButtonType.Link" OnClick="@(() => Navigation.NavigateTo("/user/meetingRooms"))" Style="display: flex;
 							justify-content:flex-start;
 							width:200px;
 							justify-content: center;
 							align-items: center;
 							padding: 0;
-							border-radius: 8px;
 							background-color:#0095ff;
 							box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
 							margin-bottom: 10px;
 							margin-right: 15px;
-							margin-left: 15px;"
-			Block>
+							margin-left: 15px;" Block>
 		<div class="reservation-button">
 			<div class="active-reservation-button-title">
 				Toplantı Odaları
 			</div>
 		</div>
 	</Button>
-	<Button Type="@ButtonType.Link"
-			OnClick="@(() => Navigation.NavigateTo("/user/myreservations"))"
-			Style="display: flex;
+	<Button Type="@ButtonType.Link" OnClick="@(() => Navigation.NavigateTo("/user/myreservations"))" Style="display: flex;
 							width:200px;
 							justify-content: center;
 							align-items: center;
 							padding: 0;
-							border-radius: 8px;
 							box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
 							margin-bottom: 10px;
 							margin-right: 15px;
-							margin-left: 15px;"
-			Block>
+							margin-left: 15px;" Block>
 		<div class="reservation-button" style="margin-left:6px;">
 			<div class="reservation-button-title">
 				Rezervasyonlarım
@@ -76,11 +68,13 @@
 			{
 				<AntDesign.Col Xs="24" Sm="24" Md="12" Lg="8" Xl="6">
 					<div @onclick="@(() => NavigateToReservation(room))">
-						<Card Hoverable Style="margin-bottom: 16px; border-radius: 10px" Class="@(room.IsAvailable ? "available-room" : "unavailable-room")">
+						<Card Hoverable Style="margin-bottom: 16px"
+							Class="@(room.IsAvailable ? "available-room" : "unavailable-room")">
 							<CardMeta Title="@room.Name" Description="@room.Location" />
 							<div style="margin-top: 16px;">
-								<p><Icon Type="user" /> Kapasite: @room.Capacity</p>
-								@* <p><Icon Type="calendar" /> Doluluk: @room.OccupancyRate.ToString("F0")%</p> *@
+								<p>
+									<Icon Type="user" /> Kapasite: @room.Capacity
+								</p>
 								<Tag Style="display:flex; justify-self: end;" Color="@GetStatusColor(room.IsAvailable)">
 									@(room.IsAvailable ? "Müsait" : "Dolu")
 								</Tag>
@@ -107,21 +101,21 @@
 	private List<MeetingRoomDto> Rooms = new();
 	private DateTime _selectedDate = DateTime.Today;
 	private DateTime TodayDate = DateTime.Today;
-    private DateItem SelectedDateItem
-    {
-        get => new DateItem(
-            SelectedDate == DateTime.Today ? "Bugün" :
-            SelectedDate == DateTime.Today.AddDays(1) ? "Yarın" :
-            SelectedDate.ToString("dd.MM.yyyy dddd", new System.Globalization.CultureInfo("tr-TR")),
-            SelectedDate);
-        set
-        {
-            if (SelectedDate != value.Date)
-            {
-                SelectedDate = value.Date;
-            }
-        }
-    }
+	private DateItem SelectedDateItem
+	{
+		get => new DateItem(
+		SelectedDate == DateTime.Today ? "Bugün" :
+		SelectedDate == DateTime.Today.AddDays(1) ? "Yarın" :
+		SelectedDate.ToString("dd.MM.yyyy dddd", new System.Globalization.CultureInfo("tr-TR")),
+		SelectedDate);
+		set
+		{
+			if (SelectedDate != value.Date)
+			{
+				SelectedDate = value.Date;
+			}
+		}
+	}
 
 	private DateTime SelectedDate
 	{

@@ -11,24 +11,24 @@
     border-color: #d2d2d2;
     border: 1.2px solid #e2dfdf;
     padding: 15px;
-    padding-top: 15px;
-    height: 80vh;
     width: 85vw;
 }
+
 .calender {
     display: flex;
     justify-content: start;
     margin-bottom: 15px;
     margin-top: 30px;
     margin-left: 7vw;
-    width:25vw;
+    width: 25vw;
 }
-    
+
 .reservation-panel-header {
     font-size: 14px;
     font-weight: bold;
     margin-bottom: 8px;
 }
+
 .container {
     background: #fff;
     padding: 30px;
@@ -43,9 +43,9 @@
     padding-left: 100px;
     max-width: 70vw;
     margin: 0 auto;
-    padding: 24px;
     margin-top: 60px;
 }
+
 .availability-panel {
     margin-top: 15px;
     margin-bottom: 25px;
@@ -61,16 +61,8 @@
     background-color: #f0f0f0;
     color: black;
     font-weight: bold;
-    
-}
-.selected-slot {
-    border: 0.5px solid;
-    border-color: #1890ff;
-    border-radius: 7px;
-    background-color: unset;
-    color: red;
-}
 
+}
 
 .blue-circle {
     display: flex;
@@ -84,10 +76,21 @@
 }
 
 .slot-grid {
-    width: 84vw;
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
     gap: 10px;
+}
+
+@media (max-width: 768px) {
+    .slot-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .slot-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .gray-circle {
@@ -98,18 +101,21 @@
     width: 20px;
     height: 20px;
 }
+
 .button-detail {
     display: flex;
     justify-content: space-between;
     width: 18.5vw;
     align-items: center;
 }
+
 .test {
     width: 12px;
     height: 12px;
     background-color: #1890ff;
     border-radius: 50%;
 }
+
 .button-circle {
     background-color: #1890ff;
     border: 0px solid;
@@ -118,6 +124,7 @@
     width: 13px;
     height: 13px;
 }
+
 .button-circle-border {
     display: flex;
     align-items: center;
@@ -130,6 +137,7 @@
     height: 20px;
     box-sizing: border-box;
 }
+
 .selected-button-circle-border {
     display: flex;
     align-items: center;
@@ -144,8 +152,8 @@
 }
 
 
-    @media (max-width: 600px) {
-        .reservation-panel {
+@media (max-width: 600px) {
+    .reservation-panel {
         display: flex;
         flex-direction: column;
         align-content: center;
@@ -168,33 +176,47 @@
         font-weight: bold;
         margin-bottom: 8px;
     }
+
     .selected-slot {
-        width: 19.3vw;
         border: 1.4px solid;
         border-color: #1890ff;
         border-radius: 7px;
         background-color: unset;
         color: #1890ff;
+        width: 100%;
+        min-height: 50px;
+        padding: 12px 16px;
+        font-weight: 500;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .unselected-slot {
+        background-color: unset;
         display: flex;
-        justify-content: space-between;
-        width: 3.3vw;
+        align-items: center;
+        justify-content: center;
         border: 1.4px solid;
         border-color: #9B9B9B;
         border-radius: 7px;
-        background-color: unset;
+        color: #333;
+        width: 100%;
+        min-height: 50px;
+        padding: 12px 16px;
+        font-weight: 500;
+        text-align: center;
     }
+
     .slot-grid {
-        width: 83vw;
-        flex-direction: column;
+        grid-template-columns: 1fr;
         gap: 12px;
     }
 
-        .slot-grid > button {
-            width: 100% !important;
-            min-width: 0;
-            max-width: none;
-        }
+    .slot-grid>button {
+        width: 100% !important;
+        min-width: 0;
+        max-width: none;
+    }
 }
