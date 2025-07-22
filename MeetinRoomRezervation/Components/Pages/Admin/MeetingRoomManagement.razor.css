@@ -139,7 +139,7 @@
     overflow: hidden;
 }
 @media (max-width: 600px) {
-    
+
     .containerW {
         background: #fff;
         display: flex;
@@ -147,6 +147,7 @@
         padding: 0;
         margin: 0;
         width: 100%;
+        flex-direction: column;
     }
 
     .containerH {
@@ -168,9 +169,13 @@
     }
 
     .admin-panel {
-        display: none;
+        width: 95vw;
+        height: 5vh;
+        background-color: unset;
+        box-shadow: unset;
+        padding: 0;
+        margin: 0;
     }
-
     .admin-button-title {
         margin-left: 5px;
         color: #4d4d4d;
@@ -190,9 +195,10 @@
         margin-top: 20px;
         flex-direction: row;
         height: auto;
-        width: 98vw;
-        justify-content: flex-start;
+        width: 96vw;
+        justify-content: space-around;
         align-items: center;
+        display: flex;
     }
 
     .halls-panel {
@@ -219,7 +225,6 @@
         padding: 15px;
         margin-top: 30px;
         margin:10px;
-        
         min-height:35vh;
     }
 

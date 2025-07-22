@@ -24,7 +24,7 @@
                     </div>
                 }
 
-                <div class="slots-list" style="overflow-y: auto;max-height: 18vh; display: flex; flex-wrap: wrap; gap: 10px; justify-content:center;">
+                <div class="slots-list" >
                     @foreach (var slot in ReservationState.SelectedSlots)
                     {
                         <div style="background-color: #1890ff;text-align:left; color: white;width:100%; padding: 8px 16px; border-radius: 5px; min-width: 100px;">
@@ -89,7 +89,7 @@
                 </div>
 
                 <div style="margin-top: 10px; text-align:center;">
-                    <Button Type="ButtonType.Default" OnClick="GoBack" Style="width: 200px;" Disabled="@isLoading">Geri</Button>
+                    <Button Type="ButtonType.Default" OnClick="GoBack" Style="width: 200px;color:red;" Disabled="@isLoading">Geri</Button>
                 </div>
             </div>
         }

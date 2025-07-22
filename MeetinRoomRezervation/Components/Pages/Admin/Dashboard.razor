@@ -82,25 +82,25 @@
 			
 			<div class="dashboard-panel">
 				<Row Gutter="12" Style="margin-bottom: 30px;">
-					<Col Span="6">
+					<Col xs="12" md="6" lg="6">
 					<div class="count-panel">
 						<div class="count-panel-title">Toplam Toplantı Odası</div>
 						<div class="count-panel-value">@TotalRoomCount</div>
 					</div>
 					</Col>
-					<Col Span="6">
+					<Col xs="12" md="6" lg="6">
 					<div class="count-panel">
 						<div class="count-panel-title">Toplam Kullanıcı Sayısı</div>
 						<div class="count-panel-value">@TotalUserCount</div>
 					</div>
 					</Col>
-					<Col Span="6">
+					<Col xs="12" md="6" lg="6">
 					<div class="count-panel">
 						<div class="count-panel-title">Bugünkü Doluluk</div>
 						<div class="count-panel-value">@TodayOccupancy%</div>
 					</div>
 					</Col>
-					<Col Span="6">
+					<Col xs="12" md="6" lg="6">
 					<div class="count-panel">
 						<div class="count-panel-title">Haftalık Doluluk Oranı</div>
 						<div class="count-panel-value">@WeeklyOccupancy%</div>
@@ -109,8 +109,8 @@
 				</Row>
 				<div class="last-reservation-panel">
 					<div class="last-reservation-panel-header">Son Rezervasyonlar</div>
-					<div class="table-responsive" style="margin-bottom:20px;">
-						<table class="table">
+					<div class="table-responsive" >
+						<table class="table-header">
 							<thead class="table">
 								<tr>
 									<th>Konum</th>
@@ -152,7 +152,7 @@
 						</table>
 					</div>
 
-					<div style="margin-top: 42px; text-align: right;">
+					<div class="pages" style="margin-top: 42px; text-align: right;">
 						<Pagination Total="@TotalReservationCount"
 									PageSize="@PageSize"
 									Current="@CurrentPage"

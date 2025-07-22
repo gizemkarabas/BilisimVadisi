@@ -25,9 +25,11 @@ else if (SelectedRoom is null)
 }
 else
 {
+	<div style="width:100%; display: flex; justify-content: center;">
 	<div class="calender">
-		<DatePicker DefaultValue=@TodayDate Style="width:85vw; height:41px; border-radius:10px" @bind-Value="SelectedDate"
+		<DatePicker DefaultValue=@TodayDate Style="width:100%; height:41px; border-radius:10px" @bind-Value="SelectedDate"
 					DisabledDate="DisablePastDates" />
+	</div>
 	</div>
 	<div class="reservation-panel">
 

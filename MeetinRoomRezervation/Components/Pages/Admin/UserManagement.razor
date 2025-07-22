@@ -78,36 +78,39 @@
 			</div>
 
 			<Modal @bind-Visible="@IsCreateModalVisible"
-				   Footer="null"
-				   Style="width:50vw;height:74vh;">
+				   Footer="null">
 
-				<div style="display:flex;justify-content: center">
-					<Form Style="gap:8px; width:450px; display:flex; flex-direction:column;align-items: flex-start; font-size:16px;"
+				<div class="create-user-panel">
+					<Form Style="gap:8px; width:100%; display:flex; flex-direction:column;align-items: flex-start; font-size:16px;"
 						  Model="@NewUser">
 
-						<FormItem Label="Şirket İsmi" Required>
+						<FormItem Label="" Required >
+							<label style="margin-bottom: 8px; font-weight: 600;">Şirket İsmi</label>
+
 							<Input @bind-Value="@NewUser.Company"
 								   Placeholder="Şirket ismini giriniz"
 								   MaxLength="100"
-								   Style="background-color:#D9D9D9; border-radius:6px; height:48px" />
+								   Style="background-color:#D9D9D9;width:100%; border-radius:6px; height:48px" />
 							@if (!string.IsNullOrEmpty(companyValidationMessage))
 							{
 								<div style="color: red; font-size: 12px; margin-top: 4px;">@companyValidationMessage</div>
 							}
 						</FormItem>
 
-						<FormItem Label="Yetkili">
+						<FormItem Label="">
+							<label style="margin-bottom: 8px; font-weight: 600;">Yetkili</label>
 							<Input @bind-Value="@NewUser.CompanyOfficial"
 								   Placeholder="Yetkili kişi adını giriniz"
-								   Style="background-color:#D9D9D9; border-radius:6px; height:48px" />
+								   Style="background-color:#D9D9D9; border-radius:6px;width:100%;height:48px" />
 						</FormItem>
 
-						<FormItem Label="Telefon" Required>
+						<FormItem Label="" Required>
+							<label style="margin-bottom: 8px; font-weight: 600;">Telefon</label>
 							<Input @bind-Value="@NewUser.ContactPhone"
 								   Placeholder="5XXXXXXXXX"
 								   Type="InputType.Tel"
 								   MaxLength="10"
-								   Style="background-color:#D9D9D9; border-radius:6px; height:48px"
+								   Style="background-color:#D9D9D9;width:100%; border-radius:6px; height:48px"
 								   OnInput="@((e) => ValidatePhoneInput(e.Value?.ToString(), true))" />
 							@if (!string.IsNullOrEmpty(phoneValidationMessage))
 							{
@@ -118,8 +121,9 @@
 							</div>
 						</FormItem>
 
-						<FormItem Label="Aylık Kullanım Hakkı (Saat)" Required>
-							<AntDesign.InputNumber Style="background-color:#D9D9D9; border-radius:6px; height:48px; width:450px; display:flex; align-items:center; font-size: 16px"
+						<FormItem Label="" Required>
+							<label style="margin-bottom: 8px; font-weight: 600;">Aylık Kullanım Hakkı (Saat)</label>
+							<AntDesign.InputNumber Style="background-color:#D9D9D9; border-radius:6px; height:48px; width:100%; display:flex; align-items:center; font-size: 16px"
 												   @bind-Value="NewUser.MonthlyUsageLimit"
 												   Min="0"
 												   Max="1000" />
@@ -143,10 +147,9 @@
 			</Modal>
 
 			<Modal @bind-Visible="@IsEditModalVisible"
-				   Footer="null"
-				   Style="width:50vw;height:74vh;">
-				<div style="display:flex;justify-content: center">
-					<Form Style="gap:8px; width:450px; display:flex; flex-direction:column;align-items: flex-start; font-size:16px; " Model="@EditingUser">
+				   Footer="null">
+				<div class="edit-user-panel">
+					<Form Style="gap:8px;  display:flex; flex-direction:column; font-size:16px; " Model="@EditingUser">
 						<b>Şirket İsmi</b>
 						<Input Style="background-color:#D9D9D9; border-radius:6px; height:48px" @bind-Value="EditingUser.Company" />
 						<b>Yetkili</b>
@@ -154,7 +157,7 @@
 						<b>Telefon</b>
 						<Input Style="background-color:#D9D9D9; border-radius:6px; height:48px" @bind-Value="EditingUser.ContactPhone" />
 						<b>Aylık Kullanım Hakkı (Saat)</b>
-						<AntDesign.InputNumber Style="background-color:#D9D9D9; border-radius:6px; height:48px; width:450px; display:flex; align-items:center; font-size: 16px " @bind-Value="EditingUser.MonthlyUsageLimit" />
+						<AntDesign.InputNumber Style="background-color:#D9D9D9; border-radius:6px; height:48px; width:40%; display:flex; align-items:center; font-size: 16px " @bind-Value="EditingUser.MonthlyUsageLimit" />
 						<b>Bu Ay Kullanıldı</b>
 						<Typography Style="font-size: 20px;font-weight:bold" Type="TextElementType.Secondary">
 							@EditingUser.UsedThisMonth Saat
@@ -168,12 +171,18 @@
 
 			<div class="users-panel">
 				<div>
-					<div class="create-user-button" style="margin-bottom:14px">
-						<Button Type="ButtonType.Primary"
-								OnClick="@OpenCreateModal">
-							Yeni Kullanıcı Oluştur
-						</Button>
+					<div style="display:flex;justify-content: space-between;align-items: center;">
+						<div class="table-header">Kullanıcılar</div>
+						<div class="create-user-button" style="margin-bottom:14px">
+							<div>
+								<Button Type="ButtonType.Primary"
+										OnClick="@OpenCreateModal">
+									Yeni Kullanıcı Oluştur
+								</Button>
+							</div>
+						</div>
 					</div>
+					
 					<div class="table-responsive">
 						<table class="table">
 							<thead>
@@ -194,7 +203,6 @@
 										<td>@user.Email</td>
 										<td>@user.Company</td>
 										<td>@(!string.IsNullOrEmpty(user.ContactPhone) ? $"+90{user.ContactPhone}" : "-")</td>
-
 										<td>
 											@if (user.IsActive)
 											{
@@ -229,7 +237,8 @@
 									Current="@CurrentPage"
 									OnChange="@HandlePaginationChange"
 									ShowSizeChanger="true"
-									PageSizeOptions="@(new int[] {5, 10, 20, 50, 100})" />
+									PageSizeOptions="@(new int[] {5, 10, 20, 50, 100})"
+									Style="margin-right:10px"/>
 					</div>
 				</div>
 			</div>

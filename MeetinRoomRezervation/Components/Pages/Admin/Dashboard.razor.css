@@ -80,7 +80,21 @@
     font-size:25px;
     font-weight:bold;
 }
+.table-responsive {
+    margin-bottom:20px;
+    width: 95vw;
+    max-width: 95vw;
+    height: auto;
+}
 .table {
+    display: table;
+    table-layout: fixed;
+    font-size: 15px;
+    font-weight: bold;
+    width: 74vw;
+    height: 10vh;
+}
+.table-header {
     display: table;
     table-layout: fixed;
     font-size: 15px;
@@ -124,7 +138,12 @@
     }
 
     .admin-panel {
-        display:none;
+        width: 95vw;
+        height: 5vh;
+        background-color: unset;
+        box-shadow: unset;
+        padding: 0;
+        margin: 0;
     }
     .admin-button-title {
         margin-left: 5px;
@@ -146,58 +165,77 @@
         margin-top: 20px;
         flex-direction: row;
         height: auto;
-        width: 98vw;
-        justify-content: flex-start;
+        width: 96vw;
+        justify-content: space-around;
         align-items: center;
+        display: flex;
     }
     .count-panel {
         box-shadow: 5px 5px 10px rgba(87, 87, 87, 0.1);
         border-radius: 10px;
         border-color: #d2d2d2;
         border: 1.2px solid #e2dfdf;
-        width: 22vw;
-        height: 130px;
+        width: 46vw;
+        height: 15vh;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
         position: relative;
     }
     .count-panel-title {
-        font-size: 12px;
+        font-size: 14px;
+        font-weight:bold;
         height: 50%;
         color: black;
         padding: 10px;
-        align-self: flex-start;
+        align-self: center;
     }
 
     .count-panel-value {
-        font-size: 20px;
+        font-size: 32px;
         font-weight: bold;
-        height: 35%;
+        height: 50%;
         color: #0095ff;
-        padding-top:20px;
-        padding: 10px;
-        align-self: flex-end;
-        text-align: right;
+        padding-top: 0px;
+        padding: 0px;
+        align-self: center;
+        text-align: center;
     }
-
+    .table-responsive {
+        margin-bottom: 20px;
+        width: 90vw;
+        max-width: 95vw;
+        height: auto;
+        overflow-x: auto;
+        overflow-y: hidden;
+        white-space: nowrap;
+    }
     .table {
-        width: 140vw;
-        max-width: 140vw;
+        width: 200vw;
+        max-width: 200vw;
         height: auto;
         font-size: 13px;
-       
+        
     }
-
+    .table-header {
+        width: 200vw;
+        max-width: 200vw;
+        height: auto;
+        font-size: 13px;
+    }
+    .last-reservation-panel-header {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom:5px;
+    }
     .last-reservation-panel {
         width: 95vw;
         max-width: 95vw;
         height: auto;
         padding: 5vw 2vw;
         box-sizing: border-box;
-        overflow-x: auto;
-        overflow-y: hidden;
-        white-space: nowrap;
+        box-shadow: 5px 5px 10px rgba(87, 87, 87, 0.1);
+        background-color:unset;
     }
     .dashboard-panel {
         width: 95vw;
@@ -206,5 +244,6 @@
         margin-top: 2vh;
 
     }
+    
 
 }
