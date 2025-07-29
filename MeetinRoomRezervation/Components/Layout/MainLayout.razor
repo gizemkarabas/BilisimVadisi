@@ -19,7 +19,7 @@
 				</NotAuthorized>
 				<Authorized>
 	<div class="main-layout-bar">
-		<a href="/user/meetingRooms">
+		<a href="@(GetHomePageUrl(context.User))">
 
 			<div class="main-layout-logo">
 				<svg width="36" height="36" viewBox="0 0 46 46" fill="white" xmlns="http://www.w3.org/2000/svg">
@@ -39,9 +39,9 @@
 						<MenuItem Key="1">
 							<div class="wellcome" style="color: white;">
 								<Icon Type="user" Theme="IconThemeType.Outline" />
-                                @if (!string.IsNullOrEmpty(CurrentUserCompany))
+								@if (!string.IsNullOrEmpty(CurrentUserCompany))
 								{
-                                    <span>Hoş geldin, @CurrentUserCompany</span>
+									<span>Hoş geldin, @CurrentUserCompany</span>
 								}
 								else
 								{
@@ -77,7 +77,20 @@
 </div>
 
 @code {
-    [Parameter] public string CurrentUserCompany { get; set; }
+	[Parameter] public string CurrentUserCompany { get; set; }
+
+	private string GetHomePageUrl(ClaimsPrincipal user)
+	{
+		if (user != null)
+		{
+			var role = user.FindFirst(ClaimTypes.Role)?.Value;
+			if (!string.IsNullOrEmpty(role) && role.ToLower().Contains("admin"))
+			{
+				return "/admin/dashboard";
+			}
+		}
+		return "/user/meetingRooms";
+	}
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -91,7 +104,7 @@
 			var currentUser = await AuthService.GetCurrentUserAsync();
 			if (currentUser != null && !string.IsNullOrEmpty(currentUser.Company))
 			{
-                CurrentUserCompany = currentUser.Company;
+				CurrentUserCompany = currentUser.Company;
 				StateHasChanged();
 			}
 		}
