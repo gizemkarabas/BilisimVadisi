@@ -122,6 +122,20 @@
 						</FormItem>
 
 						<FormItem Label="" Required>
+							<label style="margin-bottom: 8px; font-weight: 600;">E-posta</label>
+							<Input @bind-Value="@NewUser.Email"
+								   Placeholder="E-posta adresi giriniz"
+								   Type="InputType.Email"
+								   MaxLength="100"
+								   Style="background-color:#D9D9D9;width:100%; border-radius:6px; height:48px"
+								   OnInput="@((e) => ValidateEmailInput(e.Value?.ToString()))" />
+							@if (!string.IsNullOrEmpty(emailValidationMessage))
+							{
+								<div style="color: red; font-size: 12px; margin-top: 4px;">@emailValidationMessage</div>
+							}
+						</FormItem>
+
+						<FormItem Label="" Required>
 							<label style="margin-bottom: 8px; font-weight: 600;">Aylık Kullanım Hakkı (Saat)</label>
 							<AntDesign.InputNumber Style="background-color:#D9D9D9; border-radius:6px; height:48px; width:100%; display:flex; align-items:center; font-size: 16px"
 												   @bind-Value="NewUser.MonthlyUsageLimit"
@@ -156,6 +170,8 @@
 						<Input Style="background-color:#D9D9D9; border-radius:6px; height:48px" @bind-Value="EditingUser.CompanyOfficial" />
 						<b>Telefon</b>
 						<Input Style="background-color:#D9D9D9; border-radius:6px; height:48px" @bind-Value="EditingUser.ContactPhone" />
+						<b>E-posta</b>
+						<Input Style="background-color:#D9D9D9; border-radius:6px; height:48px" @bind-Value="EditingUser.Email" />
 						<b>Aylık Kullanım Hakkı (Saat)</b>
 						<AntDesign.InputNumber Style="background-color:#D9D9D9; border-radius:6px; height:48px; width:40%; display:flex; align-items:center; font-size: 16px " @bind-Value="EditingUser.MonthlyUsageLimit" />
 						<b>Bu Ay Kullanıldı</b>
@@ -273,7 +289,7 @@
 @code {
 	private List<UserDto> AllUsers = new();
 	private List<UserDto> PagedUsers = new();
-	private int PageSize = 5;
+	private int PageSize = 10;
 	private int CurrentPage = 1;
 	private int TotalUserCount = 0;
 	private bool IsCreateModalVisible = false;
@@ -286,6 +302,7 @@
 	private string phoneValidationMessage = "";
 	private string editCompanyValidationMessage = "";
 	private string editPhoneValidationMessage = "";
+	private string emailValidationMessage = string.Empty;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -295,25 +312,12 @@
 
 	private void OpenCreateModal()
 	{
-		NewUser = new UserDto
-			{
-				Id = Guid.NewGuid().ToString(),
-				Email = "",
-				FirstName = "",
-				LastName = "",
-				Company = "",
-				CompanyOfficial = "",
-				ContactPhone = "",
-				MonthlyUsageLimit = 40,
-				UsedThisMonth = 0,
-				IsActive = true
-			};
-
-		// Clear validation messages
-		companyValidationMessage = "";
-		phoneValidationMessage = "";
-
 		IsCreateModalVisible = true;
+		NewUser = new UserDto();
+		companyValidationMessage = string.Empty;
+		phoneValidationMessage = string.Empty;
+		emailValidationMessage = string.Empty;
+		ValidateEmailInput(NewUser.Email);
 		StateHasChanged();
 	}
 
@@ -323,10 +327,17 @@
 		NewUser = new();
 		companyValidationMessage = "";
 		phoneValidationMessage = "";
+		emailValidationMessage = string.Empty;
 	}
 
 	private async Task CreateUser()
 	{
+		// Tüm validasyonları tetikle
+		ValidateCompanyName(NewUser.Company, true);
+		ValidatePhoneNumber(NewUser.ContactPhone, true);
+		ValidateEmailInput(NewUser.Email);
+		StateHasChanged();
+
 		if (!IsCreateFormValid()) return;
 
 		try
@@ -350,6 +361,9 @@
 
 	private void LoadPage()
 	{
+		// Sayfa sayısı otomatik hesaplanıyor
+		int totalPages = (int)Math.Ceiling((double)TotalUserCount / PageSize);
+		if (CurrentPage > totalPages) CurrentPage = totalPages > 0 ? totalPages : 1;
 		PagedUsers = AllUsers
 			.OrderByDescending(r => r.Id)
 			.Skip((CurrentPage - 1) * PageSize)
@@ -511,12 +525,48 @@
 		StateHasChanged();
 	}
 
+	private void ValidateEmailInput(string? email)
+	{
+		if (string.IsNullOrWhiteSpace(email))
+		{
+			emailValidationMessage = "E-posta adresi zorunludur.";
+			return;
+		}
+		if (!IsValidEmail(email))
+		{
+			emailValidationMessage = "Geçerli bir e-posta adresi giriniz.";
+			return;
+		}
+		emailValidationMessage = string.Empty;
+	}
+
+	private bool IsValidEmail(string? email)
+	{
+	if (string.IsNullOrWhiteSpace(email)) return false;
+	// '@' ve '.' karakteri yoksa MailAddress kontrolü yapma
+	if (!email.Contains("@") || !email.Contains(".")) return false;
+	try
+	{
+		var addr = new System.Net.Mail.MailAddress(email);
+		return addr.Address == email;
+	}
+	catch
+	{
+		return false;
+	}
+	}
+
 	private bool IsCreateFormValid()
 	{
-		var companyValid = ValidateCompanyName(NewUser.Company, true);
-		var phoneValid = ValidatePhoneNumber(NewUser.ContactPhone, true);
-
-		return companyValid && phoneValid;
+		return string.IsNullOrEmpty(companyValidationMessage)
+			&& string.IsNullOrEmpty(phoneValidationMessage)
+			&& string.IsNullOrEmpty(emailValidationMessage)
+			&& !string.IsNullOrEmpty(NewUser.Company)
+			&& !string.IsNullOrEmpty(NewUser.CompanyOfficial)
+			&& !string.IsNullOrEmpty(NewUser.ContactPhone)
+			&& !string.IsNullOrEmpty(NewUser.Email)
+			&& IsValidEmail(NewUser.Email)
+			&& NewUser.MonthlyUsageLimit > 0;
 	}
 
 	private bool IsEditFormValid()
