@@ -7,64 +7,60 @@
 @using MeetinRoomRezervation.Data
 @using System.Security.Claims
 
-<AntDesign.AntContainer />
 
 <div Style="min-height: 90vh; background-color: white;">
 
-		<Menu Mode="MenuMode.Horizontal" style="background-color: unset;border-bottom:unset;">
-			<AuthorizeView>
-				<NotAuthorized>
+	<Menu Mode="MenuMode.Horizontal" style="background-color: unset;border-bottom:unset;">
+		<AuthorizeView>
+			<NotAuthorized>
 
-					
-				</NotAuthorized>
-				<Authorized>
-	<div class="main-layout-bar">
-		<a href="@(GetHomePageUrl(context.User))">
 
-			<div class="main-layout-logo">
-				<svg width="36" height="36" viewBox="0 0 46 46" fill="white" xmlns="http://www.w3.org/2000/svg">
-					<g clip-path="url(#clip0_129_3079)">
-						<path d="M44.3153 17.3823L29.7774 2.84247C27.9781 1.04844 25.5409 0.0410156 23 0.0410156C20.4592 0.0410156 18.022 1.04844 16.2227 2.84247L1.68477 17.3823C1.14892 17.9147 0.724082 18.5482 0.434881 19.246C0.145681 19.9439 -0.00212827 20.6922 2.31523e-05 21.4475V40.2635C2.31523e-05 41.7885 0.605825 43.251 1.68416 44.3293C2.76249 45.4077 4.22503 46.0135 5.75002 46.0135H40.25C41.775 46.0135 43.2376 45.4077 44.3159 44.3293C45.3942 43.251 46 41.7885 46 40.2635V21.4475C46.0022 20.6922 45.8544 19.9439 45.5652 19.246C45.276 18.5482 44.8511 17.9147 44.3153 17.3823ZM28.75 42.1801H17.25V34.64C17.25 33.115 17.8558 31.6524 18.9342 30.5741C20.0125 29.4958 21.475 28.89 23 28.89C24.525 28.89 25.9876 29.4958 27.0659 30.5741C28.1442 31.6524 28.75 33.115 28.75 34.64V42.1801ZM42.1667 40.2635C42.1667 40.7718 41.9648 41.2593 41.6053 41.6188C41.2459 41.9782 40.7584 42.1801 40.25 42.1801H32.5834V34.64C32.5834 32.0983 31.5737 29.6607 29.7765 27.8635C27.9792 26.0663 25.5417 25.0566 23 25.0566C20.4584 25.0566 18.0208 26.0663 16.2236 27.8635C14.4264 29.6607 13.4167 32.0983 13.4167 34.64V42.1801H5.75002C5.24169 42.1801 4.75418 41.9782 4.39474 41.6188C4.03529 41.2593 3.83336 40.7718 3.83336 40.2635V21.4475C3.83513 20.9396 4.03689 20.4528 4.39494 20.0925L18.9329 5.55838C20.0133 4.483 21.4756 3.87927 23 3.87927C24.5244 3.87927 25.9868 4.483 27.0672 5.55838L41.6051 20.0982C41.9618 20.4571 42.1634 20.9416 42.1667 21.4475V40.2635Z" fill="white" />
-					</g>
-					<defs>
-						<clipPath id="clip0_129_3079">
-							<rect width="46" height="46" fill="white" />
-						</clipPath>
-					</defs>
-				</svg>
-			</div>
-		</a>
+			</NotAuthorized>
+			<Authorized>
+				<div class="main-layout-bar">
+					<a href="@(GetHomePageUrl(context.User))">
+
+						<div class="main-layout-logo">
+							<svg width="36" height="36" viewBox="0 0 46 46" fill="white"
+								xmlns="http://www.w3.org/2000/svg">
+								<g clip-path="url(#clip0_129_3079)">
+									<path
+										d="M44.3153 17.3823L29.7774 2.84247C27.9781 1.04844 25.5409 0.0410156 23 0.0410156C20.4592 0.0410156 18.022 1.04844 16.2227 2.84247L1.68477 17.3823C1.14892 17.9147 0.724082 18.5482 0.434881 19.246C0.145681 19.9439 -0.00212827 20.6922 2.31523e-05 21.4475V40.2635C2.31523e-05 41.7885 0.605825 43.251 1.68416 44.3293C2.76249 45.4077 4.22503 46.0135 5.75002 46.0135H40.25C41.775 46.0135 43.2376 45.4077 44.3159 44.3293C45.3942 43.251 46 41.7885 46 40.2635V21.4475C46.0022 20.6922 45.8544 19.9439 45.5652 19.246C45.276 18.5482 44.8511 17.9147 44.3153 17.3823ZM28.75 42.1801H17.25V34.64C17.25 33.115 17.8558 31.6524 18.9342 30.5741C20.0125 29.4958 21.475 28.89 23 28.89C24.525 28.89 25.9876 29.4958 27.0659 30.5741C28.1442 31.6524 28.75 33.115 28.75 34.64V42.1801ZM42.1667 40.2635C42.1667 40.7718 41.9648 41.2593 41.6053 41.6188C41.2459 41.9782 40.7584 42.1801 40.25 42.1801H32.5834V34.64C32.5834 32.0983 31.5737 29.6607 29.7765 27.8635C27.9792 26.0663 25.5417 25.0566 23 25.0566C20.4584 25.0566 18.0208 26.0663 16.2236 27.8635C14.4264 29.6607 13.4167 32.0983 13.4167 34.64V42.1801H5.75002C5.24169 42.1801 4.75418 41.9782 4.39474 41.6188C4.03529 41.2593 3.83336 40.7718 3.83336 40.2635V21.4475C3.83513 20.9396 4.03689 20.4528 4.39494 20.0925L18.9329 5.55838C20.0133 4.483 21.4756 3.87927 23 3.87927C24.5244 3.87927 25.9868 4.483 27.0672 5.55838L41.6051 20.0982C41.9618 20.4571 42.1634 20.9416 42.1667 21.4475V40.2635Z"
+										fill="white" />
+								</g>
+								<defs>
+									<clipPath id="clip0_129_3079">
+										<rect width="46" height="46" fill="white" />
+									</clipPath>
+								</defs>
+							</svg>
+						</div>
+					</a>
 
 					<div class="main" style="max-height:50px; display:flex">
 						<MenuItem Key="1">
-							<div class="wellcome" style="color: white;">
-								<Icon Type="user" Theme="IconThemeType.Outline" />
-								@if (!string.IsNullOrEmpty(CurrentUserCompany))
-								{
-									<span>Hoş geldin, @CurrentUserCompany</span>
-								}
-								else
-								{
-									<span>Hoş geldin, @GetUserDisplayName(context.User)</span>
-								}
-							</div>
+						<div class="wellcome" style="color: white;">
+							<Icon Type="user" Theme="IconThemeType.Outline" />
+							<span>Hoş geldin, @CurrentUserCompany</span>
+						</div>
 						</MenuItem>
-						<MenuItem Key="2" RouterLink="/user/myReservations" RouterMatch="NavLinkMatch.All" style="color: white!important;">
-							<div class="my-reservations">
-								<Icon Type="home" Theme="IconThemeType.Outline" Style="margin-right:5px" />
-								Rezervasyonlarım
-							</div>
+						<MenuItem Key="2" RouterLink="/user/myReservations" RouterMatch="NavLinkMatch.All"
+							style="color: white!important;">
+						<div class="my-reservations">
+							<Icon Type="home" Theme="IconThemeType.Outline" Style="margin-right:5px" />
+							Rezervasyonlarım
+						</div>
 						</MenuItem>
 						<MenuItem Key="3">
-							<div class="exit" style="cursor: pointer; color: white;" @onclick="HandleLogout">
-								<img src="Exit-Icon.png" alt="Açıklama" style="width: 30px" />
-							</div>
+						<div class="exit" style="cursor: pointer; color: white;" @onclick="HandleLogout">
+							<img src="Exit-Icon.png" alt="Açıklama" style="width: 30px" />
+						</div>
 						</MenuItem>
 					</div>
-	</div>
-				</Authorized>
-			</AuthorizeView>
-		</Menu>
+				</div>
+			</Authorized>
+		</AuthorizeView>
+	</Menu>
 	<Content>
 		<div>
 			@Body
@@ -77,7 +73,7 @@
 </div>
 
 @code {
-	[Parameter] public string CurrentUserCompany { get; set; }
+	[Parameter] public string CurrentUserCompany { get; set; } = string.Empty;
 
 	private string GetHomePageUrl(ClaimsPrincipal user)
 	{
@@ -95,32 +91,46 @@
 	protected override async Task OnInitializedAsync()
 	{
 		await LoadCurrentUserInfo();
+        AuthProvider.AuthenticationStateChanged += OnAuthenticationStateChanged;
 	}
 
-	private async Task LoadCurrentUserInfo()
+    private async Task LoadCurrentUserInfo(AuthenticationState authState = null)
 	{
 		try
 		{
-			var currentUser = await AuthService.GetCurrentUserAsync();
-			if (currentUser != null && !string.IsNullOrEmpty(currentUser.Company))
+			authState ??= await AuthProvider.GetAuthenticationStateAsync();
+			if (authState.User.Identity.IsAuthenticated)
 			{
-				CurrentUserCompany = currentUser.Company;
-				StateHasChanged();
+				string email = authState.User.FindFirstValue(ClaimTypes.Name);
+				var currentUser = await AuthService.GetCurrentUserAsync(email);
+				if (currentUser != null && !string.IsNullOrEmpty(currentUser.Company))
+				{
+					CurrentUserCompany = currentUser.Company;
+				}
 			}
 		}
 		catch (Exception ex)
 		{
 			Console.WriteLine($"Error loading current user info: {ex.Message}");
 		}
+        await InvokeAsync(StateHasChanged);
 	}
 
-	private string GetUserDisplayName(ClaimsPrincipal user)
-	{
-		var company = user.FindFirst("Company")?.Value;
-		return company ?? "Kullanıcı";
+    private async void OnAuthenticationStateChanged(Task<AuthenticationState> task)
+    {
+        try
+        {
+            var authState = await task;
+            
+            await LoadCurrentUserInfo(authState);
 
-	}
-
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            // Sessizce hata yakala
+        }
+    }
 
 	private async Task HandleLogout()
 	{

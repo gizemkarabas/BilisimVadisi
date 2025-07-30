@@ -1,4 +1,5 @@
 ﻿@page "/user/reservation-summary"
+@using MeetinRoomRezervation.Components.PartialComponents.Reservations
 @using MeetinRoomRezervation.Models
 @using MeetinRoomRezervation.Services.ReservationService
 @using AntDesign
@@ -24,7 +25,7 @@
                     </div>
                 }
 
-                <div class="slots-list" >
+                <div class="slots-list">
                     @foreach (var slot in ReservationState.SelectedSlots)
                     {
                         <div style="background-color: #1890ff;text-align:left; color: white;width:100%; padding: 8px 16px; border-radius: 5px; min-width: 100px;">
@@ -33,42 +34,7 @@
                     }
                 </div>
 
-                <div class="reservation-detail-panel">
-                    <div class="icon-bar">
-                        <div>
-                            <svg width="15" height="15" viewBox="0 0 18 18" fill="white">
-                                <path d="M8.61111 15.0003L7.94444 15.5003L8.65114 16.4426L9.30448 15.4626L8.61111 15.0003ZM9.27777 14.5003L5.66667 9.68551L4.33333 10.6855L7.94444 15.5003L9.27777 14.5003ZM15.14 3.70474L7.91773 14.5381L9.30448 15.4626L16.5267 4.62924L15.14 3.70474Z" fill="white" />
-                            </svg>
-                        </div>
-                        <div>
-                            <svg width="14" height="17" viewBox="0 0 14 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M2.41699 12.333L3.25033 4.41634C3.87215 3.68983 5.30709 3.16634 7.00034 3.16634M11.5837 12.333L10.7503 4.41634C10.1285 3.68983 8.69359 3.16634 7.00034 3.16634M7.00034 3.16634L7.00033 1.49968" stroke="white" stroke-width="1.66667" stroke-linecap="square" stroke-linejoin="round" />
-                                <path d="M1.16699 13.167H4.85765M12.8337 13.167H9.14337M9.14337 13.167L9.03869 13.8994C8.89372 14.9136 8.02504 15.667 7.00046 15.667V15.667C5.97577 15.667 5.10702 14.9135 4.96218 13.8991L4.85765 13.167M9.14337 13.167H4.85765" stroke="white" stroke-width="1.66667" stroke-linecap="square" stroke-linejoin="round" />
-                            </svg>
-                        </div>
-                        <div>
-                            <svg width="24" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M7.99967 2.33301L10.1157 6.08721L14.34 6.93956L11.4235 10.1121L11.9182 14.3931L7.99967 12.5997L4.08111 14.3931L4.57587 10.1121L1.6593 6.93956L5.88365 6.08721L7.99967 2.33301Z" stroke="white" stroke-width="1.66667" />
-                            </svg>
-                        </div>
-                    </div>
-                    <div>
-                        <dl class="descriptions">
-                            <div style="height:33%">
-                                <dt><span style="font-weight:700;">Bölge</span></dt>
-                                <dd>İzmir Bilişim Vadisi</dd>
-                            </div>
-                            <div style="height:33%">
-                                <dt><span style="font-weight:700;">Salon</span></dt>
-                                <dd>@ReservationState.Room.Name</dd>
-                            </div>
-                            <div style="height:33%">
-                                <dt><span style="font-weight:700;">Tarih</span></dt>
-                                <dd>@ReservationState.SelectedDate.ToString("dd.MM.yyyy dddd", turkishCulture)</dd>
-                            </div>
-                        </dl>
-                    </div>
-                </div>
+                <Summary Info="new(){RoomName = ReservationState.RoomName, SelectedDate = ReservationState.SelectedDate}" />
 
                 <h4 style="text-align:center; font-weight:700">
                     Toplam @ReservationState.SelectedSlots.Count Saat
@@ -89,7 +55,7 @@
                 </div>
 
                 <div style="margin-top: 10px; text-align:center;">
-                    <Button Type="ButtonType.Default" OnClick="GoBack" Style="width: 200px;color:red;" Disabled="@isLoading">Geri</Button>
+                    <Button Type="ButtonType.Default" OnClick="GoBack" Style="width: 200px;" Disabled="@isLoading">Geri</Button>
                 </div>
             </div>
         }
@@ -141,7 +107,7 @@
             {
                 MessageService.Success("Rezervasyonunuz başarıyla oluşturuldu!");
 
-                Navigation.NavigateTo("/user/myreservations");
+                Navigation.NavigateTo($"/reservation-confirmed/{result}");
             }
         }
         catch (InvalidOperationException ex)

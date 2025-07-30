@@ -1,0 +1,163 @@
+@page "/reservation-confirmed"
+@page "/reservation-confirmed/{ReservationId}"
+@layout EmptyLayout
+@using MeetinRoomRezervation.Components.PartialComponents.Reservations
+@using MeetinRoomRezervation.Data
+@using MeetinRoomRezervation.Services
+@using System.Globalization
+@using MongoDB.Driver
+@using MeetinRoomRezervation.Components.Layout
+@inject MongoDbContext DbContext
+@inject IJSRuntime JSRuntime
+
+<div class="reservation-confirmed-container">
+    <div class="background-gradient"></div>
+    
+    <div class="logo-container">
+        <img src="/images/bv_logo.png" alt="Bilişim Vadisi" class="logo" />
+    </div>
+    
+    @if (reservation != null && !string.IsNullOrEmpty(reservation.Id))
+    {
+        <div class="confirmation-card">
+            <div class="card-header">
+                <h2>Rezervasyonunuz Onaylandı</h2>
+            </div>
+            
+            <div class="time-badge">
+                @reservation.StartTime.ToString("HH:mm") - @reservation.EndTime.ToString("HH:mm")
+            </div>
+            
+            <Summary Info="new(){RoomName = reservation.Room.Name, SelectedDate = reservation.StartTime}"/>
+        </div>
+    }
+    else if (isLoading)
+    {
+        <div class="loading-card">
+            <div class="loading-spinner"></div>
+            <p>Rezervasyon bilgileri yükleniyor...</p>
+        </div>
+    }
+    else
+    {
+        <div class="error-card">
+            <h3>Rezervasyon bulunamadı</h3>
+            <p>Belirtilen rezervasyon ID'si ile ilgili bir kayıt bulunamadı.</p>
+        </div>
+    }
+    
+    <!-- Action Button -->
+    <div class="action-button-container">
+        <button class="action-button" @onclick="NavigateToMyReservations">
+            Rezervasyonlarıma Git
+        </button>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string ReservationId { get; set; } = string.Empty;
+    
+    [Inject] public NavigationManager Navigation { get; set; } = default!;
+    
+    private Reservation reservation = new();
+    private bool isLoading = true;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrEmpty(ReservationId))
+        {
+            await LoadReservation();
+        }
+        else
+        {
+            // Eğer ID yoksa, en son oluşturulan rezervasyonu al
+            await LoadLatestReservation();
+        }
+        isLoading = false;
+    }
+    
+    private async Task LoadReservation()
+    {
+        try
+        {
+            var result = await DbContext.Reservations.Find(r => r.Id == ReservationId).FirstOrDefaultAsync();
+            if (result != null)
+            {
+                reservation = result;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading reservation: {ex.Message}");
+        }
+    }
+    
+    private async Task LoadLatestReservation()
+    {
+        try
+        {
+            var result = await DbContext.Reservations.Find(r => r.Status == ReservationStatus.Confirmed)
+                                    .SortByDescending(r => r.CreatedAt)
+                                    .FirstOrDefaultAsync();
+            if (result != null)
+            {
+                reservation = result;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading latest reservation: {ex.Message}");
+        }
+    }
+    
+    private void NavigateToMyReservations()
+    {
+        Navigation.NavigateTo("/user/myReservations");
+    }
+    
+    private string GetFormattedDate(DateTime date)
+    {
+        var culture = new CultureInfo("tr-TR");
+        return date.ToString("dd.MM.yyyy dddd", culture);
+    }
+    
+    private async Task ShareReservation()
+    {
+        if (reservation == null || string.IsNullOrEmpty(reservation.Id)) return;
+        
+        var shareText = $"Rezervasyon ID: #{reservation.Id}\nTarih: {GetFormattedDate(reservation.StartTime)}\nSaat: {reservation.StartTime:HH:mm} - {reservation.EndTime:HH:mm}\nSalon: {reservation.Room.Name}\nKonum: {reservation.Location}";
+        
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", shareText);
+            await JSRuntime.InvokeVoidAsync("alert", "Rezervasyon bilgileri panoya kopyalandı!");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error sharing reservation: {ex.Message}");
+        }
+    }
+    
+    private async Task SetReminder()
+    {
+        if (reservation == null || string.IsNullOrEmpty(reservation.Id)) return;
+        
+        // Bu fonksiyon hatırlatıcı servisi ile entegre edilebilir
+        await JSRuntime.InvokeVoidAsync("alert", "Hatırlatıcı ayarlandı!");
+    }
+    
+    private async Task AddToCalendar()
+    {
+        if (reservation == null || string.IsNullOrEmpty(reservation.Id)) return;
+        
+        var startDate = reservation.StartTime.ToString("yyyyMMddTHHmmss");
+        var endDate = reservation.EndTime.ToString("yyyyMMddTHHmmss");
+        var title = Uri.EscapeDataString($"Toplantı - {reservation.Room.Name}");
+        var details = Uri.EscapeDataString($"Rezervasyon ID: {reservation.Id}\nSalon: {reservation.Room.Name}\nKonum: {reservation.Location}");
+        var location = Uri.EscapeDataString(reservation.Location);
+        
+        var calendarUrl = $"https://calendar.google.com/calendar/render?action=TEMPLATE&text={title}&dates={startDate}/{endDate}&details={details}&location={location}";
+        
+        await JSRuntime.InvokeVoidAsync("window.open", calendarUrl, "_blank");
+    }
+}

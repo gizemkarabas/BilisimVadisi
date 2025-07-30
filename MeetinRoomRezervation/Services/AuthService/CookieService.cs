@@ -1,5 +1,4 @@
 ﻿using Microsoft.JSInterop;
-using System.Text.Json;
 
 namespace MeetinRoomRezervation.Services
 {
@@ -32,30 +31,23 @@ namespace MeetinRoomRezervation.Services
                     key
                 );
             }
-            catch (Exception ex)
+            catch
             {
-                var exceptionJson = JsonSerializer.Serialize(new
-                {
-                    ex.Message,
-                    ex.StackTrace,
-                    ex.Source,
-                    InnerException = ex.InnerException?.Message
-                },
-                    new JsonSerializerOptions
-                    {
-                        WriteIndented = true
-                    }
-                );
                 return null;
             }
         }
 
-        public async Task RemoveTokenFromCookieAsync()
+        public async Task RemoveFromCookieAsync(string key)
         {
             await _jsRuntime.InvokeVoidAsync(
                 "cookieManager.removeCookie",
-                TokenKey
+                key
             );
+        }
+
+        public async Task RemoveTokenFromCookieAsync()
+        {
+            await RemoveFromCookieAsync(TokenKey);
         }
     }
 }

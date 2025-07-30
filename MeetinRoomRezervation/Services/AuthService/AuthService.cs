@@ -10,162 +10,165 @@ using static MeetinRoomRezervation.Components.Pages.Register;
 
 namespace MeetinRoomRezervation.Services
 {
-	public class AuthService : IAuthService
-	{
-		private readonly MongoDbContext _context;
-		private readonly IMongoCollection<User> _userCollection;
-		private readonly IHttpContextAccessor _httpContextAccessor;
-		private readonly ILogger<AuthService> _logger;
-		private readonly IConfiguration _configuration;
-		private readonly CookieService _cookieService;
-		private readonly AuthenticationStateProvider _authStateProvider;
+    public class AuthService : IAuthService
+    {
+        private readonly MongoDbContext _context;
+        private readonly IMongoCollection<User> _userCollection;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ILogger<AuthService> _logger;
+        private readonly IConfiguration _configuration;
+        private readonly CookieService _cookieService;
+        private readonly AuthenticationStateProvider _authStateProvider;
 
-		public AuthService(MongoDbContext context, IHttpContextAccessor httpContextAccessor, ILogger<AuthService> logger, IConfiguration configuration, CookieService cookieService, AuthenticationStateProvider authStateProvider)
-		{
-			_context = context;
-			_userCollection = context.Users;
-			_httpContextAccessor = httpContextAccessor;
-			_logger = logger;
-			_configuration = configuration;
-			_cookieService = cookieService;
-			_authStateProvider = authStateProvider;
-		}
+        public AuthService(MongoDbContext context, IHttpContextAccessor httpContextAccessor, ILogger<AuthService> logger, IConfiguration configuration, CookieService cookieService, AuthenticationStateProvider authStateProvider)
+        {
+            _context = context;
+            _userCollection = context.Users;
+            _httpContextAccessor = httpContextAccessor;
+            _logger = logger;
+            _configuration = configuration;
+            _cookieService = cookieService;
+            _authStateProvider = authStateProvider;
+        }
 
-		public async Task<User> LoginAsync(LoginInputModel model)
-		{
-			_logger.LogInformation("Login attempt for email: {Email}", model.Email);
+        public async Task<User> LoginAsync(LoginInputModel model)
+        {
+            _logger.LogInformation("Login attempt for email: {Email}", model.Email);
 
-			var user = await _context.Users.Find(u => u.Email == model.Email).FirstOrDefaultAsync();
-			if (user != null && user.IsActive && BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash))
-			{
-				var claims = new List<Claim>
-				{
-					new Claim(ClaimTypes.Name, user.Email),
-					new Claim(ClaimTypes.NameIdentifier, user.Id),
-					new Claim(ClaimTypes.Role, user.Role.ToString()),
-					new Claim("Company", user.Company ?? ""),
-					new Claim("CompanyOfficial", user.CompanyOfficial ?? ""),
-					new Claim("FirstName", user.FirstName ?? ""),
-					new Claim("LastName", user.LastName ?? "")
-				};
-				byte[] key = Encoding.ASCII.GetBytes(_configuration["JwtOptions:Secret"]);
-				JwtSecurityTokenHandler tokenHandler = new();
+            var user = await _context.Users.Find(u => u.Email == model.Email).FirstOrDefaultAsync();
+            if (user != null && user.IsActive && BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash))
+            {
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, user.Email),
+                    new Claim(ClaimTypes.NameIdentifier, user.Id),
+                    new Claim(ClaimTypes.Role, user.Role.ToString()),
+                    new Claim("Company", user.Company ?? ""),
+                    new Claim("CompanyOfficial", user.CompanyOfficial ?? ""),
+                    new Claim("FirstName", user.FirstName ?? ""),
+                    new Claim("LastName", user.LastName ?? "")
+                };
+                byte[] key = Encoding.ASCII.GetBytes(_configuration["JwtOptions:Secret"]);
+                JwtSecurityTokenHandler tokenHandler = new();
 
-				SecurityTokenDescriptor tokenDescriptor = new()
-				{
-					Subject = new(claims),
-					Issuer = _configuration["JwtOptions:Issuer"],
-					Audience = _configuration["JwtOptions:Audience"],
-					Expires = DateTime.UtcNow.AddMinutes(_configuration.GetValue<int>("JwtOptions:Expires")),
-					SigningCredentials = new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-				};
-				SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
-				await _cookieService.StoreInCookieAsync(tokenHandler.WriteToken(token), "Token");
+                SecurityTokenDescriptor tokenDescriptor = new()
+                {
+                    Subject = new(claims),
+                    Issuer = _configuration["JwtOptions:Issuer"],
+                    Audience = _configuration["JwtOptions:Audience"],
+                    Expires = DateTime.UtcNow.AddMinutes(_configuration.GetValue<int>("JwtOptions:Expires")),
+                    SigningCredentials = new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                };
+                SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
+                await _cookieService.StoreInCookieAsync(tokenHandler.WriteToken(token), "Token");
 
-				return user;
-			}
+                return user;
+            }
 
-			return null;
-		}
+            return null;
+        }
 
-		public async Task<User> RegisterAsync(RegisterInputModel model)
-		{
-			_logger.LogInformation("Registration attempt for email: {Email}", model.Email);
+        public async Task<User> RegisterAsync(RegisterInputModel model)
+        {
+            _logger.LogInformation("Registration attempt for email: {Email}", model.Email);
 
-			try
-			{
-				var existingUser = await _context.Users
-				   .Find(u => u.Email == model.Email)
-				   .FirstOrDefaultAsync();
+            try
+            {
+                var existingUser = await _context.Users
+                   .Find(u => u.Email == model.Email)
+                   .FirstOrDefaultAsync();
 
-				if (existingUser != null)
-				{
-					_logger.LogWarning("Registration failed - email already exists: {Email}", model.Email);
-					throw new InvalidOperationException("Bu email adresi zaten kullanılıyor.");
-				}
+                if (existingUser != null)
+                {
+                    _logger.LogWarning("Registration failed - email already exists: {Email}", model.Email);
+                    throw new InvalidOperationException("Bu email adresi zaten kullanılıyor.");
+                }
 
-				var hash = BCrypt.Net.BCrypt.HashPassword(model.Password);
+                var hash = BCrypt.Net.BCrypt.HashPassword(model.Password);
 
-				var user = new User
-				{
-					Id = Guid.NewGuid().ToString(),
-					Email = model.Email,
-					PasswordHash = hash,
-					CreatedAt = DateTime.UtcNow,
-				};
+                var user = new User
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = model.Email,
+                    FirstName = model.Name,
+                    LastName = model.Surname,
+                    PasswordHash = hash,
+                    CreatedAt = DateTime.UtcNow,
+                    Role = UserRole.User,
+                    IsActive = true,
+                };
 
-				await _context.Users.InsertOneAsync(user);
-				_logger.LogInformation("User registered successfully: {Email}", user.Email);
+                await _context.Users.InsertOneAsync(user);
+                _logger.LogInformation("User registered successfully: {Email}", user.Email);
 
-				return user;
-			}
-			catch (Exception ex)
-			{
-				_logger.LogError(ex, "Error during registration for email: {Email}", model.Email);
-				throw;
-			}
-		}
+                return user;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during registration for email: {Email}", model.Email);
+                throw;
+            }
+        }
 
-		public async Task LogoutAsync()
-		{
-			var userEmail = _httpContextAccessor.HttpContext?.User?.Identity?.Name;
-			_logger.LogInformation("Logout attempt for user: {Email}", userEmail);
+        public async Task LogoutAsync()
+        {
+            var userEmail = _httpContextAccessor.HttpContext?.User?.Identity?.Name;
+            _logger.LogInformation("Logout attempt for user: {Email}", userEmail);
 
-			try
-			{
-				// Cookie'yi sil
-				await _cookieService.RemoveTokenFromCookieAsync();
+            try
+            {
+                await _cookieService.RemoveTokenFromCookieAsync();
 
-				// Authentication state'i güncelle
-				if (_authStateProvider is CustomAuthenticationStateProvider customProvider)
-				{
-					customProvider.NotifyUserLoggedOut();
-				}
-			}
-			catch (InvalidOperationException ex)
-			{
-				_logger.LogWarning("Could not complete logout: {Error}", ex.Message);
-			}
-		}
+                if (_authStateProvider is CustomAuthenticationStateProvider customProvider)
+                {
+                    customProvider.NotifyUserLoggedOut();
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, "Could not complete logout: {Error}", ex.Message);
+            }
+        }
 
-		public async Task<bool> IsEmailTaken(string email)
-		{
-			var existing = await _context.Users.Find(u => u.Email == email).FirstOrDefaultAsync();
-			return existing != null;
-		}
+        public async Task<bool> IsEmailTaken(string email)
+        {
+            var existing = await _context.Users.Find(u => u.Email == email).FirstOrDefaultAsync();
+            return existing != null;
+        }
 
-		public async Task<bool> IsAdminAsync(string userId)
-		{
-			var user = await _context.Users
-				.Find(u => u.Id == userId)
-				.FirstOrDefaultAsync();
+        public async Task<bool> IsAdminAsync(string userId)
+        {
+            var user = await _context.Users
+                .Find(u => u.Id == userId)
+                .FirstOrDefaultAsync();
 
-			return user?.Role == UserRole.Admin;
-		}
+            return user?.Role == UserRole.Admin;
+        }
 
-		public async Task<UserRole> GetUserRoleAsync(string userId)
-		{
-			var user = await _context.Users
-				.Find(u => u.Id == userId)
-				.FirstOrDefaultAsync();
+        public async Task<UserRole> GetUserRoleAsync(string userId)
+        {
+            var user = await _context.Users
+                .Find(u => u.Id == userId)
+                .FirstOrDefaultAsync();
 
-			return user?.Role ?? UserRole.User;
-		}
+            return user?.Role ?? UserRole.User;
+        }
 
-		public async Task<User> GetCurrentUserAsync()
-		{
-			var httpContext = _httpContextAccessor.HttpContext;
-			var userEmail = httpContext.User.FindFirst(ClaimTypes.Name)?.Value;
-			if (!string.IsNullOrEmpty(userEmail))
-			{
-				var user = await _context.Users
-					.Find(u => u.Email == userEmail)
-					.FirstOrDefaultAsync();
-				return user;
-			}
+        public async Task<User> GetCurrentUserAsync(string userEmail = null)
+        {
+            var httpContext = _httpContextAccessor.HttpContext;
+            userEmail ??= httpContext?.User?.FindFirst(ClaimTypes.Name)?.Value;
 
-			return null;
-		}
+            if (!string.IsNullOrEmpty(userEmail))
+            {
+                var user = await _context.Users
+                    .Find(u => u.Email == userEmail)
+                    .FirstOrDefaultAsync();
+                return user;
+            }
 
-	}
+            return null;
+        }
+
+    }
 }

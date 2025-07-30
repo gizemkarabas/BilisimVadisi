@@ -1,0 +1,25 @@
+﻿.icon-bar {
+    width: 24px;
+    height: 193px;
+    background-color: #0A6FFA;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 5px;
+    padding-bottom: 24px;
+}
+
+.reservation-detail-panel {
+    display: flex;
+    margin-top: 15px;
+}
+
+.descriptions {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 210px;
+    margin-left: 15px;
+}
