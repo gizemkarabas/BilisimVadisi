@@ -74,7 +74,14 @@ builder.Services.AddHostedService<MeetingReminderBackgroundService>();
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
 builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor();
+builder.Services.AddServerSideBlazor(options =>
+{
+	options.DetailedErrors = builder.Environment.IsDevelopment();
+	options.DisconnectedCircuitMaxRetained = 100;
+	options.DisconnectedCircuitRetentionPeriod = TimeSpan.FromMinutes(3);
+	options.JSInteropDefaultCallTimeout = TimeSpan.FromMinutes(1);
+	options.MaxBufferedUnacknowledgedRenderBatches = 10;
+});
 builder.Services.AddAuthenticationCore();
 builder.Services.AddScoped<SeedDataService>();
 builder.Services.AddCascadingAuthenticationState();
@@ -98,6 +105,8 @@ else
 }
 
 app.UseHttpsRedirection();
+
+app.UseWebSockets();
 
 app.UseAuthentication();
 app.UseAuthorization();
