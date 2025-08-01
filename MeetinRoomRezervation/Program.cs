@@ -16,27 +16,27 @@ using System.IdentityModel.Tokens.Jwt;
 
 var builder = WebApplication.CreateBuilder(args);
 Log.Logger = new LoggerConfiguration()
-	.MinimumLevel.Information()
-	.WriteTo.Console()
-	.WriteTo.File("Logs/app-.txt", rollingInterval: RollingInterval.Day)
-	.CreateLogger();
+    .MinimumLevel.Information()
+    .WriteTo.Console()
+    .WriteTo.File("Logs/app-.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
 
 builder.Host.UseSerilog();
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-	.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
-	{
-		options.LoginPath = "/";
-		options.LogoutPath = "/logout";
-		options.AccessDeniedPath = "/";
-		options.ExpireTimeSpan = TimeSpan.FromDays(7);
-		options.SlidingExpiration = true;
-		options.Cookie.HttpOnly = true;
-		options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
-		options.Cookie.SameSite = SameSiteMode.Lax;
-	});
+    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+    {
+        options.LoginPath = "/";
+        options.LogoutPath = "/logout";
+        options.AccessDeniedPath = "/";
+        options.ExpireTimeSpan = TimeSpan.FromDays(7);
+        options.SlidingExpiration = true;
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+        options.Cookie.SameSite = SameSiteMode.Lax;
+    });
 
 builder.Services.AddAuthorization();
 builder.Services.AddScoped<CookieService>();
@@ -54,11 +54,11 @@ builder.Services.AddValidatorsFromAssemblyContaining<UserValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<ReservationValidator>();
 builder.Services.AddSingleton<IMongoClient>(serviceProvider =>
 {
-	var clientSettings = MongoClientSettings.FromConnectionString(builder.Configuration.GetConnectionString("MongoDb"));
-	MongoClient client = new(clientSettings);
-	ConventionPack conventionPack = [new IgnoreExtraElementsConvention(true)];
-	ConventionRegistry.Register("MongoConventions", conventionPack, _ => true);
-	return client;
+    var clientSettings = MongoClientSettings.FromConnectionString(builder.Configuration.GetConnectionString("MongoDb"));
+    MongoClient client = new(clientSettings);
+    ConventionPack conventionPack = [new IgnoreExtraElementsConvention(true)];
+    ConventionRegistry.Register("MongoConventions", conventionPack, _ => true);
+    return client;
 });
 builder.Services.AddSingleton<MongoDbContext>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -76,11 +76,11 @@ builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor(options =>
 {
-	options.DetailedErrors = builder.Environment.IsDevelopment();
-	options.DisconnectedCircuitMaxRetained = 100;
-	options.DisconnectedCircuitRetentionPeriod = TimeSpan.FromMinutes(3);
-	options.JSInteropDefaultCallTimeout = TimeSpan.FromMinutes(1);
-	options.MaxBufferedUnacknowledgedRenderBatches = 10;
+    options.DetailedErrors = builder.Environment.IsDevelopment();
+    options.DisconnectedCircuitMaxRetained = 100;
+    options.DisconnectedCircuitRetentionPeriod = TimeSpan.FromMinutes(3);
+    options.JSInteropDefaultCallTimeout = TimeSpan.FromMinutes(1);
+    options.MaxBufferedUnacknowledgedRenderBatches = 10;
 });
 builder.Services.AddAuthenticationCore();
 builder.Services.AddScoped<SeedDataService>();
@@ -89,19 +89,19 @@ builder.Services.AddCascadingAuthenticationState();
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
-	var seedService = scope.ServiceProvider.GetRequiredService<SeedDataService>();
-	await seedService.SeedAdminUserAsync();
+    var seedService = scope.ServiceProvider.GetRequiredService<SeedDataService>();
+    await seedService.SeedAdminUserAsync();
 }
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-	app.UseMigrationsEndPoint();
+    app.UseMigrationsEndPoint();
 }
 else
 {
-	app.UseExceptionHandler("/Error", createScopeForErrors: true);
-	// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-	app.UseHsts();
+    app.UseExceptionHandler("/Error", createScopeForErrors: true);
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
 }
 
 app.UseHttpsRedirection();
@@ -115,12 +115,12 @@ app.UseAntiforgery();
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
-	.AddInteractiveServerRenderMode();
+    .AddInteractiveServerRenderMode();
 
 using (var scope = app.Services.CreateScope())
 {
-	var seedService = scope.ServiceProvider.GetRequiredService<SeedDataService>();
-	await seedService.SeedAdminUserAsync();
+    var seedService = scope.ServiceProvider.GetRequiredService<SeedDataService>();
+    await seedService.SeedAdminUserAsync();
 }
 
 await app.RunAsync();

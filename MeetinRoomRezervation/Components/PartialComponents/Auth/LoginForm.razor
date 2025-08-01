@@ -12,9 +12,9 @@
     {
         <Alert Message="@ErrorMessage" Type="@AlertType.Error" ShowIcon="true" />
     }
-    
-    <FormTitle Text="Giriş Yap"/>
-    <br/>
+
+    <FormTitle Text="Giriş Yap" />
+    <br />
     <Form Model="@LoginModel" OnFinish="HandleLogin" Layout="@FormLayout.Vertical">
         <FormItem>
             <OutlinedLabelInput Value="@LoginModel.Email" ValueChanged="@(e => LoginModel.Email = e)" Label="Email" />
