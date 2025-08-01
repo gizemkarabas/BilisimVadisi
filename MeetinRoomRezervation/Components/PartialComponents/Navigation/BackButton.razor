@@ -1,0 +1,36 @@
+@using Microsoft.AspNetCore.Components
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+
+<div class="back-button-container">
+    <button class="back-button" @onclick="HandleBackClick">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+        </svg>
+    </button>
+</div>
+
+@code {
+    [Parameter] public string BackUrl { get; set; } = string.Empty;
+    [Parameter] public EventCallback OnBackClick { get; set; }
+
+    private async Task HandleBackClick()
+    {
+        if (OnBackClick.HasDelegate)
+        {
+            await OnBackClick.InvokeAsync();
+        }
+        else if (!string.IsNullOrEmpty(BackUrl))
+        {
+            Navigation.NavigateTo(BackUrl);
+        }
+        else
+        {
+            // Tarayıcı geçmişinde geri git
+            await JSRuntime.InvokeVoidAsync("history.back");
+        }
+    }
+}
+
+                

@@ -1,4 +1,5 @@
 ﻿@using MeetinRoomRezervation.Components.PartialComponents.Input
+@using MeetinRoomRezervation.Components.PartialComponents.Title
 @using MeetinRoomRezervation.Data
 @using System.Security.Claims
 @using static MeetinRoomRezervation.Components.Pages.Login
@@ -11,8 +12,9 @@
     {
         <Alert Message="@ErrorMessage" Type="@AlertType.Error" ShowIcon="true" />
     }
-    <div class="head-title">Giriş Yap</div>
-
+    
+    <FormTitle Text="Giriş Yap"/>
+    <br/>
     <Form Model="@LoginModel" OnFinish="HandleLogin" Layout="@FormLayout.Vertical">
         <FormItem>
             <OutlinedLabelInput Value="@LoginModel.Email" ValueChanged="@(e => LoginModel.Email = e)" Label="Email" />
@@ -36,13 +38,7 @@
         </FormItem>
     </Form>
 </div>
-<style>
-    .head-title {
-        font-size: 22px !important;
-        font-weight: bold;
-        margin-bottom: 25px;
-    }
-</style>
+
 @code {
     private LoginInputModel LoginModel = new();
     private bool IsLoading = false;

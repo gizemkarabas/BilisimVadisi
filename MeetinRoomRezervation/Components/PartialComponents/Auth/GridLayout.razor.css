@@ -31,14 +31,14 @@
 }
 
 .container ::deep .left-col-content {
-    height: 80vh;
+    height: 100vh;
     display: flex;
     align-items: center;
     justify-content: flex-end;
 }
 
 .container ::deep .right-col-content {
-    height: 80vh;
+    height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -50,5 +50,4 @@
 
 .right-content {
     width: 60%;
-    height:90%;
 }

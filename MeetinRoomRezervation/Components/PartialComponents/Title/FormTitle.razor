@@ -1,0 +1,13 @@
+﻿<div class="form-title">
+    <div class="head-title">@Text</div>
+    @if (!string.IsNullOrWhiteSpace(SubText))
+    {
+        <br />
+        <div class="head-note-title">@SubText</div>
+    }
+</div>
+
+@code {
+    [Parameter] public string Text { get; set; }
+    [Parameter] public string SubText { get; set; }
+}
