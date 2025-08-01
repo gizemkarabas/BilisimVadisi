@@ -247,7 +247,7 @@ namespace MeetinRoomRezervation.Services.ReservationService
                         Id = room.Id!,
                         Name = room.Name,
                         Capacity = room.Capacity,
-                        Location = room.Location ?? "Bina 1 Koridor 2",
+                        Location = room.Location ?? "İzmir Bilisim Vadisi",
                         OccupancyRate = occupancyRate,
                         IsAvailable = occupancyRate < 100
                     });

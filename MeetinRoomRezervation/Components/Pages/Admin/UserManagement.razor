@@ -185,36 +185,36 @@
 				</div>
 			</Modal>
 
-<Modal @bind-Visible="IsReservationModalVisible" Title="Bir Toplantı Ayarla" Footer="null">
-	<div style="display:flex; flex-direction:column; gap:16px; min-width:300px;">
-		<b>Kullanıcı Seç</b>
-@if (AllUsers != null && AllUsers.Any(u => !string.IsNullOrEmpty(u.Id)))
-{
-	<Select TItem="UserDto"
-		   TItemValue="string"
-		   DataSource="@AllUsers"
-		   @bind-Value="SelectedUserId"
-		   LabelName="Company"
-		   ValueName="Id"
-		   Placeholder="Kullanıcı seçiniz"
-		   EnableSearch
-		   Style="min-width:220px;max-width:320px;">
-	</Select>
-}
-else
-{
-	<Alert Message="Kullanıcı listesi yüklenemedi veya kullanıcıların Id bilgisi eksik." Type="AlertType.Error" ShowIcon="true" />
-}
-<br /><br />
-<p>
-	Seçilen Kullanıcı Id: @SelectedUserId <br />
-	Seçilen Kullanıcı: @(AllUsers.FirstOrDefault(u => u.Id == SelectedUserId)?.Company),"/", @(AllUsers.FirstOrDefault(u => u.Id == SelectedUserId)?.CompanyOfficial)
-</p>
-		<Button Type="ButtonType.Primary" Disabled="@(string.IsNullOrEmpty(SelectedUserId))" OnClick="GoToReservationForSelectedUser">
-			Devam Et
-		</Button>
-	</div>
-</Modal>
+			<Modal @bind-Visible="IsReservationModalVisible" Title="Bir Toplantı Ayarla" Footer="null">
+				<div style="display:flex; flex-direction:column; gap:16px; min-width:300px;">
+					<b>Kullanıcı Seç</b>
+			@if (AllUsers != null && AllUsers.Any(u => !string.IsNullOrEmpty(u.Id)))
+			{
+				<Select TItem="UserDto"
+					   TItemValue="string"
+					   DataSource="@AllUsers"
+					   @bind-Value="SelectedUserId"
+					   LabelName="Company"
+					   ValueName="Id"
+					   Placeholder="Kullanıcı seçiniz"
+					   EnableSearch
+					   Style="min-width:220px;max-width:320px;">
+				</Select>
+			}
+			else
+			{
+				<Alert Message="Kullanıcı listesi yüklenemedi veya kullanıcıların Id bilgisi eksik." Type="AlertType.Error" ShowIcon="true" />
+			}
+			<br /><br />
+			<p>
+				Seçilen Kullanıcı Id: @SelectedUserId <br />
+				Seçilen Kullanıcı: @(AllUsers.FirstOrDefault(u => u.Id == SelectedUserId)?.Company),"/", @(AllUsers.FirstOrDefault(u => u.Id == SelectedUserId)?.CompanyOfficial)
+			</p>
+					<Button Type="ButtonType.Primary" Disabled="@(string.IsNullOrEmpty(SelectedUserId))" OnClick="GoToReservationForSelectedUser">
+						Devam Et
+					</Button>
+				</div>
+			</Modal>
 			<div class="users-panel">
 				<div>
 					<div style="display:flex;justify-content: space-between;align-items: center;">
