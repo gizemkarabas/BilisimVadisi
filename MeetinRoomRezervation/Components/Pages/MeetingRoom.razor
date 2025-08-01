@@ -1,4 +1,5 @@
 ﻿@page "/user/meetingRooms"
+@using Microsoft.AspNetCore.WebUtilities
 @using AntDesign
 @using MeetinRoomRezervation.Components.PartialComponents.Rooms
 @using MeetinRoomRezervation.Models
@@ -6,6 +7,7 @@
 @using static MeetinRoomRezervation.Components.PartialComponents.Rooms.WeeklyDayPicker
 @inject IRoomService RoomService
 @inject NavigationManager Navigation
+@inject NavigationManager NavManager
 
 <div class="calender">
 	<DatePicker DefaultValue="@TodayDate" Style="width:90vw; height:41px" @bind-Value="SelectedDate"
@@ -99,13 +101,15 @@
 	private List<MeetingRoomDto> Rooms = new();
 	private DateTime _selectedDate = DateTime.Today;
 	private DateTime TodayDate = DateTime.Today;
+	private string? UserIdFromQuery;
+
 	private DateItem SelectedDateItem
 	{
 		get => new DateItem(
-		SelectedDate == DateTime.Today ? "Bugün" :
-		SelectedDate == DateTime.Today.AddDays(1) ? "Yarın" :
-		SelectedDate.ToString("dd.MM.yyyy dddd", new System.Globalization.CultureInfo("tr-TR")),
-		SelectedDate);
+			SelectedDate == DateTime.Today ? "Bugün" :
+			SelectedDate == DateTime.Today.AddDays(1) ? "Yarın" :
+			SelectedDate.ToString("dd.MM.yyyy dddd", new System.Globalization.CultureInfo("tr-TR")),
+			SelectedDate);
 		set
 		{
 			if (SelectedDate != value.Date)
@@ -127,6 +131,12 @@
 
 	protected override async Task OnInitializedAsync()
 	{
+		// Read userId from query string if present
+		var uri = NavManager.ToAbsoluteUri(NavManager.Uri);
+		if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("userId", out var userId))
+		{
+			UserIdFromQuery = userId.ToString();
+		}
 		await LoadRooms();
 	}
 
@@ -135,9 +145,7 @@
 		try
 		{
 			Rooms.Clear();
-
 			Rooms = await RoomService.GetAllRoomsWithOccupancyAsync(SelectedDate);
-
 			await InvokeAsync(StateHasChanged);
 		}
 		catch (Exception ex)
@@ -153,7 +161,12 @@
 		if (!room.IsAvailable) return;
 
 		var dateStr = SelectedDate.ToString("yyyy-MM-dd");
-		Navigation.NavigateTo($"/user/reservationForm?roomId={room.Id}&date={dateStr}");
+		var url = $"/user/reservationForm?roomId={room.Id}&date={dateStr}";
+		if (!string.IsNullOrEmpty(UserIdFromQuery))
+		{
+			url += $"&userId={UserIdFromQuery}";
+		}
+		Navigation.NavigateTo(url);
 	}
 
 	private bool DisablePastDates(DateTime date) => date < DateTime.Today;

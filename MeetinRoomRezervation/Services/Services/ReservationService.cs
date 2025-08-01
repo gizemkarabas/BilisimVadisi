@@ -6,196 +6,235 @@ using System.Security.Claims;
 
 namespace MeetinRoomRezervation.Services.ReservationService
 {
-	public class ReservationService : IReservationService
-	{
-		private readonly MongoDbContext _context;
-		private readonly IHttpContextAccessor _httpContextAccessor;
-		private readonly AuthenticationStateProvider _authStateProvider;
-		private readonly ILogger<ReservationService> _logger;
-		private readonly IUserService _userService;
+    public class ReservationService : IReservationService
+    {
+        private readonly MongoDbContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly AuthenticationStateProvider _authStateProvider;
+        private readonly ILogger<ReservationService> _logger;
+        private readonly IUserService _userService;
 
-		public ReservationService(
-			MongoDbContext context,
-			IHttpContextAccessor httpContextAccessor,
-			AuthenticationStateProvider authStateProvider,
-			ILogger<ReservationService> logger, IUserService userService)
-		{
-			_context = context;
-			_httpContextAccessor = httpContextAccessor;
-			_authStateProvider = authStateProvider;
-			_logger = logger;
-			_userService = userService;
-		}
+        public ReservationService(
+            MongoDbContext context,
+            IHttpContextAccessor httpContextAccessor,
+            AuthenticationStateProvider authStateProvider,
+            ILogger<ReservationService> logger, IUserService userService)
+        {
+            _context = context;
+            _httpContextAccessor = httpContextAccessor;
+            _authStateProvider = authStateProvider;
+            _logger = logger;
+            _userService = userService;
+        }
 
-		public async Task<string> AddReservationAsync(ReservationDto reservationDto)
-		{
-			try
-			{
-				_logger.LogInformation("AddReservationAsync called for RoomId: {RoomId}", reservationDto.RoomId);
-				_logger.LogInformation("Selected date: {Date}", reservationDto.SelectedDate);
-				_logger.LogInformation("Selected slots count: {Count}", reservationDto.SelectedSlots?.Count ?? 0);
+        public async Task<string> AddReservationAsync(ReservationDto reservationDto)
+        {
+            try
+            {
+                _logger.LogInformation("AddReservationAsync called for RoomId: {RoomId}", reservationDto.RoomId);
+                _logger.LogInformation("Selected date: {Date}", reservationDto.SelectedDate);
+                _logger.LogInformation("Selected slots count: {Count}", reservationDto.SelectedSlots?.Count ?? 0);
 
-				if (reservationDto.SelectedSlots == null || !reservationDto.SelectedSlots.Any())
-				{
-					throw new InvalidOperationException("Hiç slot seçilmemiş.");
-				}
+                if (reservationDto.SelectedSlots == null || !reservationDto.SelectedSlots.Any())
+                {
+                    throw new InvalidOperationException("Hiç slot seçilmemiş.");
+                }
 
-				var currentUser = await GetCurrentUserAsync();
-				if (currentUser == null)
-				{
-					_logger.LogWarning("Current user not found");
-					throw new InvalidOperationException("Kullanıcı oturumu bulunamadı. Lütfen tekrar giriş yapın.");
-				}
+                // Admin seçimi varsa, rezervasyonu seçilen kullanıcıya ata
+                UserDto targetUser = null;
+                if (!string.IsNullOrEmpty(reservationDto.UserId))
+                {
+                    targetUser = reservationDto.User;
+                    if (targetUser == null)
+                    {
+                        var user = await _userService.GetUserByIdAsync(reservationDto.UserId);
+                        if (user != null)
+                        {
+                            targetUser = new UserDto
+                            {
+                                Id = user.Id,
+                                Email = user.Email,
+                                Company = user.Company,
+                                CompanyOfficial = user.CompanyOfficial,
+                                ContactPhone = user.ContactPhone,
+                                FirstName = user.FirstName,
+                                LastName = user.LastName
+                            };
+                        }
+                    }
+                }
+                else
+                {
+                    var user = await GetCurrentUserAsync();
+                    if (user != null)
+                    {
+                        targetUser = new UserDto
+                        {
+                            Id = user.Id,
+                            Email = user.Email,
+                            Company = user.Company,
+                            CompanyOfficial = user.CompanyOfficial,
+                            ContactPhone = user.ContactPhone,
+                            FirstName = user.FirstName,
+                            LastName = user.LastName
+                        };
+                    }
+                }
+                if (targetUser == null)
+                {
+                    _logger.LogWarning("Target user not found");
+                    throw new InvalidOperationException("Kullanıcı bulunamadı. Lütfen tekrar deneyin.");
+                }
 
-				var mergedSlots = MergeConsecutiveSlots(reservationDto.SelectedSlots.ToList());
-				var reservationIds = new List<string>();
+                var mergedSlots = MergeConsecutiveSlots(reservationDto.SelectedSlots.ToList());
+                var reservationIds = new List<string>();
 
-				foreach (var mergedSlot in mergedSlots)
-				{
-					_logger.LogInformation("Processing merged slot: {StartTime} - {EndTime}", mergedSlot.StartTime, mergedSlot.EndTime);
+                foreach (var mergedSlot in mergedSlots)
+                {
+                    _logger.LogInformation("Processing merged slot: {StartTime} - {EndTime}", mergedSlot.StartTime, mergedSlot.EndTime);
 
-					var localStartTime = new DateTime(
-						reservationDto.SelectedDate.Year,
-						reservationDto.SelectedDate.Month,
-						reservationDto.SelectedDate.Day,
-						mergedSlot.StartTime.Hour,
-						mergedSlot.StartTime.Minute,
-						mergedSlot.StartTime.Second,
-						DateTimeKind.Local
-					);
+                    var localStartTime = new DateTime(
+                        reservationDto.SelectedDate.Year,
+                        reservationDto.SelectedDate.Month,
+                        reservationDto.SelectedDate.Day,
+                        mergedSlot.StartTime.Hour,
+                        mergedSlot.StartTime.Minute,
+                        mergedSlot.StartTime.Second,
+                        DateTimeKind.Local
+                    );
 
-					var localEndTime = new DateTime(
-						reservationDto.SelectedDate.Year,
-						reservationDto.SelectedDate.Month,
-						reservationDto.SelectedDate.Day,
-						mergedSlot.EndTime.Hour,
-						mergedSlot.EndTime.Minute,
-						mergedSlot.EndTime.Second,
-						DateTimeKind.Local
-					);
+                    var localEndTime = new DateTime(
+                        reservationDto.SelectedDate.Year,
+                        reservationDto.SelectedDate.Month,
+                        reservationDto.SelectedDate.Day,
+                        mergedSlot.EndTime.Hour,
+                        mergedSlot.EndTime.Minute,
+                        mergedSlot.EndTime.Second,
+                        DateTimeKind.Local
+                    );
 
-					if (localEndTime.Hour == 0)
-					{
-						localEndTime = localEndTime.AddDays(1).AddMinutes(-1);
-					}
+                    if (localEndTime.Hour == 0)
+                    {
+                        localEndTime = localEndTime.AddDays(1).AddMinutes(-1);
+                    }
 
-					// UTC'ye çevir
-					var utcStartTime = localStartTime.ToUniversalTime();
-					var utcEndTime = localEndTime.ToUniversalTime();
+                    // UTC'ye çevir
+                    var utcStartTime = localStartTime.ToUniversalTime();
+                    var utcEndTime = localEndTime.ToUniversalTime();
 
-					_logger.LogInformation("Local time: {LocalStart} - {LocalEnd}", localStartTime, localEndTime);
-					_logger.LogInformation("UTC time: {UtcStart} - {UtcEnd}", utcStartTime, utcEndTime);
+                    _logger.LogInformation("Local time: {LocalStart} - {LocalEnd}", localStartTime, localEndTime);
+                    _logger.LogInformation("UTC time: {UtcStart} - {UtcEnd}", utcStartTime, utcEndTime);
 
-					var reservation = new Reservation
-					{
-						Id = Guid.NewGuid().ToString(),
-						UserId = currentUser.Id,
+                    var reservation = new Reservation
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        UserId = targetUser.Id,
                         RoomId = reservationDto.RoomId,
-						StartTime = utcStartTime,
-						EndTime = utcEndTime,
-						CreatedAt = DateTime.UtcNow,
-						Status = ReservationStatus.Active,
+                        StartTime = utcStartTime,
+                        EndTime = utcEndTime,
+                        CreatedAt = DateTime.UtcNow,
+                        Status = ReservationStatus.Active,
 
-						User = new UserDto
-						{
-							Id = currentUser.Id,
-							Email = currentUser.Email,
-							Company = currentUser.Company ?? "",
-							CompanyOfficial = currentUser.CompanyOfficial ?? "",
-							ContactPhone = currentUser.ContactPhone ?? "",
-							FirstName = currentUser.FirstName ?? "",
-							LastName = currentUser.LastName ?? ""
-						},
+                        User = new UserDto
+                        {
+                            Id = targetUser.Id,
+                            Email = targetUser.Email,
+                            Company = targetUser.Company ?? "",
+                            CompanyOfficial = targetUser.CompanyOfficial ?? "",
+                            ContactPhone = targetUser.ContactPhone ?? "",
+                            FirstName = targetUser.FirstName ?? "",
+                            LastName = targetUser.LastName ?? ""
+                        },
 
-						Room = reservationDto.Room ?? new MeetingRoomDto(),
-						Location = reservationDto.Location ?? ""
-					};
-					// Rezervasyon oluşturulmadan önce kontrol
-					var reservationHours = (int)Math.Ceiling((reservation.EndTime - reservation.StartTime).TotalHours);
-					var canMakeReservation = await _userService.CanUserMakeReservationAsync(reservation.UserId, reservationHours);
+                        Room = reservationDto.Room ?? new MeetingRoomDto(),
+                        Location = reservationDto.Location ?? ""
+                    };
+                    // Rezervasyon oluşturulmadan önce kontrol
+                    var reservationHours = (int)Math.Ceiling((reservation.EndTime - reservation.StartTime).TotalHours);
+                    var canMakeReservation = await _userService.CanUserMakeReservationAsync(reservation.UserId, reservationHours);
 
-					if (!canMakeReservation)
-					{
-						throw new InvalidOperationException("Aylık kullanım limitinizi aştınız. Rezervasyon yapılamaz.");
-					}
-					await _context.Reservations.InsertOneAsync(reservation);
-					reservationIds.Add(reservation.Id);
+                    if (!canMakeReservation)
+                    {
+                        throw new InvalidOperationException("Aylık kullanım limitinizi aştınız. Rezervasyon yapılamaz.");
+                    }
+                    await _context.Reservations.InsertOneAsync(reservation);
+                    reservationIds.Add(reservation.Id);
 
-					_logger.LogInformation("Reservation created: {ReservationId} - Local: {LocalStart}-{LocalEnd}, UTC: {UtcStart}-{UtcEnd}",
-						reservation.Id, localStartTime, localEndTime, utcStartTime, utcEndTime);
-				}
+                    _logger.LogInformation("Reservation created: {ReservationId} - Local: {LocalStart}-{LocalEnd}, UTC: {UtcStart}-{UtcEnd}",
+                        reservation.Id, localStartTime, localEndTime, utcStartTime, utcEndTime);
+                }
 
-				_logger.LogInformation("Total reservations created: {Count}", reservationIds.Count);
-				return string.Join(",", reservationIds);
-			}
-			catch (Exception ex)
-			{
-				_logger.LogError(ex, "Error creating reservation for RoomId: {RoomId}", reservationDto.RoomId);
-				throw;
-			}
-		}
+                _logger.LogInformation("Total reservations created: {Count}", reservationIds.Count);
+                return string.Join(",", reservationIds);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating reservation for RoomId: {RoomId}", reservationDto.RoomId);
+                throw;
+            }
+        }
 
-		public async Task<bool> UpdateReservationAsync(ReservationDto updated)
-		{
-			var reservation = new Reservation
-			{
-				Id = updated.Id,
-				UserId = updated.UserId,
-				RoomId = updated.RoomId,
-				StartTime = updated.StartTime,
-				EndTime = updated.EndTime,
+        public async Task<bool> UpdateReservationAsync(ReservationDto updated)
+        {
+            var reservation = new Reservation
+            {
+                Id = updated.Id,
+                UserId = updated.UserId,
+                RoomId = updated.RoomId,
+                StartTime = updated.StartTime,
+                EndTime = updated.EndTime,
 
-			};
-			var filter = Builders<Reservation>.Filter.Eq(r => r.Id, updated.Id);
-			var update = Builders<Reservation>.Update
-				.Set(r => r.StartTime, updated.StartTime)
-				.Set(r => r.EndTime, updated.EndTime);
+            };
+            var filter = Builders<Reservation>.Filter.Eq(r => r.Id, updated.Id);
+            var update = Builders<Reservation>.Update
+                .Set(r => r.StartTime, updated.StartTime)
+                .Set(r => r.EndTime, updated.EndTime);
 
-			var result = await _context.Reservations.UpdateOneAsync(filter, update);
-			return result.ModifiedCount > 0;
-		}
-		public async Task CancelReservationAsync(string reservationId)
-		{
-			var filter = Builders<Reservation>.Filter.Eq(r => r.Id, reservationId);
-			await _context.Reservations.DeleteOneAsync(filter);
-		}
-		public async Task<List<ReservationDto>> GetAllReservationsAsync()
-		{
-			var reservations = await _context.Reservations.Find(_ => true).ToListAsync();
-			var result = new List<ReservationDto>();
-			foreach (var reservation in reservations)
-			{
-				string userEmail = null;
-				if (!string.IsNullOrEmpty(reservation.UserId))
-				{
-					var userFilter = Builders<User>.Filter.Eq("_id", reservation.UserId);
-					var user = await _context.Users.Find(userFilter).FirstOrDefaultAsync();
-					userEmail = user?.Email;
-				}
+            var result = await _context.Reservations.UpdateOneAsync(filter, update);
+            return result.ModifiedCount > 0;
+        }
+        public async Task CancelReservationAsync(string reservationId)
+        {
+            var filter = Builders<Reservation>.Filter.Eq(r => r.Id, reservationId);
+            await _context.Reservations.DeleteOneAsync(filter);
+        }
+        public async Task<List<ReservationDto>> GetAllReservationsAsync()
+        {
+            var reservations = await _context.Reservations.Find(_ => true).ToListAsync();
+            var result = new List<ReservationDto>();
+            foreach (var reservation in reservations)
+            {
+                string userEmail = null;
+                if (!string.IsNullOrEmpty(reservation.UserId))
+                {
+                    var userFilter = Builders<User>.Filter.Eq("_id", reservation.UserId);
+                    var user = await _context.Users.Find(userFilter).FirstOrDefaultAsync();
+                    userEmail = user?.Email;
+                }
 
-				string roomName = null;
-				if (!string.IsNullOrEmpty(reservation.RoomId))
-				{
-					var roomFilter = Builders<Data.MeetingRoom>.Filter.Eq("_id", reservation.RoomId);
-					var room = await _context.Rooms.Find(roomFilter).FirstOrDefaultAsync();
-					roomName = room?.Name;
-				}
+                string roomName = null;
+                if (!string.IsNullOrEmpty(reservation.RoomId))
+                {
+                    var roomFilter = Builders<Data.MeetingRoom>.Filter.Eq("_id", reservation.RoomId);
+                    var room = await _context.Rooms.Find(roomFilter).FirstOrDefaultAsync();
+                    roomName = room?.Name;
+                }
 
-				result.Add(new ReservationDto
-				{
-					Id = reservation.Id,
-					UserId = reservation.UserId,
-					RoomId = reservation.RoomId,
-					UserEmail = userEmail,
-					RoomName = roomName,
-					StartTime = reservation.StartTime,
-					EndTime = reservation.EndTime
-				});
-			}
+                result.Add(new ReservationDto
+                {
+                    Id = reservation.Id,
+                    UserId = reservation.UserId,
+                    RoomId = reservation.RoomId,
+                    UserEmail = userEmail,
+                    RoomName = roomName,
+                    StartTime = reservation.StartTime,
+                    EndTime = reservation.EndTime
+                });
+            }
 
-			return result;
+            return result;
 
-		}
+        }
         // ReservationService.cs içinde
         public async Task<List<ReservationDto>> GetReservationsByDateAsync(DateTime date)
         {
@@ -270,278 +309,293 @@ namespace MeetinRoomRezervation.Services.ReservationService
         }
 
         public async Task<List<ReservationDto>> GetUserReservationsAsync()
-		{
-			try
-			{
-				var currentUser = await GetCurrentUserAsync();
-				if (currentUser == null)
-				{
-					_logger.LogWarning("Current user is null in GetUserReservationsAsync");
-					return new List<ReservationDto>();
-				}
+        {
+            try
+            {
+                var currentUser = await GetCurrentUserAsync();
+                if (currentUser == null)
+                {
+                    _logger.LogWarning("Current user is null in GetUserReservationsAsync");
+                    return new List<ReservationDto>();
+                }
 
-				_logger.LogInformation("Getting reservations for user: {UserId}", currentUser.Id);
+                _logger.LogInformation("Getting reservations for user: {UserId}", currentUser.Id);
 
-				var reservations = await _context.Reservations
-					.Find(r => r.UserId == currentUser.Id && r.Status == ReservationStatus.Active)
-					.SortByDescending(r => r.StartTime)
-					.ToListAsync();
+                var reservations = await _context.Reservations
+                    .Find(r => r.UserId == currentUser.Id && r.Status == ReservationStatus.Active)
+                    .SortByDescending(r => r.StartTime)
+                    .ToListAsync();
 
-				_logger.LogInformation("Found {Count} reservations for user {UserId}", reservations.Count, currentUser.Id);
+                _logger.LogInformation("Found {Count} reservations for user {UserId}", reservations.Count, currentUser.Id);
 
-				var result = new List<ReservationDto>();
+                var result = new List<ReservationDto>();
 
-				foreach (var reservation in reservations)
-				{
-					// MongoDB'den gelen zamanları UTC olarak işaretle
-					var utcStartTime = DateTime.SpecifyKind(reservation.StartTime, DateTimeKind.Utc);
-					var utcEndTime = DateTime.SpecifyKind(reservation.EndTime, DateTimeKind.Utc);
+                foreach (var reservation in reservations)
+                {
+                    // MongoDB'den gelen zamanları UTC olarak işaretle
+                    var utcStartTime = DateTime.SpecifyKind(reservation.StartTime, DateTimeKind.Utc);
+                    var utcEndTime = DateTime.SpecifyKind(reservation.EndTime, DateTimeKind.Utc);
 
-					_logger.LogInformation("Processing reservation: {Id}, StartTime: {StartTime} UTC, EndTime: {EndTime} UTC",
-						reservation.Id, utcStartTime, utcEndTime);
+                    _logger.LogInformation("Processing reservation: {Id}, StartTime: {StartTime} UTC, EndTime: {EndTime} UTC",
+                        reservation.Id, utcStartTime, utcEndTime);
 
-					// Room bilgilerini al
-					string roomName = reservation.Room?.Name ?? "";
-					if (string.IsNullOrEmpty(roomName) && !string.IsNullOrEmpty(reservation.RoomId))
-					{
-						var room = await _context.Rooms.Find(r => r.Id == reservation.RoomId).FirstOrDefaultAsync();
-						roomName = room?.Name ?? "Bilinmeyen Oda";
-					}
+                    // Room bilgilerini al
+                    string roomName = reservation.Room?.Name ?? "";
+                    if (string.IsNullOrEmpty(roomName) && !string.IsNullOrEmpty(reservation.RoomId))
+                    {
+                        var room = await _context.Rooms.Find(r => r.Id == reservation.RoomId).FirstOrDefaultAsync();
+                        roomName = room?.Name ?? "Bilinmeyen Oda";
+                    }
 
-					var dto = new ReservationDto
-					{
-						Id = reservation.Id,
-						UserId = reservation.UserId,
-						RoomId = reservation.RoomId,
-						StartTime = utcStartTime,  // UTC olarak döndür
-						EndTime = utcEndTime,      // UTC olarak döndür
-						User = reservation.User,
-						Room = reservation.Room ?? new MeetingRoomDto { Name = roomName },
-						RoomName = roomName,
-						Location = reservation.Location,
-						SelectedDate = utcStartTime.ToLocalTime().Date // Local date için
-					};
+                    var dto = new ReservationDto
+                    {
+                        Id = reservation.Id,
+                        UserId = reservation.UserId,
+                        RoomId = reservation.RoomId,
+                        StartTime = utcStartTime,  // UTC olarak döndür
+                        EndTime = utcEndTime,      // UTC olarak döndür
+                        User = reservation.User,
+                        Room = reservation.Room ?? new MeetingRoomDto { Name = roomName },
+                        RoomName = roomName,
+                        Location = reservation.Location,
+                        SelectedDate = utcStartTime.ToLocalTime().Date // Local date için
+                    };
 
-					result.Add(dto);
-				}
+                    result.Add(dto);
+                }
 
-				return result;
-			}
-			catch (Exception ex)
-			{
-				_logger.LogError(ex, "Error getting user reservations");
-				return new List<ReservationDto>();
-			}
-		}
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting user reservations");
+                return new List<ReservationDto>();
+            }
+        }
 
-		public async Task<bool> DeleteReservationAsync(string reservationId)
-		{
-			try
-			{
-				var currentUser = await GetCurrentUserAsync();
-				if (currentUser == null)
-				{
-					return false;
-				}
+        public async Task<bool> DeleteReservationAsync(string reservationId)
+        {
+            try
+            {
+                var currentUser = await GetCurrentUserAsync();
+                if (currentUser == null)
+                {
+                    return false;
+                }
 
-				// Kullanıcının kendi rezervasyonunu sildiğinden emin ol
-				var reservation = await _context.Reservations
-					.Find(r => r.Id == reservationId && r.UserId == currentUser.Id)
-					.FirstOrDefaultAsync();
+                // Kullanıcının kendi rezervasyonunu sildiğinden emin ol
+                var reservation = await _context.Reservations
+                    .Find(r => r.Id == reservationId && r.UserId == currentUser.Id)
+                    .FirstOrDefaultAsync();
 
-				if (reservation == null)
-				{
-					_logger.LogWarning("Reservation not found or user not authorized: {ReservationId}", reservationId);
-					return false;
-				}
+                if (reservation == null)
+                {
+                    _logger.LogWarning("Reservation not found or user not authorized: {ReservationId}", reservationId);
+                    return false;
+                }
 
-				// Soft delete - status'u cancelled yap
-				var update = Builders<Reservation>.Update.Set(r => r.Status, ReservationStatus.Cancelled);
-				var result = await _context.Reservations.UpdateOneAsync(r => r.Id == reservationId, update);
+                // Soft delete - status'u cancelled yap
+                var update = Builders<Reservation>.Update.Set(r => r.Status, ReservationStatus.Cancelled);
+                var result = await _context.Reservations.UpdateOneAsync(r => r.Id == reservationId, update);
 
-				_logger.LogInformation("Reservation cancelled: {ReservationId} by User: {UserId}",
-					reservationId, currentUser.Id);
+                _logger.LogInformation("Reservation cancelled: {ReservationId} by User: {UserId}",
+                    reservationId, currentUser.Id);
 
-				return result.ModifiedCount > 0;
-			}
-			catch (Exception ex)
-			{
-				_logger.LogError(ex, "Error deleting reservation: {ReservationId}", reservationId);
-				return false;
-			}
-		}
+                return result.ModifiedCount > 0;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting reservation: {ReservationId}", reservationId);
+                return false;
+            }
+        }
 
-		public async Task<bool> AdminDeleteReservationAsync(string reservationId)
-		{
-			try
-			{
-				var update = Builders<Reservation>.Update.Set(r => r.Status, ReservationStatus.Cancelled);
-				var result = await _context.Reservations.UpdateOneAsync(r => r.Id == reservationId, update);
+        public async Task<bool> AdminDeleteReservationAsync(string reservationId)
+        {
+            try
+            {
+                var update = Builders<Reservation>.Update.Set(r => r.Status, ReservationStatus.Cancelled);
+                var result = await _context.Reservations.UpdateOneAsync(r => r.Id == reservationId, update);
 
-				_logger.LogInformation("Reservation cancelled by admin: {ReservationId}", reservationId);
-				return result.ModifiedCount > 0;
-			}
-			catch (Exception ex)
-			{
-				_logger.LogError(ex, "Error admin deleting reservation: {ReservationId}", reservationId);
-				return false;
-			}
-		}
-		public async Task<User?> GetCurrentUserAsync()
-		{
-			try
-			{
-				// Önce HttpContext'ten dene
-				var httpContext = _httpContextAccessor.HttpContext;
-				if (httpContext?.User?.Identity?.IsAuthenticated == true)
-				{
-					var userEmail = httpContext.User.FindFirst(ClaimTypes.Name)?.Value;
-					var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                _logger.LogInformation("Reservation cancelled by admin: {ReservationId}", reservationId);
+                return result.ModifiedCount > 0;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error admin deleting reservation: {ReservationId}", reservationId);
+                return false;
+            }
+        }
 
-					_logger.LogInformation("HttpContext - Email: {Email}, UserId: {UserId}", userEmail, userId);
+        public async Task<User?> GetCurrentUserAsync()
+        {
+            try
+            {
+                // Yardımcı fonksiyon: claim'leri sırayla dene
+                string? GetEmail(ClaimsPrincipal principal)
+                {
+                    return principal.FindFirst(ClaimTypes.Email)?.Value
+                        ?? principal.FindFirst(ClaimTypes.Name)?.Value
+                        ?? principal.FindFirst("email")?.Value;
+                }
+                string? GetUserId(ClaimsPrincipal principal)
+                {
+                    return principal.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                        ?? principal.FindFirst("sub")?.Value
+                        ?? principal.FindFirst("id")?.Value;
+                }
 
-					// Email ile kullanıcıyı bul
-					if (!string.IsNullOrEmpty(userEmail))
-					{
-						var foundUser = await _context.Users
-							.Find(u => u.Email == userEmail)
-							.FirstOrDefaultAsync();
+                // Önce HttpContext'ten dene
+                var httpContext = _httpContextAccessor.HttpContext;
+                if (httpContext?.User?.Identity?.IsAuthenticated == true)
+                {
+                    var userEmail = GetEmail(httpContext.User);
+                    var userId = GetUserId(httpContext.User);
 
-						if (foundUser != null)
-						{
-							_logger.LogInformation("User found by email: {UserId}", foundUser.Id);
-							return foundUser;
-						}
-					}
+                    _logger.LogInformation("HttpContext - Email: {Email}, UserId: {UserId}", userEmail, userId);
 
-					// UserId ile kullanıcıyı bul
-					if (!string.IsNullOrEmpty(userId))
-					{
-						var foundUser = await _context.Users
-							.Find(u => u.Id == userId)
-							.FirstOrDefaultAsync();
+                    // Email ile kullanıcıyı bul
+                    if (!string.IsNullOrEmpty(userEmail))
+                    {
+                        var foundUser = await _context.Users
+                            .Find(u => u.Email == userEmail)
+                            .FirstOrDefaultAsync();
 
-						if (foundUser != null)
-						{
-							_logger.LogInformation("User found by ID: {UserId}", foundUser.Id);
-							return foundUser;
-						}
-					}
-				}
+                        if (foundUser != null)
+                        {
+                            _logger.LogInformation("User found by email: {UserId}", foundUser.Id);
+                            return foundUser;
+                        }
+                    }
 
-				// AuthenticationStateProvider'dan dene
-				var authState = await _authStateProvider.GetAuthenticationStateAsync();
-				var user = authState.User;
+                    // UserId ile kullanıcıyı bul
+                    if (!string.IsNullOrEmpty(userId))
+                    {
+                        var foundUser = await _context.Users
+                            .Find(u => u.Id == userId)
+                            .FirstOrDefaultAsync();
 
-				_logger.LogInformation("AuthState - IsAuthenticated: {IsAuthenticated}", user.Identity?.IsAuthenticated);
+                        if (foundUser != null)
+                        {
+                            _logger.LogInformation("User found by ID: {UserId}", foundUser.Id);
+                            return foundUser;
+                        }
+                    }
+                }
 
-				if (user.Identity?.IsAuthenticated == true)
-				{
-					var userEmail = user.FindFirst(ClaimTypes.Name)?.Value;
-					var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                // AuthenticationStateProvider'dan dene
+                var authState = await _authStateProvider.GetAuthenticationStateAsync();
+                var user = authState.User;
 
-					_logger.LogInformation("AuthState - Email: {Email}, UserId: {UserId}", userEmail, userId);
+                _logger.LogInformation("AuthState - IsAuthenticated: {IsAuthenticated}", user.Identity?.IsAuthenticated);
 
-					// Email ile kullanıcıyı bul
-					if (!string.IsNullOrEmpty(userEmail))
-					{
-						var foundUser = await _context.Users
-							.Find(u => u.Email == userEmail)
-							.FirstOrDefaultAsync();
+                if (user.Identity?.IsAuthenticated == true)
+                {
+                    var userEmail = GetEmail(user);
+                    var userId = GetUserId(user);
 
-						if (foundUser != null)
-						{
-							_logger.LogInformation("User found by email from AuthState: {UserId}", foundUser.Id);
-							return foundUser;
-						}
-					}
+                    _logger.LogInformation("AuthState - Email: {Email}, UserId: {UserId}", userEmail, userId);
 
-					// UserId ile kullanıcıyı bul
-					if (!string.IsNullOrEmpty(userId))
-					{
-						var foundUser = await _context.Users
-							.Find(u => u.Id == userId)
-							.FirstOrDefaultAsync();
+                    // Email ile kullanıcıyı bul
+                    if (!string.IsNullOrEmpty(userEmail))
+                    {
+                        var foundUser = await _context.Users
+                            .Find(u => u.Email == userEmail)
+                            .FirstOrDefaultAsync();
 
-						if (foundUser != null)
-						{
-							_logger.LogInformation("User found by ID from AuthState: {UserId}", foundUser.Id);
-							return foundUser;
-						}
-					}
-				}
+                        if (foundUser != null)
+                        {
+                            _logger.LogInformation("User found by email from AuthState: {UserId}", foundUser.Id);
+                            return foundUser;
+                        }
+                    }
 
-				_logger.LogWarning("User not found in any method");
-				return null;
-			}
-			catch (Exception ex)
-			{
-				_logger.LogError(ex, "Error getting current user");
-				return null;
-			}
-		}
+                    // UserId ile kullanıcıyı bul
+                    if (!string.IsNullOrEmpty(userId))
+                    {
+                        var foundUser = await _context.Users
+                            .Find(u => u.Id == userId)
+                            .FirstOrDefaultAsync();
 
-		private List<SlotDto> MergeConsecutiveSlots(List<SlotDto> slots)
-		{
-			if (slots == null || !slots.Any())
-				return new List<SlotDto>();
+                        if (foundUser != null)
+                        {
+                            _logger.LogInformation("User found by ID from AuthState: {UserId}", foundUser.Id);
+                            return foundUser;
+                        }
+                    }
+                }
 
-			// Slotları başlangıç saatine göre sırala
-			var sortedSlots = slots.OrderBy(s => s.StartTime).ToList();
-			var mergedSlots = new List<SlotDto>();
+                _logger.LogWarning("User not found in any method");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting current user");
+                return null;
+            }
+        }
 
-			_logger.LogInformation("Starting merge process with {Count} slots", sortedSlots.Count);
+        private List<SlotDto> MergeConsecutiveSlots(List<SlotDto> slots)
+        {
+            if (slots == null || !slots.Any())
+                return new List<SlotDto>();
 
-			// İlk slotu başlangıç olarak al
-			var currentMergedSlot = new SlotDto
-			{
-				StartTime = sortedSlots[0].StartTime,
-				EndTime = sortedSlots[0].EndTime
-			};
+            // Slotları başlangıç saatine göre sırala
+            var sortedSlots = slots.OrderBy(s => s.StartTime).ToList();
+            var mergedSlots = new List<SlotDto>();
 
-			for (int i = 1; i < sortedSlots.Count; i++)
-			{
-				var nextSlot = sortedSlots[i];
+            _logger.LogInformation("Starting merge process with {Count} slots", sortedSlots.Count);
 
-				_logger.LogInformation("Comparing current slot end time {CurrentEnd} with next slot start time {NextStart}",
-					currentMergedSlot.EndTime, nextSlot.StartTime);
+            // İlk slotu başlangıç olarak al
+            var currentMergedSlot = new SlotDto
+            {
+                StartTime = sortedSlots[0].StartTime,
+                EndTime = sortedSlots[0].EndTime
+            };
 
-				// Eğer mevcut slotun bitiş saati, bir sonraki slotun başlangıç saatine eşitse birleştir
-				if (currentMergedSlot.EndTime == nextSlot.StartTime)
-				{
-					// Mevcut slotun bitiş saatini güncelle
-					currentMergedSlot.EndTime = nextSlot.EndTime;
+            for (int i = 1; i < sortedSlots.Count; i++)
+            {
+                var nextSlot = sortedSlots[i];
 
-					_logger.LogInformation("Merged slots: {StartTime} - {EndTime}",
-						currentMergedSlot.StartTime, currentMergedSlot.EndTime);
-				}
-				else
-				{
-					// Ard arda değilse, mevcut slotu listeye ekle ve yeni slotu başlat
-					mergedSlots.Add(currentMergedSlot);
+                _logger.LogInformation("Comparing current slot end time {CurrentEnd} with next slot start time {NextStart}",
+                    currentMergedSlot.EndTime, nextSlot.StartTime);
 
-					_logger.LogInformation("Added merged slot to list: {StartTime} - {EndTime}",
-						currentMergedSlot.StartTime, currentMergedSlot.EndTime);
+                // Eğer mevcut slotun bitiş saati, bir sonraki slotun başlangıç saatine eşitse birleştir
+                if (currentMergedSlot.EndTime == nextSlot.StartTime)
+                {
+                    // Mevcut slotun bitiş saatini güncelle
+                    currentMergedSlot.EndTime = nextSlot.EndTime;
 
-					currentMergedSlot = new SlotDto
-					{
-						StartTime = nextSlot.StartTime,
-						EndTime = nextSlot.EndTime
-					};
-				}
-			}
+                    _logger.LogInformation("Merged slots: {StartTime} - {EndTime}",
+                        currentMergedSlot.StartTime, currentMergedSlot.EndTime);
+                }
+                else
+                {
+                    // Ard arda değilse, mevcut slotu listeye ekle ve yeni slotu başlat
+                    mergedSlots.Add(currentMergedSlot);
 
-			// Son slotu da ekle
-			mergedSlots.Add(currentMergedSlot);
+                    _logger.LogInformation("Added merged slot to list: {StartTime} - {EndTime}",
+                        currentMergedSlot.StartTime, currentMergedSlot.EndTime);
 
-			_logger.LogInformation("Final merged slot added: {StartTime} - {EndTime}",
-				currentMergedSlot.StartTime, currentMergedSlot.EndTime);
+                    currentMergedSlot = new SlotDto
+                    {
+                        StartTime = nextSlot.StartTime,
+                        EndTime = nextSlot.EndTime
+                    };
+                }
+            }
 
-			_logger.LogInformation("Merge completed. Original slots: {OriginalCount}, Merged slots: {MergedCount}",
-				slots.Count, mergedSlots.Count);
+            // Son slotu da ekle
+            mergedSlots.Add(currentMergedSlot);
 
-			return mergedSlots;
-		}
+            _logger.LogInformation("Final merged slot added: {StartTime} - {EndTime}",
+                currentMergedSlot.StartTime, currentMergedSlot.EndTime);
+
+            _logger.LogInformation("Merge completed. Original slots: {OriginalCount}, Merged slots: {MergedCount}",
+                slots.Count, mergedSlots.Count);
+
+            return mergedSlots;
+        }
 
 
     }

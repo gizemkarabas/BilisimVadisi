@@ -8,6 +8,7 @@
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthProvider
 @inject ReservationDto Reservation
+@inject IUserService UserService
 
 @if (isLoading)
 {
@@ -26,17 +27,15 @@ else if (SelectedRoom is null)
 else
 {
 	<div style="width:100%; display: flex; justify-content: center;">
-	<div class="calender">
-		<DatePicker DefaultValue=@TodayDate Style="width:100%; height:41px; border-radius:10px" @bind-Value="SelectedDate"
-					DisabledDate="DisablePastDates" />
-	</div>
+		<div class="calender">
+			<DatePicker DefaultValue=@TodayDate Style="width:100%; height:41px; border-radius:10px" @bind-Value="SelectedDate"
+						DisabledDate="DisablePastDates" />
+		</div>
 	</div>
 	<div class="reservation-panel">
-
 		<Form Model="this" OnFinish="GoToSummary">
-    		<b>Lütfen Tarihi Seçin</b>
-	
-            <div class="availability-panel">
+			<b>Lütfen Tarihi Seçin</b>
+			<div class="availability-panel">
 				<div style="display: flex; gap: 20px;">
 					<div style="display: flex; align-items: center;">
 						<div style="width: 12px; height: 12px; background-color: #1890ff; border-radius: 50%; margin-right: 8px;"></div>
@@ -48,18 +47,16 @@ else
 					</div>
 				</div>
 			</div>
-
 			<h5>Çoklu Saat Seçebilirsiniz</h5>
-
 			@if (Slots != null && Slots.Any())
 			{
 				<div class="slot-grid">
 					@foreach (var slot in AvailableSlots)
 					{
 						<Button Type="@GetButtonType(slot)"
-							class="@(SelectedSlots.Contains(slot) ? "selected-slot" : "unselected-slot")"
-							OnClick="() => ToggleSlot(slot)"
-							Style="padding: 0;">
+								class="@(SelectedSlots.Contains(slot) ? "selected-slot" : "unselected-slot")"
+								OnClick="() => ToggleSlot(slot)"
+								Style="padding: 0;">
 							<div class="button-detail">
 								<div>
 									@slot.StartTime.ToString("HH:mm") - @slot.EndTime.ToString("HH:mm")
@@ -78,7 +75,6 @@ else
 			{
 				<Alert Message="Bu tarih için müsait slot bulunamadı." Type="AlertType.Info" ShowIcon="true" />
 			}
-
 			<div style="margin-top:10px;">
 				<p><b>Toplam @(SelectedSlots?.Count ?? 0) Saatlik Seçim Yapıldı</b></p>
 			</div>
@@ -94,21 +90,22 @@ else
 	</div>
 }
 
+
 @code {
 	private List<SlotDto> Slots = new();
 	private List<SlotDto> SelectedSlots = new();
 	private MeetingRoomDto? SelectedRoom;
 	private bool isLoading = true;
+	private List<UserDto> AllUsers = new();
+	private string SelectedUserId = string.Empty;
+	private bool IsAdmin = false;
 
 	private List<SlotDto> AvailableSlots => Slots?.Where(s => !s.IsReserved && !s.IsDisabled).ToList() ?? new List<SlotDto>();
-
-
 
 	private DateTime _selectedDate = DateTime.Today;
 	private DateTime TodayDate = DateTime.Today;
 
 	private bool DisablePastDates(DateTime date) => date < DateTime.Today;
-
 
 	private DateTime SelectedDate
 	{
@@ -123,22 +120,38 @@ else
 		}
 	}
 
-	protected override async Task OnInitializedAsync()
+protected override async Task OnInitializedAsync()
+{
+	try
 	{
-		try
+		var authState = await AuthProvider.GetAuthenticationStateAsync();
+		var user = authState.User;
+		IsAdmin = user.IsInRole("Admin") || user.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value.ToLower().Contains("admin"));
+		string userIdFromQuery = null;
+		if (IsAdmin)
 		{
-			await LoadInitialData();
+			AllUsers = await UserService.GetAllUsersAsync();
+			// Query string'den userId al
+			var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+			var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+			userIdFromQuery = query.Get("userId");
+			if (!string.IsNullOrEmpty(userIdFromQuery))
+			{
+				SelectedUserId = userIdFromQuery;
+			}
 		}
-		catch (Exception ex)
-		{
-			Console.WriteLine($"Error in OnInitializedAsync: {ex.Message}");
-		}
-		finally
-		{
-			isLoading = false;
-			StateHasChanged();
-		}
+		await LoadInitialData();
 	}
+	catch (Exception ex)
+	{
+		Console.WriteLine($"Error in OnInitializedAsync: {ex.Message}");
+	}
+	finally
+	{
+		isLoading = false;
+		StateHasChanged();
+	}
+}
 
 	private async Task LoadInitialData()
 	{
@@ -222,7 +235,6 @@ else
 
 	}
 
-
 	private ButtonType GetButtonType(SlotDto slot)
 	{
 		if (slot == null) return ButtonType.Default;
@@ -236,53 +248,70 @@ else
 		return ButtonType.Default;
 	}
 
-	@code {
-		private void GoToSummary()
+	private void GoToSummary()
+	{
+		try
 		{
-			try
+			Console.WriteLine($"GoToSummary called - SelectedSlots count: {SelectedSlots?.Count ?? 0}");
+			Console.WriteLine($"Selected Date: {SelectedDate}");
+
+			if (SelectedSlots == null || !SelectedSlots.Any())
 			{
-				Console.WriteLine($"GoToSummary called - SelectedSlots count: {SelectedSlots?.Count ?? 0}");
-				Console.WriteLine($"Selected Date: {SelectedDate}");
-
-				if (SelectedSlots == null || !SelectedSlots.Any())
-				{
-					Console.WriteLine("No slots selected!");
-					return;
-				}
-
-				// Debug: Seçilen slotları logla
-				foreach (var slot in SelectedSlots)
-				{
-					Console.WriteLine($"Selected slot: {slot.StartTime:yyyy-MM-dd HH:mm} - {slot.EndTime:yyyy-MM-dd HH:mm}");
-				}
-
-				if (Reservation == null)
-				{
-					Console.WriteLine("Reservation object is null");
-					return;
-				}
-
-				Reservation.SelectedSlots = new List<SlotDto>(SelectedSlots);
-				Reservation.Location = SelectedRoom?.Location ?? "";
-				Reservation.Room = new MeetingRoomDto
-				{
-					Name = SelectedRoom?.Name ?? "",
-					Id = SelectedRoom?.Id ?? ""
-				};
-				Reservation.SelectedDate = SelectedDate; // Bu önemli!
-				Reservation.RoomId = SelectedRoom?.Id ?? "";
-
-				Console.WriteLine($"Reservation object - SelectedDate: {Reservation.SelectedDate}");
-				Console.WriteLine($"Reservation object - SelectedSlots count: {Reservation.SelectedSlots?.Count ?? 0}");
-
-				Navigation.NavigateTo("/user/reservation-summary");
+				Console.WriteLine("No slots selected!");
+				return;
 			}
-			catch (Exception ex)
+
+			// Debug: Seçilen slotları logla
+			foreach (var slot in SelectedSlots)
 			{
-				Console.WriteLine($"Error in GoToSummary: {ex.Message}");
+				Console.WriteLine($"Selected slot: {slot.StartTime:yyyy-MM-dd HH:mm} - {slot.EndTime:yyyy-MM-dd HH:mm}");
 			}
+
+			if (Reservation == null)
+			{
+				Console.WriteLine("Reservation object is null");
+				return;
+			}
+
+			Reservation.SelectedSlots = new List<SlotDto>(SelectedSlots);
+			Reservation.Location = SelectedRoom?.Location ?? "";
+			Reservation.Room = new MeetingRoomDto
+			{
+				Name = SelectedRoom?.Name ?? "",
+				Id = SelectedRoom?.Id ?? ""
+			};
+			Reservation.SelectedDate = SelectedDate; // Bu önemli!
+			Reservation.RoomId = SelectedRoom?.Id ?? "";
+
+			// Admin ise seçilen kullanıcıyı ata
+			if (IsAdmin && !string.IsNullOrEmpty(SelectedUserId))
+			{
+				var selectedUser = AllUsers.FirstOrDefault(u => u.Id == SelectedUserId);
+				if (selectedUser != null)
+				{
+					Reservation.UserId = selectedUser.Id;
+					Reservation.UserEmail = selectedUser.Email;
+					Reservation.User = new UserDto
+					{
+						Id = selectedUser.Id,
+						Email = selectedUser.Email,
+						Company = selectedUser.Company,
+						CompanyOfficial = selectedUser.CompanyOfficial,
+						ContactPhone = selectedUser.ContactPhone,
+						FirstName = selectedUser.FirstName,
+						LastName = selectedUser.LastName
+					};
+				}
+			}
+
+			Console.WriteLine($"Reservation object - SelectedDate: {Reservation.SelectedDate}");
+			Console.WriteLine($"Reservation object - SelectedSlots count: {Reservation.SelectedSlots?.Count ?? 0}");
+
+			Navigation.NavigateTo("/user/reservation-summary");
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error in GoToSummary: {ex.Message}");
 		}
 	}
-
-	
 }

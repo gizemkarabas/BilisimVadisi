@@ -2,18 +2,18 @@
 
 namespace MeetinRoomRezervation.Services.ReservationService
 {
-	public interface IUserService
-	{
-		Task<List<UserDto>> GetAllUsersAsync();
-		Task<bool> UpdateUserStatusAsync(string userId, bool isActive);
-		Task<bool> DeleteUserAsync(string userId);
-		Task AddUserAsync(UserDto userDto);
-		Task UpdateMonthlyUsageAsync();
-		Task<bool> UpdateUserAsync(UserDto userDto);
-		Task<bool> IsUserActiveAsync(string userId);
-		Task<bool> CanUserMakeReservationAsync(string userId, int requestedHours);
-		Task<int> GetRemainingHoursAsync(string userId);
-		Task<List<UserDto>> GetUsersInfoAsync();
-
+    public interface IUserService
+    {
+        Task<List<UserDto>> GetAllUsersAsync();
+        Task<bool> UpdateUserStatusAsync(string userId, bool isActive);
+        Task<bool> DeleteUserAsync(string userId);
+        Task AddUserAsync(UserDto userDto);
+        Task UpdateMonthlyUsageAsync();
+        Task<bool> UpdateUserAsync(UserDto userDto);
+        Task<bool> IsUserActiveAsync(string userId);
+        Task<bool> CanUserMakeReservationAsync(string userId, int requestedHours);
+        Task<int> GetRemainingHoursAsync(string userId);
+        Task<List<UserDto>> GetUsersInfoAsync();
+        Task<UserDto> GetUserByIdAsync(string userId);
     }
 }

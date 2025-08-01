@@ -36,6 +36,11 @@
 
                 <Summary Info="new(){RoomName = ReservationState.RoomName, SelectedDate = ReservationState.SelectedDate}" />
 
+                <div style="margin-top: 16px; text-align:center;">
+                    <b>Kullanıcı:</b>
+                    @(ReservationState.User != null ? $"{ReservationState.User.FirstName} {ReservationState.User.LastName} ({ReservationState.User.Email})" : ReservationState.UserEmail)
+                </div>
+
                 <h4 style="text-align:center; font-weight:700">
                     Toplam @ReservationState.SelectedSlots.Count Saat
                 </h4>
