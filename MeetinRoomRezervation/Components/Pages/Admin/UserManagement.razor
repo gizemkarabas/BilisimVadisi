@@ -232,9 +232,10 @@
 						<table class="table">
 							<thead>
 								<tr>
-									<th>Ad Soyad</th>
+									<th>Şirket İsmi</th>
+									<th>Yetkili</th>
+									<th>Aylık Kalan Haklar</th>
 									<th>Email</th>
-									<th>Şirket</th>
 									<th>Telefon</th>
 									<th>Durum</th>
 									<th>İşlemler</th>
@@ -244,9 +245,10 @@
 								@foreach (var user in PagedUsers)
 								{
 									<tr>
-										<td>@user.FirstName @user.LastName</td>
-										<td>@user.Email</td>
 										<td>@user.Company</td>
+										<td>@user.CompanyOfficial</td>
+										<td>@user.UsedThisMonth/@user.MonthlyUsageLimit saat</td>
+										<td>@user.Email</td>
 										<td>@(!string.IsNullOrEmpty(user.ContactPhone) ? $"+90{user.ContactPhone}" : "-")</td>
 										<td>
 											@if (user.IsActive)
