@@ -1,0 +1,22 @@
+﻿<div class="container">
+    <GridRow class="grid-row-reverse">
+        <GridCol xs="24" sm="24" md="12" lg="12" xl="12" class="left-col-content">
+            <div class="left-content">
+                @LeftContent
+            </div>
+        </GridCol>
+        <GridCol xs="24" sm="24" md="12" lg="12" xl="12" class="right-col-content">
+            <div class="right-content">
+                @RightContent
+            </div>
+        </GridCol>
+    </GridRow>
+</div>
+
+@code {
+    [Parameter]
+    public RenderFragment LeftContent { get; set; }
+
+    [Parameter]
+    public RenderFragment RightContent { get; set; }
+}

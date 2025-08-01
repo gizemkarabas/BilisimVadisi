@@ -1,11 +1,11 @@
 ﻿using MeetinRoomRezervation.Data;
+using MeetinRoomRezervation.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using static MeetinRoomRezervation.Components.Pages.Login;
 using static MeetinRoomRezervation.Components.Pages.Register;
 
 namespace MeetinRoomRezervation.Services

@@ -1,0 +1,13 @@
+﻿@media (max-width: 768px) {
+    .image-content ::deep .image {
+        display: none;
+    }
+
+    .image-content ::deep .square-image {
+        display: block !important;
+    }
+}
+
+.image-content ::deep .square-image {
+    display: none;
+}

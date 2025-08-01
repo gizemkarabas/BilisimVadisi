@@ -1,5 +1,5 @@
 ﻿using MeetinRoomRezervation.Data;
-using static MeetinRoomRezervation.Components.Pages.Login;
+using MeetinRoomRezervation.Models;
 using static MeetinRoomRezervation.Components.Pages.Register;
 
 namespace MeetinRoomRezervation.Services

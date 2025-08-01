@@ -64,10 +64,9 @@
 }
 .ref {
   background-color: #f0f2f5;
-  height: 10vh;
+  height: 60px;
   display: flex;
   align-items: center;
-  margin-top: 10vh;
   justify-content: center;
 }
 .top-row {
