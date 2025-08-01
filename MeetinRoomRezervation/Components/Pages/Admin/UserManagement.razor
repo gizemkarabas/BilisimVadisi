@@ -7,13 +7,13 @@
 @inject NavigationManager Navigation
 
 <AuthorizeView Roles="Admin" Context="authContext">
-	<Authorized Context="authContext">
-		<div class="container">
-			<div class="admin-panel">
-				<div class="admin-panel-buttons">
-					<Button Type="@ButtonType.Link"
-					OnClick="@(() => Navigation.NavigateTo("admin/dashboard"))"
-					Style="display: flex;
+    <Authorized Context="authContext">
+        <div class="container">
+            <div class="admin-panel">
+                <div class="admin-panel-buttons">
+                    <Button Type="@ButtonType.Link"
+                            OnClick="@(() => Navigation.NavigateTo("admin/dashboard"))"
+                            Style="display: flex;
 							justify-content:flex-start;
 							width:160px;
 							align-items:center;
@@ -21,19 +21,19 @@
 							border-radius: 8px;
 							margin-bottom: 10px;
 							margin-left: 5px;"
-					Block>
-						<div class="button">
-							<svg width="15" height="15" viewBox="0 0 18 18" fill="#4d4d4d">
-								<path d="M10 6V0H18V6H10ZM0 10V0H8V10H0ZM10 18V8H18V18H10ZM0 18V12H8V18H0Z" />
-							</svg>
-							<div class="admin-button-title">
-								Gösterge Paneli
-							</div>
-						</div>
-					</Button>
-					<Button Type="@ButtonType.Link"
-					OnClick="@(() => Navigation.NavigateTo("/admin/users"))"
-					Style="display: flex;
+                            Block>
+                        <div class="button">
+                            <svg width="15" height="15" viewBox="0 0 18 18" fill="#4d4d4d">
+                                <path d="M10 6V0H18V6H10ZM0 10V0H8V10H0ZM10 18V8H18V18H10ZM0 18V12H8V18H0Z" />
+                            </svg>
+                            <div class="admin-button-title">
+                                Gösterge Paneli
+                            </div>
+                        </div>
+                    </Button>
+                    <Button Type="@ButtonType.Link"
+                            OnClick="@(() => Navigation.NavigateTo("/admin/users"))"
+                            Style="display: flex;
 							justify-content:flex-start;
 							width:160px;
 							align-items:center;
@@ -42,21 +42,21 @@
 							border-radius: 8px;
 							margin-bottom: 10px;
 							margin-left: 5px;"
-					Block>
+                            Block>
 
-						<div class="button" style="margin-left:6px;">
-							<svg width="20" height="20" viewBox="0 0 20 23" fill="white">
-								<path fill-rule="evenodd" clip-rule="evenodd" d="M9.15831 7.6665C9.15831 9.25734 8.04998 10.5415 6.66665 10.5415C5.28331 10.5415 4.16665 9.25734 4.16665 7.6665C4.16665 6.07567 5.28331 4.7915 6.66665 4.7915C8.04998 4.7915 9.15831 6.07567 9.15831 7.6665ZM15.825 7.6665C15.825 9.25734 14.7166 10.5415 13.3333 10.5415C11.95 10.5415 10.8333 9.25734 10.8333 7.6665C10.8333 6.07567 11.95 4.7915 13.3333 4.7915C14.7166 4.7915 15.825 6.07567 15.825 7.6665ZM6.66665 12.4582C4.72498 12.4582 0.833313 13.5794 0.833313 15.8123V17.2498C0.833313 17.7769 1.20831 18.2082 1.66665 18.2082H11.6666C12.125 18.2082 12.5 17.7769 12.5 17.2498V15.8123C12.5 13.5794 8.60831 12.4582 6.66665 12.4582ZM12.525 12.5061C12.8166 12.4773 13.0916 12.4582 13.3333 12.4582C15.275 12.4582 19.1666 13.5794 19.1666 15.8123V17.2498C19.1666 17.7769 18.7916 18.2082 18.3333 18.2082H14.0166C14.1083 17.9111 14.1666 17.5853 14.1666 17.2498V15.8123C14.1666 14.4036 13.5083 13.3398 12.5583 12.5444C12.5558 12.5415 12.5533 12.5377 12.5505 12.5336C12.5442 12.5241 12.5366 12.5128 12.525 12.5061Z" />
-							</svg>
-							<div class="active-admin-button-title">
-								Kullanıcı Yönetimi
-							</div>
-						</div>
+                        <div class="button" style="margin-left:6px;">
+                            <svg width="20" height="20" viewBox="0 0 20 23" fill="white">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M9.15831 7.6665C9.15831 9.25734 8.04998 10.5415 6.66665 10.5415C5.28331 10.5415 4.16665 9.25734 4.16665 7.6665C4.16665 6.07567 5.28331 4.7915 6.66665 4.7915C8.04998 4.7915 9.15831 6.07567 9.15831 7.6665ZM15.825 7.6665C15.825 9.25734 14.7166 10.5415 13.3333 10.5415C11.95 10.5415 10.8333 9.25734 10.8333 7.6665C10.8333 6.07567 11.95 4.7915 13.3333 4.7915C14.7166 4.7915 15.825 6.07567 15.825 7.6665ZM6.66665 12.4582C4.72498 12.4582 0.833313 13.5794 0.833313 15.8123V17.2498C0.833313 17.7769 1.20831 18.2082 1.66665 18.2082H11.6666C12.125 18.2082 12.5 17.7769 12.5 17.2498V15.8123C12.5 13.5794 8.60831 12.4582 6.66665 12.4582ZM12.525 12.5061C12.8166 12.4773 13.0916 12.4582 13.3333 12.4582C15.275 12.4582 19.1666 13.5794 19.1666 15.8123V17.2498C19.1666 17.7769 18.7916 18.2082 18.3333 18.2082H14.0166C14.1083 17.9111 14.1666 17.5853 14.1666 17.2498V15.8123C14.1666 14.4036 13.5083 13.3398 12.5583 12.5444C12.5558 12.5415 12.5533 12.5377 12.5505 12.5336C12.5442 12.5241 12.5366 12.5128 12.525 12.5061Z" />
+                            </svg>
+                            <div class="active-admin-button-title">
+                                Kullanıcı Yönetimi
+                            </div>
+                        </div>
 
-					</Button>
-					<Button Type="@ButtonType.Link"
-					OnClick="@(() => Navigation.NavigateTo("/admin/halls"))"
-					Style="display: flex;
+                    </Button>
+                    <Button Type="@ButtonType.Link"
+                            OnClick="@(() => Navigation.NavigateTo("/admin/halls"))"
+                            Style="display: flex;
 							justify-content:flex-start;
 							width:160px;
 							align-items:center;
@@ -64,565 +64,554 @@
 							border-radius: 8px;
 							margin-bottom: 10px;
 							margin-left: 5px;"
-					Block>
-						<div class="button" style="margin-left:6px;">
-							<svg width="20" height="16" viewBox="0 0 20 24" fill="#4d4d4d">
-								<path d="M0.8715 10.4H2.614V21.6H5.2285V12H7.843V21.6H10.457V12H13.072V21.6H15.6865V10.4H17.4285C17.91 10.4 18.3005 10.042 18.3005 9.6C18.3005 9.333 18.1565 9.098 17.937 8.953L17.9385 8.9515L17.9255 8.944L17.903 8.9305L9.5855 4.626V3.365C11.1215 4.071 12.386 2.855 14.378 3.586V0.8005C12.385 0.0695 11.121 1.2845 9.5855 0.579V0.4C9.5855 0.1785 9.391 0 9.15 0C8.909 0 8.715 0.1785 8.715 0.4V4.626L0.3975 8.9295L0.375 8.943L0.3625 8.9515V8.953C0.144 9.098 0.000499964 9.3335 0.000499964 9.6C-3.62634e-08 10.042 0.3905 10.4 0.8715 10.4ZM1.7425 22.4005L0 24H18.301L16.5575 22.4005H1.7425Z" />
-							</svg>
-							<div class="admin-button-title">
-								Salon Yönetimi
-							</div>
-						</div>
-					</Button>
-				</div>
-			</div>
+                            Block>
+                        <div class="button" style="margin-left:6px;">
+                            <svg width="20" height="16" viewBox="0 0 20 24" fill="#4d4d4d">
+                                <path d="M0.8715 10.4H2.614V21.6H5.2285V12H7.843V21.6H10.457V12H13.072V21.6H15.6865V10.4H17.4285C17.91 10.4 18.3005 10.042 18.3005 9.6C18.3005 9.333 18.1565 9.098 17.937 8.953L17.9385 8.9515L17.9255 8.944L17.903 8.9305L9.5855 4.626V3.365C11.1215 4.071 12.386 2.855 14.378 3.586V0.8005C12.385 0.0695 11.121 1.2845 9.5855 0.579V0.4C9.5855 0.1785 9.391 0 9.15 0C8.909 0 8.715 0.1785 8.715 0.4V4.626L0.3975 8.9295L0.375 8.943L0.3625 8.9515V8.953C0.144 9.098 0.000499964 9.3335 0.000499964 9.6C-3.62634e-08 10.042 0.3905 10.4 0.8715 10.4ZM1.7425 22.4005L0 24H18.301L16.5575 22.4005H1.7425Z" />
+                            </svg>
+                            <div class="admin-button-title">
+                                Salon Yönetimi
+                            </div>
+                        </div>
+                    </Button>
+                </div>
+            </div>
 
-			<Modal @bind-Visible="@IsCreateModalVisible"
-			Footer="null">
+            <Modal @bind-Visible="@IsCreateModalVisible"
+                   Footer="null">
 
-				<div class="create-user-panel">
-					<Form Style="gap:8px; width:100%; display:flex; flex-direction:column;align-items: flex-start; font-size:16px;"
-					Model="@NewUser">
+                <div class="create-user-panel">
+                    <Form Style="gap:8px; width:100%; display:flex; flex-direction:column;align-items: flex-start; font-size:16px;"
+                          Model="@NewUser">
 
-						<FormItem Label="" Required >
-							<label style="margin-bottom: 8px; font-weight: 600;">Şirket İsmi</label>
+                        <FormItem Label="" Required>
+                            <label style="margin-bottom: 8px; font-weight: 600;">Şirket İsmi</label>
+                            <Input @bind-Value="@NewUser.Company"
+                                   Placeholder="Şirket ismini giriniz"
+                                   MaxLength="100"
+                                   Style="background-color:#D9D9D9;width:100%; border-radius:6px; height:48px" />
+                            @if (string.IsNullOrWhiteSpace(NewUser.Company))
+                            {
+                                <div style="color: red; font-size: 12px; margin-top: 4px;">Şirket ismi zorunludur.</div>
+                            }
+                        </FormItem>
 
-							<Input @bind-Value="@NewUser.Company"
-							Placeholder="Şirket ismini giriniz"
-							MaxLength="100"
-							Style="background-color:#D9D9D9;width:100%; border-radius:6px; height:48px" />
-							@if (!string.IsNullOrEmpty(companyValidationMessage))
-							{
-								<div style="color: red; font-size: 12px; margin-top: 4px;">@companyValidationMessage</div>
-							}
-						</FormItem>
+                        <FormItem Label="" Required>
+                            <label style="margin-bottom: 8px; font-weight: 600;">Yetkili</label>
+                            <Input @bind-Value="@NewUser.CompanyOfficial"
+                                   Placeholder="Yetkili kişi adını giriniz"
+                                   Style="background-color:#D9D9D9; border-radius:6px;width:100%;height:48px" />
+                            @if (string.IsNullOrWhiteSpace(NewUser.CompanyOfficial))
+                            {
+                                <div style="color: red; font-size: 12px; margin-top: 4px;">Yetkili kişi zorunludur.</div>
+                            }
+                        </FormItem>
 
-						<FormItem Label="">
-							<label style="margin-bottom: 8px; font-weight: 600;">Yetkili</label>
-							<Input @bind-Value="@NewUser.CompanyOfficial"
-							Placeholder="Yetkili kişi adını giriniz"
-							Style="background-color:#D9D9D9; border-radius:6px;width:100%;height:48px" />
-						</FormItem>
+                        <FormItem Label="" Required>
+                            <label style="margin-bottom: 8px; font-weight: 600;">Telefon</label>
+                            <Input @bind-Value="@NewUser.ContactPhone"
+                                   Placeholder="5XXXXXXXXX"
+                                   Type="InputType.Tel"
+                                   MaxLength="10"
+                                   Style="background-color:#D9D9D9;width:100%; border-radius:6px; height:48px"
+                                   OnInput="@((e) => ValidatePhoneInput(e.Value?.ToString(), true))" />
+                            <div style="font-size: 12px; color: #666; margin-top: 4px;">
+                                Format: 5XXXXXXXXX (10 haneli, 5 ile başlamalı)
+                            </div>
+                        </FormItem>
 
-						<FormItem Label="" Required>
-							<label style="margin-bottom: 8px; font-weight: 600;">Telefon</label>
-							<Input @bind-Value="@NewUser.ContactPhone"
-							Placeholder="5XXXXXXXXX"
-							Type="InputType.Tel"
-							MaxLength="10"
-							Style="background-color:#D9D9D9;width:100%; border-radius:6px; height:48px"
-							OnInput="@((e) => ValidatePhoneInput(e.Value?.ToString(), true))" />
-							@if (!string.IsNullOrEmpty(phoneValidationMessage))
-							{
-								<div style="color: red; font-size: 12px; margin-top: 4px;">@phoneValidationMessage</div>
-							}
-							<div style="font-size: 12px; color: #666; margin-top: 4px;">
-								Format: 5XXXXXXXXX (10 haneli, 5 ile başlamalı)
-							</div>
-						</FormItem>
+                        <FormItem Label="" Required>
+                            <label style="margin-bottom: 8px; font-weight: 600;">E-posta</label>
+                            <Input @bind-Value="@NewUser.Email"
+                                   Placeholder="E-posta adresi giriniz"
+                                   Type="InputType.Email"
+                                   MaxLength="100"
+                                   Style="background-color:#D9D9D9;width:100%; border-radius:6px; height:48px"
+                                   OnInput="@((e) => ValidateEmailInput(e.Value?.ToString()))" />
+                        </FormItem>
 
-						<FormItem Label="" Required>
-							<label style="margin-bottom: 8px; font-weight: 600;">E-posta</label>
-							<Input @bind-Value="@NewUser.Email"
-							Placeholder="E-posta adresi giriniz"
-							Type="InputType.Email"
-							MaxLength="100"
-							Style="background-color:#D9D9D9;width:100%; border-radius:6px; height:48px"
-							OnInput="@((e) => ValidateEmailInput(e.Value?.ToString()))" />
-							@if (!string.IsNullOrEmpty(emailValidationMessage))
-							{
-								<div style="color: red; font-size: 12px; margin-top: 4px;">@emailValidationMessage</div>
-							}
-						</FormItem>
+                        <FormItem Label="" Required>
+                            <label style="margin-bottom: 8px; font-weight: 600;">Aylık Kullanım Hakkı (Saat)</label>
+                            <AntDesign.InputNumber Style="background-color:#D9D9D9; border-radius:6px; height:48px; width:100%; display:flex; align-items:center; font-size: 16px"
+                                                   @bind-Value="NewUser.MonthlyUsageLimit"
+                                                   Min="0"
+                                                   Max="1000" />
+                        </FormItem>
 
-						<FormItem Label="" Required>
-							<label style="margin-bottom: 8px; font-weight: 600;">Aylık Kullanım Hakkı (Saat)</label>
-							<AntDesign.InputNumber Style="background-color:#D9D9D9; border-radius:6px; height:48px; width:100%; display:flex; align-items:center; font-size: 16px"
-							@bind-Value="NewUser.MonthlyUsageLimit"
-							Min="0"
-							Max="1000" />
-						</FormItem>
+                        <FormItem Label="Bu Ay Kullanıldı">
+                            <Typography Style="font-size: 20px;font-weight:bold" Type="TextElementType.Secondary">
+                                @NewUser.UsedThisMonth saat
+                            </Typography>
+                        </FormItem>
+                    </Form>
+                </div>
+                <div style="display:flex; justify-content: center;margin-top:15px">
+                    <Button Style="background-color:#0095FF;border-radius:6px;width:30%;height:48px"
+                            Type="ButtonType.Primary"
+                            OnClick="CreateUser"
+                            Disabled="@(!IsCreateFormValid())">
+                        Kaydet
+                    </Button>
+                </div>
+            </Modal>
 
-						<FormItem Label="Bu Ay Kullanıldı">
-							<Typography Style="font-size: 20px;font-weight:bold" Type="TextElementType.Secondary">
-								@NewUser.UsedThisMonth saat
-							</Typography>
-						</FormItem>
-					</Form>
-				</div>
-				<div style="display:flex; justify-content: center;margin-top:15px">
-					<Button Style="background-color:#0095FF;border-radius:6px;width:30%;height:48px"
-					Type="ButtonType.Primary"
-					OnClick="CreateUser"
-					Disabled="@(!IsCreateFormValid())">
-						Kaydet
-					</Button>
-				</div>
-			</Modal>
+            <Modal @bind-Visible="@IsEditModalVisible"
+                   Footer="null">
+                <div class="edit-user-panel">
+                    <Form Style="gap:8px;  display:flex; flex-direction:column; font-size:16px; " Model="@EditingUser">
+                        <b>Şirket İsmi</b>
+                        <Input Style="background-color:#D9D9D9; border-radius:6px; height:48px" @bind-Value="EditingUser.Company" />
+                        <b>Yetkili</b>
+                        <Input Style="background-color:#D9D9D9; border-radius:6px; height:48px" @bind-Value="EditingUser.CompanyOfficial" />
+                        <b>Telefon</b>
+                        <Input Style="background-color:#D9D9D9; border-radius:6px; height:48px" @bind-Value="EditingUser.ContactPhone" />
+                        <b>E-posta</b>
+                        <Input Style="background-color:#D9D9D9; border-radius:6px; height:48px" @bind-Value="EditingUser.Email" />
+                        <b>Aylık Kullanım Hakkı (Saat)</b>
+                        <AntDesign.InputNumber Style="background-color:#D9D9D9; border-radius:6px; height:48px; width:40%; display:flex; align-items:center; font-size: 16px " @bind-Value="EditingUser.MonthlyUsageLimit" />
+                        <b>Bu Ay Kullanıldı</b>
+                        <Typography Style="font-size: 20px;font-weight:bold" Type="TextElementType.Secondary">
+                            @EditingUser.UsedThisMonth Saat
+                        </Typography>
+                    </Form>
+                </div>
+                <div style="display:flex; justify-content: center;margin-top:15px">
+                    <Button Style="background-color:#0095FF;border-radius:6px;width:30%;height:48px" Type="ButtonType.Primary" OnClick="UpdateUser">Güncelle</Button>
+                </div>
+            </Modal>
 
-			<Modal @bind-Visible="@IsEditModalVisible"
-			Footer="null">
-				<div class="edit-user-panel">
-					<Form Style="gap:8px;  display:flex; flex-direction:column; font-size:16px; " Model="@EditingUser">
-						<b>Şirket İsmi</b>
-						<Input Style="background-color:#D9D9D9; border-radius:6px; height:48px" @bind-Value="EditingUser.Company" />
-						<b>Yetkili</b>
-						<Input Style="background-color:#D9D9D9; border-radius:6px; height:48px" @bind-Value="EditingUser.CompanyOfficial" />
-						<b>Telefon</b>
-						<Input Style="background-color:#D9D9D9; border-radius:6px; height:48px" @bind-Value="EditingUser.ContactPhone" />
-						<b>E-posta</b>
-						<Input Style="background-color:#D9D9D9; border-radius:6px; height:48px" @bind-Value="EditingUser.Email" />
-						<b>Aylık Kullanım Hakkı (Saat)</b>
-						<AntDesign.InputNumber Style="background-color:#D9D9D9; border-radius:6px; height:48px; width:40%; display:flex; align-items:center; font-size: 16px " @bind-Value="EditingUser.MonthlyUsageLimit" />
-						<b>Bu Ay Kullanıldı</b>
-						<Typography Style="font-size: 20px;font-weight:bold" Type="TextElementType.Secondary">
-							@EditingUser.UsedThisMonth Saat
-						</Typography>
-					</Form>
-				</div>
-				<div style="display:flex; justify-content: center;margin-top:15px">
-					<Button Style="background-color:#0095FF;border-radius:6px;width:30%;height:48px" Type="ButtonType.Primary" OnClick="UpdateUser">Güncelle</Button>
-				</div>
-			</Modal>
+            <Modal @bind-Visible="IsReservationModalVisible" Title="Bir Toplantı Ayarla" Footer="null">
+                <div style="display:flex; flex-direction:column; gap:16px; min-width:300px;">
+                    <b>Kullanıcı Seç</b>
+                    @if (AllUsers != null && AllUsers.Any(u => !string.IsNullOrEmpty(u.Id)))
+                    {
+                        <Select TItem="UserDto"
+                                TItemValue="string"
+                                DataSource="@AllUsers"
+                                @bind-Value="SelectedUserId"
+                                LabelName="Company"
+                                ValueName="Id"
+                                Placeholder="Kullanıcı seçiniz"
+                                EnableSearch
+                                Style="min-width:220px;max-width:320px;">
+                        </Select>
+                    }
+                    else
+                    {
+                        <Alert Message="Kullanıcı listesi yüklenemedi veya kullanıcıların Id bilgisi eksik." Type="AlertType.Error" ShowIcon="true" />
+                    }
 
-			<Modal @bind-Visible="IsReservationModalVisible" Title="Bir Toplantı Ayarla" Footer="null">
-				<div style="display:flex; flex-direction:column; gap:16px; min-width:300px;">
-					<b>Kullanıcı Seç</b>
-			@if (AllUsers != null && AllUsers.Any(u => !string.IsNullOrEmpty(u.Id)))
-			{
-				<Select TItem="UserDto"
-					   TItemValue="string"
-					   DataSource="@AllUsers"
-					   @bind-Value="SelectedUserId"
-					   LabelName="Company"
-					   ValueName="Id"
-					   Placeholder="Kullanıcı seçiniz"
-					   EnableSearch
-					   Style="min-width:220px;max-width:320px;">
-				</Select>
-			}
-			else
-			{
-				<Alert Message="Kullanıcı listesi yüklenemedi veya kullanıcıların Id bilgisi eksik." Type="AlertType.Error" ShowIcon="true" />
-			}
-			<br /><br />
-			<p>
-				Seçilen Kullanıcı Id: @SelectedUserId <br />
-				Seçilen Kullanıcı: @(AllUsers.FirstOrDefault(u => u.Id == SelectedUserId)?.Company),"/", @(AllUsers.FirstOrDefault(u => u.Id == SelectedUserId)?.CompanyOfficial)
-			</p>
-					<Button Type="ButtonType.Primary" Disabled="@(string.IsNullOrEmpty(SelectedUserId))" OnClick="GoToReservationForSelectedUser">
-						Devam Et
-					</Button>
-				</div>
-			</Modal>
-			<div class="users-panel">
-				<div>
-					<div style="display:flex;justify-content: space-between;align-items: center;">
-						<div class="table-header">Kullanıcılar</div>
-						<div class="create-user-button" style="margin-bottom:14px; display:flex; gap:12px;">
-							<Button Type="ButtonType.Primary" OnClick="@OpenCreateModal">
-								Yeni Kullanıcı Oluştur
-							</Button>
-							<Button Type="ButtonType.Primary" OnClick="@ShowReservationModal">
-								Rezervasyon Oluştur
-							</Button>
-						</div>
-					</div>
-					<div class="table-responsive">
-						<table class="table">
-							<thead>
-								<tr>
-									<th>Şirket İsmi</th>
-									<th>Yetkili</th>
-									<th>Aylık Kalan Haklar</th>
-									<th>Email</th>
-									<th>Telefon</th>
-									<th>Durum</th>
-									<th>İşlemler</th>
-								</tr>
-							</thead>
-							<tbody style="font-weight:normal">
-								@foreach (var user in PagedUsers)
-								{
-									<tr>
-										<td>@user.Company</td>
-										<td>@user.CompanyOfficial</td>
-										<td>@user.UsedThisMonth/@user.MonthlyUsageLimit saat</td>
-										<td>@user.Email</td>
-										<td>@(!string.IsNullOrEmpty(user.ContactPhone) ? $"+90{user.ContactPhone}" : "-")</td>
-										<td>
-											@if (user.IsActive)
-											{
-												<Tag Color="TagColor.Lime" Style="cursor:pointer;" OnClick="@(() => ToggleStatus(user))">Aktif</Tag>
-											}
-											else
-											{
-												<Tag Color="TagColor.Red" Style="cursor:pointer;" OnClick="@(() => ToggleStatus(user))">Pasif</Tag>
-											}
-										</td>
-										<td>
-											<Space>
-												<Button Style="margin-right:4px;margin-bottom:4px" Icon="edit" Shape="ButtonShape.Circle"
-												OnClick="@(() => EditUser(user))">
-												</Button>
-												<Popconfirm Title="Bu kullanıcı silinsin mi?"
-												OnConfirm="@(() => DeleteUser(user.Id))">
-													<Button Icon="delete" Shape="ButtonShape.Circle" Danger></Button>
-												</Popconfirm>
-											</Space>
-										</td>
-									</tr>
-								}
-							</tbody>
-						</table>
-					</div>
-				</div>
-				<div class="pages">
-					<div>
-						<Pagination Total="@TotalUserCount"
-						PageSize="@PageSize"
-						Current="@CurrentPage"
-						OnChange="@HandlePaginationChange"
-						ShowSizeChanger="true"
-						PageSizeOptions="@(new int[] {5, 10, 20, 50, 100})"
-						Style="margin-right:10px"/>
-					</div>
-				</div>
-			</div>
-		</div>
-	</Authorized>
-	<NotAuthorized>
-		<div style="padding: 24px; max-width: 600px; margin: 0 auto;">
-			<Alert Type="@AlertType.Warning"
-			Message="Yetkisiz Erişim"
-			Description="Bu sayfaya erişim yetkiniz bulunmamaktadır. Admin yetkisi gereklidir."
-			ShowIcon="true"
-			Style="margin-bottom: 16px;" />
+                    <Button Type="ButtonType.Primary" Disabled="@(string.IsNullOrEmpty(SelectedUserId))" OnClick="GoToReservationForSelectedUser">
+                        Devam Et
+                    </Button>
+                </div>
+            </Modal>
+            <div class="users-panel">
+                <div>
+                    <div style="display:flex;justify-content: space-between;align-items: center;">
+                        <div class="table-header">Kullanıcılar</div>
+                        <div class="create-user-button" style="margin-bottom:14px; display:flex; gap:12px;">
+                            <Button Type="ButtonType.Primary" OnClick="@OpenCreateModal">
+                                Yeni Kullanıcı Oluştur
+                            </Button>
+                            <Button Type="ButtonType.Primary" OnClick="@ShowReservationModal">
+                                Rezervasyon Oluştur
+                            </Button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Şirket İsmi</th>
+                                    <th>Yetkili</th>
+                                    <th>Aylık Kalan Haklar</th>
+                                    <th>Email</th>
+                                    <th>Telefon</th>
+                                    <th>Durum</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody style="font-weight:normal">
+                                @foreach (var user in PagedUsers)
+                                {
+                                    <tr>
+                                        <td>@user.Company</td>
+                                        <td>@user.CompanyOfficial</td>
+                                        <td>@user.UsedThisMonth/@user.MonthlyUsageLimit saat</td>
+                                        <td>@user.Email</td>
+                                        <td>@(!string.IsNullOrEmpty(user.ContactPhone) ? $"+90{user.ContactPhone}" : "-")</td>
+                                        <td>
+                                            @if (user.IsActive)
+                                            {
+                                                <Tag Color="TagColor.Lime" Style="cursor:pointer;" OnClick="@(() => ToggleStatus(user))">Aktif</Tag>
+                                            }
+                                            else
+                                            {
+                                                <Tag Color="TagColor.Red" Style="cursor:pointer;" OnClick="@(() => ToggleStatus(user))">Pasif</Tag>
+                                            }
+                                        </td>
+                                        <td>
+                                            <Space>
+                                                <Button Style="margin-right:4px;margin-bottom:4px" Icon="edit" Shape="ButtonShape.Circle"
+                                                        OnClick="@(() => EditUser(user))">
+                                                </Button>
+                                                <Popconfirm Title="Bu kullanıcı silinsin mi?"
+                                                            OnConfirm="@(() => DeleteUser(user.Id))">
+                                                    <Button Icon="delete" Shape="ButtonShape.Circle" Danger></Button>
+                                                </Popconfirm>
+                                            </Space>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="pages">
+                    <div>
+                        <Pagination Total="@TotalUserCount"
+                                    PageSize="@PageSize"
+                                    Current="@CurrentPage"
+                                    OnChange="@HandlePaginationChange"
+                                    ShowSizeChanger="true"
+                                    PageSizeOptions="@(new int[] {5, 10, 20, 50, 100})"
+                                    Style="margin-right:10px" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <div style="padding: 24px; max-width: 600px; margin: 0 auto;">
+            <Alert Type="@AlertType.Warning"
+                   Message="Yetkisiz Erişim"
+                   Description="Bu sayfaya erişim yetkiniz bulunmamaktadır. Admin yetkisi gereklidir."
+                   ShowIcon="true"
+                   Style="margin-bottom: 16px;" />
 
-			<div style="text-align: center;">
-				<Space>
-					<SpaceItem>
-						<Button Type="ButtonType.Primary" OnClick="@(() => Navigation.NavigateTo("/"))" Icon="login">
-							Giriş Yap
-						</Button>
-					</SpaceItem>
-					<SpaceItem>
-						<Button Type="ButtonType.Default" OnClick="@(() => Navigation.NavigateTo("/user/meetingRooms"))" Icon="home">
-							Ana Sayfaya Dön
-						</Button>
-					</SpaceItem>
-				</Space>
-			</div>
-		</div>
-	</NotAuthorized>
+            <div style="text-align: center;">
+                <Space>
+                    <SpaceItem>
+                        <Button Type="ButtonType.Primary" OnClick="@(() => Navigation.NavigateTo("/"))" Icon="login">
+                            Giriş Yap
+                        </Button>
+                    </SpaceItem>
+                    <SpaceItem>
+                        <Button Type="ButtonType.Default" OnClick="@(() => Navigation.NavigateTo("/user/meetingRooms"))" Icon="home">
+                            Ana Sayfaya Dön
+                        </Button>
+                    </SpaceItem>
+                </Space>
+            </div>
+        </div>
+    </NotAuthorized>
 </AuthorizeView>
 
 @code {
-	private List<UserDto> AllUsers = new();
-	private List<UserDto> PagedUsers = new();
-	private int PageSize = 10;
-	private int CurrentPage = 1;
-	private int TotalUserCount = 0;
-	private bool IsCreateModalVisible = false;
-	private UserDto NewUser = new();
-	private bool IsEditModalVisible = false;
-	private UserDto EditingUser = new();
+    private List<UserDto> AllUsers = new();
+    private List<UserDto> PagedUsers = new();
+    private int PageSize = 10;
+    private int CurrentPage = 1;
+    private int TotalUserCount = 0;
+    private bool IsCreateModalVisible = false;
+    private UserDto NewUser = new();
+    private bool IsEditModalVisible = false;
+    private UserDto EditingUser = new();
 
-	// Validation messages
-	private string companyValidationMessage = "";
-	private string phoneValidationMessage = "";
-	private string editCompanyValidationMessage = "";
-	private string editPhoneValidationMessage = "";
-	private string emailValidationMessage = string.Empty;
-	private string SelectedUserId = string.Empty;
-	private bool IsReservationModalVisible = false;
+    // Validation messages
+    private string companyValidationMessage = "Şirket ismi giriniz.";
+    private string phoneValidationMessage = "Telefon numarası giriniz.";
+    private string editCompanyValidationMessage = "";
+    private string editPhoneValidationMessage = "";
+    private string emailValidationMessage = string.Empty;
+    private string SelectedUserId = string.Empty;
+    private bool IsReservationModalVisible = false;
 
-	protected override async Task OnInitializedAsync()
-	{
-		await UserService.UpdateMonthlyUsageAsync();
-		await LoadUsers();
-	}
+    protected override async Task OnInitializedAsync()
+    {
+        await UserService.UpdateMonthlyUsageAsync();
+        await LoadUsers();
+    }
 
-	private void OpenCreateModal()
-	{
-		IsCreateModalVisible = true;
-		NewUser = new UserDto();
-		companyValidationMessage = string.Empty;
-		phoneValidationMessage = string.Empty;
-		emailValidationMessage = string.Empty;
-		ValidateEmailInput(NewUser.Email);
-		StateHasChanged();
-	}
-	
-	private void ShowReservationModal()
-	{
-		SelectedUserId = string.Empty;
-		IsReservationModalVisible = true;
-	}
-	private void GoToReservationForSelectedUser()
-	{
-		if (!string.IsNullOrEmpty(SelectedUserId))
-		{
-			IsReservationModalVisible = false;
-			Navigation.NavigateTo($"/user/meetingRooms?userId={SelectedUserId}");
-		}
-	}
+    private void OpenCreateModal()
+    {
+        IsCreateModalVisible = true;
+        NewUser = new UserDto();
+        companyValidationMessage = string.Empty;
+        phoneValidationMessage = string.Empty;
+        emailValidationMessage = string.Empty;
+        ValidateEmailInput(NewUser.Email);
+        StateHasChanged();
+    }
 
-	private void CancelCreate()
-	{
-		IsCreateModalVisible = false;
-		NewUser = new();
-		companyValidationMessage = "";
-		phoneValidationMessage = "";
-		emailValidationMessage = string.Empty;
-	}
+    private void ShowReservationModal()
+    {
+        SelectedUserId = string.Empty;
+        IsReservationModalVisible = true;
+    }
+    private void GoToReservationForSelectedUser()
+    {
+        if (!string.IsNullOrEmpty(SelectedUserId))
+        {
+            IsReservationModalVisible = false;
+            Navigation.NavigateTo($"/user/meetingRooms?userId={SelectedUserId}");
+        }
+    }
 
-	private async Task CreateUser()
-	{
-		// Tüm validasyonları tetikle
-		ValidateCompanyName(NewUser.Company, true);
-		ValidatePhoneNumber(NewUser.ContactPhone, true);
-		ValidateEmailInput(NewUser.Email);
-		StateHasChanged();
+    private void CancelCreate()
+    {
+        IsCreateModalVisible = false;
+        NewUser = new();
+        companyValidationMessage = "";
+        phoneValidationMessage = "";
+        emailValidationMessage = string.Empty;
+    }
 
-		if (!IsCreateFormValid()) return;
+    private async Task CreateUser()
+    {
+        // Tüm validasyonları tetikle
+        ValidateCompanyName(NewUser.Company, true);
+        ValidatePhoneNumber(NewUser.ContactPhone, true);
+        ValidateEmailInput(NewUser.Email);
+        StateHasChanged();
 
-		try
-		{
-			await UserService.AddUserAsync(NewUser);
-			await LoadUsers();
-			CancelCreate();
-		}
-		catch (Exception ex)
-		{
-			Console.WriteLine($"Error creating user: {ex.Message}");
-		}
-	}
+        if (!IsCreateFormValid()) return;
 
-	private async Task LoadUsers()
-	{
-		AllUsers = await UserService.GetAllUsersAsync();
-		TotalUserCount = AllUsers.Count;
-		LoadPage();
-	}
+        try
+        {
+            await UserService.AddUserAsync(NewUser);
+            await LoadUsers();
+            CancelCreate();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error creating user: {ex.Message}");
+        }
+    }
 
-	private void LoadPage()
-	{
-		// Sayfa sayısı otomatik hesaplanıyor
-		int totalPages = (int)Math.Ceiling((double)TotalUserCount / PageSize);
-		if (CurrentPage > totalPages) CurrentPage = totalPages > 0 ? totalPages : 1;
-		PagedUsers = AllUsers
-			.OrderByDescending(r => r.Id)
-			.Skip((CurrentPage - 1) * PageSize)
-			.Take(PageSize)
-			.ToList();
-	}
+    private async Task LoadUsers()
+    {
+        AllUsers = await UserService.GetAllUsersAsync();
+        TotalUserCount = AllUsers.Count;
+        LoadPage();
+    }
 
-	private async Task ToggleStatus(UserDto user)
-	{
-		user.IsActive = !user.IsActive;
-		await UserService.UpdateUserStatusAsync(user.Id, user.IsActive);
-		await LoadUsers();
-	}
+    private void LoadPage()
+    {
+        // Sayfa sayısı otomatik hesaplanıyor
+        int totalPages = (int)Math.Ceiling((double)TotalUserCount / PageSize);
+        if (CurrentPage > totalPages) CurrentPage = totalPages > 0 ? totalPages : 1;
+        PagedUsers = AllUsers
+            .OrderByDescending(r => r.Id)
+            .Skip((CurrentPage - 1) * PageSize)
+            .Take(PageSize)
+            .ToList();
+    }
 
-	private async Task DeleteUser(string id)
-	{
-		await UserService.DeleteUserAsync(id);
-		await LoadUsers();
-	}
+    private async Task ToggleStatus(UserDto user)
+    {
+        user.IsActive = !user.IsActive;
+        await UserService.UpdateUserStatusAsync(user.Id, user.IsActive);
+        await LoadUsers();
+    }
 
-	private void HandlePaginationChange(PaginationEventArgs args)
-	{
-		CurrentPage = args.Page;
+    private async Task DeleteUser(string id)
+    {
+        await UserService.DeleteUserAsync(id);
+        await LoadUsers();
+    }
 
-		if (args.PageSize != PageSize)
-		{
-			PageSize = args.PageSize;
-		}
+    private void HandlePaginationChange(PaginationEventArgs args)
+    {
+        CurrentPage = args.Page;
 
-		LoadPage();
-		StateHasChanged();
-	}
+        if (args.PageSize != PageSize)
+        {
+            PageSize = args.PageSize;
+        }
 
-	private void EditUser(UserDto user)
-	{
-		EditingUser = new UserDto
-			{
-				Id = user.Id,
-				Email = user.Email,
-				FirstName = user.FirstName,
-				LastName = user.LastName,
-				Company = user.Company,
-				CompanyOfficial = user.CompanyOfficial,
-				ContactPhone = user.ContactPhone,
-				MonthlyUsageLimit = user.MonthlyUsageLimit,
-				UsedThisMonth = user.UsedThisMonth,
-				IsActive = user.IsActive
-			};
+        LoadPage();
+        StateHasChanged();
+    }
 
-		// Clear validation messages
-		editCompanyValidationMessage = "";
-		editPhoneValidationMessage = "";
+    private void EditUser(UserDto user)
+    {
+        EditingUser = new UserDto
+            {
+                Id = user.Id,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Company = user.Company,
+                CompanyOfficial = user.CompanyOfficial,
+                ContactPhone = user.ContactPhone,
+                MonthlyUsageLimit = user.MonthlyUsageLimit,
+                UsedThisMonth = user.UsedThisMonth,
+                IsActive = user.IsActive
+            };
 
-		IsEditModalVisible = true;
-		StateHasChanged();
-	}
+        // Clear validation messages
+        editCompanyValidationMessage = "";
+        editPhoneValidationMessage = "";
 
-	private void CancelEdit()
-	{
-		IsEditModalVisible = false;
-		EditingUser = new();
-		editCompanyValidationMessage = "";
-		editPhoneValidationMessage = "";
-	}
+        IsEditModalVisible = true;
+        StateHasChanged();
+    }
 
-	private void OnMonthlyLimitChange(int newValue)
-	{
-		EditingUser.MonthlyUsageLimit = newValue;
-		StateHasChanged();
-	}
+    private void CancelEdit()
+    {
+        IsEditModalVisible = false;
+        EditingUser = new();
+        editCompanyValidationMessage = "";
+        editPhoneValidationMessage = "";
+    }
 
-	private int GetRemainingHours()
-	{
-		return Math.Max(0, EditingUser.MonthlyUsageLimit - EditingUser.UsedThisMonth);
-	}
+    private void OnMonthlyLimitChange(int newValue)
+    {
+        EditingUser.MonthlyUsageLimit = newValue;
+        StateHasChanged();
+    }
 
-	private string GetRemainingHoursColor()
-	{
-		var remaining = GetRemainingHours();
-		if (remaining <= 0) return "#ff4d4f"; // Kırmızı
-		if (remaining <= 5) return "#faad14"; // Sarı
-		return "#52c41a"; // Yeşil
-	}
+    private int GetRemainingHours()
+    {
+        return Math.Max(0, EditingUser.MonthlyUsageLimit - EditingUser.UsedThisMonth);
+    }
 
-	private async Task UpdateUser()
-	{
-		await UserService.UpdateUserAsync(EditingUser);
-		await LoadUsers();
-		IsEditModalVisible = false;
-	}
+    private string GetRemainingHoursColor()
+    {
+        var remaining = GetRemainingHours();
+        if (remaining <= 0) return "#ff4d4f"; // Kırmızı
+        if (remaining <= 5) return "#faad14"; // Sarı
+        return "#52c41a"; // Yeşil
+    }
 
-	// Validation Methods
-	private bool ValidateCompanyName(string company, bool isCreate = true)
-	{
-		var message = "";
-		var isValid = true;
+    private async Task UpdateUser()
+    {
+        await UserService.UpdateUserAsync(EditingUser);
+        await LoadUsers();
+        IsEditModalVisible = false;
+    }
 
-		if (string.IsNullOrWhiteSpace(company))
-		{
-			message = "Şirket ismi zorunludur.";
-			isValid = false;
-		}
-		else if (company.Length < 2)
-		{
-			message = "Şirket ismi en az 2 karakter olmalıdır.";
-			isValid = false;
-		}
-		else if (company.Length > 100)
-		{
-			message = "Şirket ismi en fazla 100 karakter olabilir.";
-			isValid = false;
-		}
+    // Validation Methods
+    private bool ValidateCompanyName(string company, bool isCreate = true)
+    {
+        var message = "";
+        var isValid = true;
 
-		if (isCreate)
-			companyValidationMessage = message;
-		else
-			editCompanyValidationMessage = message;
+        if (string.IsNullOrWhiteSpace(company))
+        {
+            message = "Şirket ismi zorunludur.";
+            isValid = false;
+        }
+        else if (company.Length < 2)
+        {
+            message = "Şirket ismi en az 2 karakter olmalıdır.";
+            isValid = false;
+        }
+        else if (company.Length > 100)
+        {
+            message = "Şirket ismi en fazla 100 karakter olabilir.";
+            isValid = false;
+        }
 
-		return isValid;
-	}
+        if (isCreate)
+            companyValidationMessage = message;
+        else
+            editCompanyValidationMessage = message;
 
-	private bool ValidatePhoneNumber(string phone, bool isCreate = true)
-	{
-		var message = "";
-		var isValid = true;
+        return isValid;
+    }
 
-		if (string.IsNullOrWhiteSpace(phone))
-		{
-			message = "Telefon numarası zorunludur.";
-			isValid = false;
-		}
-		else if (phone.Length != 10)
-		{
-			message = "Telefon numarası 10 haneli olmalıdır.";
-			isValid = false;
-		}
-		else if (!phone.StartsWith("5"))
-		{
-			message = "Telefon numarası 5 ile başlamalıdır.";
-			isValid = false;
-		}
-		else if (!phone.All(char.IsDigit))
-		{
-			message = "Telefon numarası sadece rakam içermelidir.";
-			isValid = false;
-		}
+    private bool ValidatePhoneNumber(string phone, bool isCreate = true)
+    {
+        var message = "";
+        var isValid = true;
 
-		if (isCreate)
-			phoneValidationMessage = message;
-		else
-			editPhoneValidationMessage = message;
+        if (string.IsNullOrWhiteSpace(phone))
+        {
+            message = "Telefon numarası zorunludur.";
+            isValid = false;
+        }
+        else if (phone.Length != 10)
+        {
+            message = "Telefon numarası 10 haneli olmalıdır.";
+            isValid = false;
+        }
+        else if (!phone.StartsWith("5"))
+        {
+            message = "Telefon numarası 5 ile başlamalıdır.";
+            isValid = false;
+        }
+        else if (!phone.All(char.IsDigit))
+        {
+            message = "Telefon numarası sadece rakam içermelidir.";
+            isValid = false;
+        }
 
-		return isValid;
-	}
+        if (isCreate)
+            phoneValidationMessage = message;
+        else
+            editPhoneValidationMessage = message;
 
-	private void ValidatePhoneInput(string phone, bool isCreate)
-	{
-		ValidatePhoneNumber(phone, isCreate);
-		StateHasChanged();
-	}
+        return isValid;
+    }
 
-	private void ValidateEmailInput(string? email)
-	{
-		if (string.IsNullOrWhiteSpace(email))
-		{
-			emailValidationMessage = "E-posta adresi zorunludur.";
-			return;
-		}
-		if (!IsValidEmail(email))
-		{
-			emailValidationMessage = "Geçerli bir e-posta adresi giriniz.";
-			return;
-		}
-		emailValidationMessage = string.Empty;
-	}
+    private void ValidatePhoneInput(string phone, bool isCreate)
+    {
+        ValidatePhoneNumber(phone, isCreate);
+        StateHasChanged();
+    }
 
-	private bool IsValidEmail(string? email)
-	{
-	if (string.IsNullOrWhiteSpace(email)) return false;
-	// '@' ve '.' karakteri yoksa MailAddress kontrolü yapma
-	if (!email.Contains("@") || !email.Contains(".")) return false;
-	try
-	{
-		var addr = new System.Net.Mail.MailAddress(email);
-		return addr.Address == email;
-	}
-	catch
-	{
-		return false;
-	}
-	}
+    private void ValidateEmailInput(string? email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            emailValidationMessage = "E-posta adresi zorunludur.";
+            return;
+        }
+        if (!IsValidEmail(email))
+        {
+            emailValidationMessage = "Geçerli bir e-posta adresi giriniz.";
+            return;
+        }
+        emailValidationMessage = string.Empty;
+    }
 
-	private bool IsCreateFormValid()
-	{
-		return string.IsNullOrEmpty(companyValidationMessage)
-			&& string.IsNullOrEmpty(phoneValidationMessage)
-			&& string.IsNullOrEmpty(emailValidationMessage)
-			&& !string.IsNullOrEmpty(NewUser.Company)
-			&& !string.IsNullOrEmpty(NewUser.CompanyOfficial)
-			&& !string.IsNullOrEmpty(NewUser.ContactPhone)
-			&& !string.IsNullOrEmpty(NewUser.Email)
-			&& IsValidEmail(NewUser.Email)
-			&& NewUser.MonthlyUsageLimit > 0;
-	}
+    private bool IsValidEmail(string? email)
+    {
+        if (string.IsNullOrWhiteSpace(email)) return false;
+        // '@' ve '.' karakteri yoksa MailAddress kontrolü yapma
+        if (!email.Contains("@") || !email.Contains(".")) return false;
+        try
+        {
+            var addr = new System.Net.Mail.MailAddress(email);
+            return addr.Address == email;
+        }
+        catch
+        {
+            return false;
+        }
+    }
 
-	private bool IsEditFormValid()
-	{
-		var companyValid = ValidateCompanyName(EditingUser.Company, false);
-		var phoneValid = ValidatePhoneNumber(EditingUser.ContactPhone, false);
-		var limitValid = EditingUser.MonthlyUsageLimit >= EditingUser.UsedThisMonth;
+    private bool IsCreateFormValid()
+    {
+        return string.IsNullOrEmpty(companyValidationMessage)
+            && string.IsNullOrEmpty(phoneValidationMessage)
+            && string.IsNullOrEmpty(emailValidationMessage)
+            && !string.IsNullOrWhiteSpace(NewUser.Company)
+            && !string.IsNullOrWhiteSpace(NewUser.CompanyOfficial)
+            && !string.IsNullOrWhiteSpace(NewUser.ContactPhone)
+            && NewUser.MonthlyUsageLimit > 0;
+    }
 
-		return companyValid && phoneValid && limitValid;
-	}
+    private bool IsEditFormValid()
+    {
+        var companyValid = ValidateCompanyName(EditingUser.Company, false);
+        var phoneValid = ValidatePhoneNumber(EditingUser.ContactPhone, false);
+        var limitValid = EditingUser.MonthlyUsageLimit >= EditingUser.UsedThisMonth;
+
+        return companyValid && phoneValid && limitValid;
+    }
 }
 
