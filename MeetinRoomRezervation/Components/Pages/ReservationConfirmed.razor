@@ -9,6 +9,7 @@
 @using MeetinRoomRezervation.Components.Layout
 @inject MongoDbContext DbContext
 @inject IJSRuntime JSRuntime
+@inject AuthenticationStateProvider AuthProvider
 
 <div class="reservation-confirmed-container">
     <div class="background-gradient"></div>
@@ -62,20 +63,6 @@
     private Reservation reservation = new();
     private bool isLoading = true;
     
-    protected override async Task OnInitializedAsync()
-    {
-        if (!string.IsNullOrEmpty(ReservationId))
-        {
-            await LoadReservation();
-        }
-        else
-        {
-            // Eğer ID yoksa, en son oluşturulan rezervasyonu al
-            await LoadLatestReservation();
-        }
-        isLoading = false;
-    }
-    
     private async Task LoadReservation()
     {
         try
@@ -110,9 +97,32 @@
         }
     }
     
+    private bool isAdmin = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrEmpty(ReservationId))
+        {
+            await LoadReservation();
+        }
+        else
+        {
+            // Eğer ID yoksa, en son oluşturulan rezervasyonu al
+            await LoadLatestReservation();
+        }
+        // Kullanıcı admin mi kontrol et
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        isAdmin = user.IsInRole("Admin") || user.Claims.Any(c => c.Type == System.Security.Claims.ClaimTypes.Role && c.Value.ToLower().Contains("admin"));
+        isLoading = false;
+    }
+
     private void NavigateToMyReservations()
     {
-        Navigation.NavigateTo("/user/myReservations");
+        if (isAdmin)
+            Navigation.NavigateTo("/admin/dashboard");
+        else
+            Navigation.NavigateTo("/user/myReservations");
     }
     
     private string GetFormattedDate(DateTime date)
