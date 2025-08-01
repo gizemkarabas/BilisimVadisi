@@ -1,0 +1,8 @@
+﻿<div class="image-content">
+    <Image src="@ImageUrl" alt="Travelwise Logo" Preview="false" class="image" />
+    <Image src="@SquareImageUrl" alt="Travelwise Logo" Preview="false" Class="square-image" />
+</div>
+@code {
+    [Parameter] public string ImageUrl { get; set; }
+    [Parameter] public string SquareImageUrl { get; set; }
+}

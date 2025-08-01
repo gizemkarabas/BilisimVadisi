@@ -1,12 +1,12 @@
 @page "/reservation-confirmed"
 @page "/reservation-confirmed/{ReservationId}"
 @layout EmptyLayout
+@using MeetinRoomRezervation.Components.Layout
 @using MeetinRoomRezervation.Components.PartialComponents.Reservations
 @using MeetinRoomRezervation.Data
 @using MeetinRoomRezervation.Services
 @using System.Globalization
 @using MongoDB.Driver
-@using MeetinRoomRezervation.Components.Layout
 @inject MongoDbContext DbContext
 @inject IJSRuntime JSRuntime
 @inject AuthenticationStateProvider AuthProvider

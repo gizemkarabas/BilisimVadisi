@@ -1,7 +1,11 @@
 html,
 body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
 }
+.text2 {
+    font-family: 'Poppins', sans-serif;
+}
+
 
 a,
 .btn-link {

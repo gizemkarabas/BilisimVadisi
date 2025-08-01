@@ -1,0 +1,126 @@
+﻿@using MeetinRoomRezervation.Components.PartialComponents.Input
+@using MeetinRoomRezervation.Data
+@using System.Security.Claims
+@using static MeetinRoomRezervation.Components.Pages.Login
+@inject AuthenticationStateProvider AuthProvider
+@inject IAuthService AuthService
+@inject NavigationManager Navigation
+
+<div>
+    @if (!string.IsNullOrEmpty(ErrorMessage))
+    {
+        <Alert Message="@ErrorMessage" Type="@AlertType.Error" ShowIcon="true" />
+    }
+    <div class="head-title">Giriş Yap</div>
+
+    <Form Model="@LoginModel" OnFinish="HandleLogin" Layout="@FormLayout.Vertical">
+        <FormItem>
+            <OutlinedLabelInput Value="@LoginModel.Email" ValueChanged="@(e => LoginModel.Email = e)" Label="Email" />
+        </FormItem>
+        <FormItem>
+            <OutlinedPasswordInput Value="@LoginModel.Password" ValueChanged="@(e => LoginModel.Password = e)" Label="Şifre" />
+            <Button Type="@ButtonType.Link"
+                    Style="display: flex; justify-content: flex-end; color:crimson; font-size:12px"
+                    OnClick="@(() => Navigation.NavigateTo("/forgot-password"))" Block>
+                Şifremi Unuttum
+            </Button>
+        </FormItem>
+        <FormItem>
+            <Button Type="@ButtonType.Primary" HtmlType="submit" Style="background-color: #515def;
+                           color: #fff;
+                           margin-top: 10px;
+                           font-size: 10px;
+                           font-weight: bold " Block>
+                Giriş Yap
+            </Button>
+        </FormItem>
+    </Form>
+</div>
+<style>
+    .head-title {
+        font-size: 22px !important;
+        font-weight: bold;
+        margin-bottom: 25px;
+    }
+</style>
+@code {
+    private LoginInputModel LoginModel = new();
+    private bool IsLoading = false;
+    private string ErrorMessage = "";
+    private bool hasRendered = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !hasRendered)
+        {
+            hasRendered = true;
+            await CheckExistingAuthentication();
+        }
+    }
+
+    private async Task CheckExistingAuthentication()
+    {
+        try
+        {
+            var authState = await AuthProvider.GetAuthenticationStateAsync();
+            if (authState.User.Identity?.IsAuthenticated == true)
+            {
+                var role = authState.User.FindFirst(ClaimTypes.Role)?.Value;
+
+                if (!string.IsNullOrEmpty(role) && role.ToLower().Contains("admin"))
+                {
+                    Navigation.NavigateTo("/admin/dashboard", true);
+                }
+                else
+                {
+                    Navigation.NavigateTo("/user/meetingRooms", true);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error checking existing authentication: {ex.Message}");
+        }
+    }
+
+    private async Task HandleLogin()
+    {
+        IsLoading = true;
+        ErrorMessage = "";
+
+        try
+        {
+            var user = await AuthService.LoginAsync(LoginModel);
+
+            if (user != null)
+            {
+                if (AuthProvider is CustomAuthenticationStateProvider customProvider)
+                {
+                    customProvider.MarkUserAsAuthenticated(user.Email, user.Role.ToString());
+                }
+
+                if (user.Role == UserRole.Admin)
+                {
+
+                    Navigation.NavigateTo("/admin/dashboard");
+                }
+                else
+                {
+                    Navigation.NavigateTo("/user/meetingRooms");
+                }
+            }
+            else
+            {
+                ErrorMessage = "Email veya şifre hatalı.";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Giriş yapılırken bir hata oluştu.";
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+}
