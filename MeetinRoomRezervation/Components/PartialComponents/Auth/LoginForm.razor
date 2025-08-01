@@ -22,7 +22,7 @@
         <FormItem>
             <OutlinedPasswordInput Value="@LoginModel.Password" ValueChanged="@(e => LoginModel.Password = e)" Label="Şifre" />
             <Button Type="@ButtonType.Link"
-                    Style="display: flex; justify-content: flex-end; color:crimson; font-size:12px"
+                    Style="display: flex; justify-content: flex-end; color: #FF8682; font-size:12px"
                     OnClick="@(() => Navigation.NavigateTo("/forgot-password"))" Block>
                 Şifremi Unuttum
             </Button>

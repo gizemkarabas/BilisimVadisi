@@ -1,60 +1,45 @@
 .back-button-container {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  z-index: 1000;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+    display: none;
 }
 
 .back-button {
-  width: 44px;
-  height: 44px;
-  border: none;
-  background-color: rgba(255, 255, 255, 0.9);
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
-  color: #666;
+    width: 44px;
+    height: 44px;
+    border: none;
+    background-color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #666;
 }
 
-.back-button:hover {
-  background-color: rgba(255, 255, 255, 1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  color: #333;
-  transform: translateY(-1px);
-}
+    .back-button:hover {
+        background-color: rgba(255, 255, 255, 1);
+        color: #333;
+        transform: translateY(-1px);
+    }
 
-.back-button:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
+    .back-button:active {
+        transform: translateY(0);
+    }
 
 /* Mobile responsive */
 @media (max-width: 768px) {
-  .back-button-container {
-    top: 15px;
-    left: 15px;
-  }
+    .back-button-container {
+        top: 15px;
+        left: 15px;
+        display: block !important;
+    }
 
-  .back-button {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-  }
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .back-button {
-    background-color: rgba(45, 45, 45, 0.9);
-    color: #ccc;
-  }
-
-  .back-button:hover {
-    background-color: rgba(60, 60, 60, 1);
-    color: #fff;
-  }
+    .back-button {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+    }
 }
