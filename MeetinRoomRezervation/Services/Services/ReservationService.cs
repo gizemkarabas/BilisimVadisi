@@ -86,8 +86,45 @@ namespace MeetinRoomRezervation.Services.ReservationService
                     throw new InvalidOperationException("Kullanıcı bulunamadı. Lütfen tekrar deneyin.");
                 }
 
+
                 var mergedSlots = MergeConsecutiveSlots(reservationDto.SelectedSlots.ToList());
                 var reservationIds = new List<string>();
+
+                // Room ve User detaylarını veritabanından çek
+                MeetingRoomDto? roomDto = null;
+                if (!string.IsNullOrEmpty(reservationDto.RoomId))
+                {
+                    var room = await _context.Rooms.Find(r => r.Id == reservationDto.RoomId).FirstOrDefaultAsync();
+                    if (room != null)
+                    {
+                        roomDto = new MeetingRoomDto
+                        {
+                            Id = room.Id,
+                            Name = room.Name,
+                            Location = room.Location,
+                            Capacity = room.Capacity,
+                        };
+                    }
+                }
+
+                UserDto? userDto = null;
+                if (!string.IsNullOrEmpty(targetUser?.Id))
+                {
+                    var user = await _context.Users.Find(u => u.Id == targetUser.Id).FirstOrDefaultAsync();
+                    if (user != null)
+                    {
+                        userDto = new UserDto
+                        {
+                            Id = user.Id,
+                            Email = user.Email,
+                            Company = user.Company,
+                            CompanyOfficial = user.CompanyOfficial,
+                            ContactPhone = user.ContactPhone,
+                            FirstName = user.FirstName,
+                            LastName = user.LastName
+                        };
+                    }
+                }
 
                 foreach (var mergedSlot in mergedSlots)
                 {
@@ -134,20 +171,10 @@ namespace MeetinRoomRezervation.Services.ReservationService
                         EndTime = utcEndTime,
                         CreatedAt = DateTime.UtcNow,
                         Status = ReservationStatus.Active,
-
-                        User = new UserDto
-                        {
-                            Id = targetUser.Id,
-                            Email = targetUser.Email,
-                            Company = targetUser.Company ?? "",
-                            CompanyOfficial = targetUser.CompanyOfficial ?? "",
-                            ContactPhone = targetUser.ContactPhone ?? "",
-                            FirstName = targetUser.FirstName ?? "",
-                            LastName = targetUser.LastName ?? ""
-                        },
-
-                        Room = reservationDto.Room ?? new MeetingRoomDto(),
-                        Location = reservationDto.Location ?? ""
+                        User = userDto,
+                        Room = roomDto,
+                        // Öncelik: reservationDto.Location (summary'den gelen), sonra roomDto.Location, en son ""
+                        Location = !string.IsNullOrWhiteSpace(reservationDto.Location) ? reservationDto.Location : (roomDto?.Location ?? "")
                     };
                     // Rezervasyon oluşturulmadan önce kontrol
                     var reservationHours = (int)Math.Ceiling((reservation.EndTime - reservation.StartTime).TotalHours);
@@ -204,20 +231,45 @@ namespace MeetinRoomRezervation.Services.ReservationService
             var result = new List<ReservationDto>();
             foreach (var reservation in reservations)
             {
+                UserDto userDto = null;
                 string userEmail = null;
                 if (!string.IsNullOrEmpty(reservation.UserId))
                 {
                     var userFilter = Builders<User>.Filter.Eq("_id", reservation.UserId);
                     var user = await _context.Users.Find(userFilter).FirstOrDefaultAsync();
                     userEmail = user?.Email;
+                    if (user != null)
+                    {
+                        userDto = new UserDto
+                        {
+                            Id = user.Id,
+                            Email = user.Email,
+                            Company = user.Company,
+                            CompanyOfficial = user.CompanyOfficial,
+                            ContactPhone = user.ContactPhone,
+                            FirstName = user.FirstName,
+                            LastName = user.LastName
+                        };
+                    }
                 }
 
                 string roomName = null;
+                MeetingRoomDto roomDto = null;
                 if (!string.IsNullOrEmpty(reservation.RoomId))
                 {
                     var roomFilter = Builders<Data.MeetingRoom>.Filter.Eq("_id", reservation.RoomId);
                     var room = await _context.Rooms.Find(roomFilter).FirstOrDefaultAsync();
                     roomName = room?.Name;
+                    if (room != null)
+                    {
+                        roomDto = new MeetingRoomDto
+                        {
+                            Id = room.Id,
+                            Name = room.Name,
+                            Location = room.Location,
+                            Capacity = room.Capacity,
+                        };
+                    }
                 }
 
                 result.Add(new ReservationDto
@@ -228,14 +280,15 @@ namespace MeetinRoomRezervation.Services.ReservationService
                     UserEmail = userEmail,
                     RoomName = roomName,
                     StartTime = reservation.StartTime,
-                    EndTime = reservation.EndTime
+                    EndTime = reservation.EndTime,
+                    User = userDto,
+                    Room = roomDto,
+                    Location = reservation.Location
                 });
             }
 
             return result;
-
         }
-        // ReservationService.cs içinde
         public async Task<List<ReservationDto>> GetReservationsByDateAsync(DateTime date)
         {
             try

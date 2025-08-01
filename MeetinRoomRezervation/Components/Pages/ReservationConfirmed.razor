@@ -9,7 +9,10 @@
 @using MongoDB.Driver
 @inject MongoDbContext DbContext
 @inject IJSRuntime JSRuntime
+
 @inject AuthenticationStateProvider AuthProvider
+@inject IUserService UserService
+@inject IRoomService RoomService
 
 <div class="reservation-confirmed-container">
     <div class="background-gradient"></div>
@@ -110,6 +113,17 @@
             // Eğer ID yoksa, en son oluşturulan rezervasyonu al
             await LoadLatestReservation();
         }
+
+        // Room ve User bilgilerini doldur
+        if (!string.IsNullOrEmpty(reservation.RoomId) && reservation.Room == null)
+        {
+            try { reservation.Room = await RoomService.GetRoomByIdAsync(reservation.RoomId); } catch { }
+        }
+        if (!string.IsNullOrEmpty(reservation.UserId) && reservation.User == null)
+        {
+            try { reservation.User = await UserService.GetUserByIdAsync(reservation.UserId); } catch { }
+        }
+
         // Kullanıcı admin mi kontrol et
         var authState = await AuthProvider.GetAuthenticationStateAsync();
         var user = authState.User;

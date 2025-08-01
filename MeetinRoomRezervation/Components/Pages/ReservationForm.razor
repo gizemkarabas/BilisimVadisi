@@ -274,7 +274,7 @@ protected override async Task OnInitializedAsync()
 			}
 
 			Reservation.SelectedSlots = new List<SlotDto>(SelectedSlots);
-			Reservation.Location = SelectedRoom?.Location ?? "";
+			Reservation.Location = SelectedRoom?.Location ?? "İzmir Bilişim Vadisi";
 			Reservation.Room = new MeetingRoomDto
 			{
 				Name = SelectedRoom?.Name ?? "",

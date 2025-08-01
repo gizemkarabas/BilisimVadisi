@@ -6,6 +6,7 @@
 @using System.Globalization
 @inject ReservationDto ReservationState
 @inject IReservationService ReservationService
+@inject IRoomService RoomService
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthProvider
 @inject IMessageService MessageService
@@ -85,6 +86,17 @@
             foreach (var slot in ReservationState.SelectedSlots)
             {
                 Console.WriteLine($"Summary slot: {slot.StartTime:HH:mm} - {slot.EndTime:HH:mm}");
+            }
+        }
+
+        // Salon adı eksikse RoomId ile doldur
+        if ((string.IsNullOrWhiteSpace(ReservationState.RoomName) || ReservationState.RoomName == "-") && !string.IsNullOrEmpty(ReservationState.RoomId))
+        {
+            var room = await RoomService.GetRoomByIdAsync(ReservationState.RoomId);
+            if (room != null)
+            {
+                ReservationState.RoomName = room.Name;
+                ReservationState.Room = room;
             }
         }
     }
