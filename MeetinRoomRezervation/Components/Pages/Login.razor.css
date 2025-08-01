@@ -1,36 +1,74 @@
 ﻿.container {
     background: #fff;
     padding: 30px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
     display: flex;
-    justify-items: center;
-    justify-content: center;
-    align-content: center;
     flex-wrap: nowrap;
     align-items: center;
+    justify-content: center;
     padding-right: 100px;
     padding-left: 100px;
-    max-width: 70vw;
+    width: 90vw;
     margin: 0 auto;
     padding: 24px;
-    margin-top:60px;
+    margin-top: 60px;
 }
 
 .container-items {
-    width: 50%;
+    width: 50vw;
     text-align: left;
 }
 
-.image {
-    align-content: center;
+::deep .ant-input-password-icon svg {
+    font-size: 24px !important;
+    width: 24px !important;
+    height: Auto !important;
+}
+::deep .ant-input-password input:focus {
+    background-color: #fff !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+::deep .ant-input-affix-wrapper {
+    border-radius: 4px !important;
+    border: 1px solid #79747E !important;
+    height: 56px !important;
+}
+
+
+::deep .ant-image-img {
+    width: 25vw;
+    height: auto;
+    justify-self: center;
+    display: flex;
+    align-items: center;
+}
+::deep .ant-image {
+    width:100%;
     
+}
+.image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.image-panel {
+    width: 45vw;
+    height: 80vh;
+    background-color: #f4f4f4;
+    border: 0px;
+    border-radius: 30px;
+    margin-left:5vw;
+    display: flex;
+    justify-content: center;
 }
 
 .head-title {
-    font-size: 22px !important;
-    font-weight: bold;
+    font-weight: 600;
     text-align: center;
-    margin-bottom : 25px;
+    margin-bottom: 25px;
+    display: flex;
+    font-size: 40px;
 }
 @media (max-width: 600px) {
     .container {
@@ -44,13 +82,27 @@
     }
 
     .container-items {
-        width: 100%;
+        width: 110%;
         min-width: 0;
     }
 
-    .image {
-        width: 80%;
-        margin-bottom: 20px;
+    ::deep .ant-image-img {
+        width: 38vw;
+        height: auto;
+        justify-self: center;
+        display: flex;
+        align-items: center;
+    }
+
+    .image-panel {
+        width: 75vw;
+        height: 35vh;
+        background-color: #f4f4f4;
+        border: 0px;
+        border-radius: 30px;
+        margin-left: 0vw;
+        display: flex;
+        justify-content: center;
     }
 
     .head-title {
