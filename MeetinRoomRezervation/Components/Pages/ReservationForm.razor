@@ -51,19 +51,25 @@ else
 			@if (Slots != null && Slots.Any())
 			{
 				<div class="slot-grid">
-					@foreach (var slot in AvailableSlots)
+					@foreach (var slot in Slots)
 					{
-						<Button Type="@GetButtonType(slot)"
-								class="@(SelectedSlots.Contains(slot) ? "selected-slot" : "unselected-slot")"
-								OnClick="() => ToggleSlot(slot)"
-								Style="padding: 0;">
+						var isSelected = SelectedSlots.Contains(slot);
+						var isReserved = slot.IsReserved;
+						var isDisabled = slot.IsDisabled || isReserved;
+						var buttonClass = isReserved ? "reserved-slot" : (isSelected ? "selected-slot" : "unselected-slot");
+						var buttonStyle = isReserved? "background-color: #808080; padding:0; height:50px; border-radius:10px; width:100%;" : "padding:0; height:41px; border-radius:10px; width:100%;";
+							<Button Type="@GetButtonType(slot)"
+								class="@buttonClass"
+								Disabled="@isDisabled"
+								OnClick="@(() => ToggleSlot(slot))"
+								Style="@buttonStyle">
 							<div class="button-detail">
 								<div>
 									@slot.StartTime.ToString("HH:mm") - @slot.EndTime.ToString("HH:mm")
 								</div>
 								<div>
-									<div class="@(SelectedSlots.Contains(slot) ? "selected-button-circle-border" : "button-circle-border")">
-										<div class="@(SelectedSlots.Contains(slot) ? "button-circle" : "")"></div>
+									<div class="@(isSelected ? "selected-button-circle-border" : "button-circle-border")">
+										<div class="@(isSelected ? "button-circle" : "")"></div>
 									</div>
 								</div>
 							</div>
@@ -115,6 +121,14 @@ else
 			if (_selectedDate != value)
 			{
 				_selectedDate = value;
+				var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+				var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+				query.Set("date", _selectedDate.ToString("yyyy-MM-dd"));
+				var roomId = query.Get("roomId");
+				var newQuery = $"roomId={roomId}&date={_selectedDate:yyyy-MM-dd}";
+				var newUrl = $"/user/reservationForm?{newQuery}";
+				Navigation.NavigateTo(newUrl, forceLoad: false);
+
 				InvokeAsync(LoadSlots);
 			}
 		}
@@ -131,7 +145,6 @@ protected override async Task OnInitializedAsync()
 		if (IsAdmin)
 		{
 			AllUsers = await UserService.GetAllUsersAsync();
-			// Query string'den userId al
 			var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
 			var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
 			userIdFromQuery = query.Get("userId");
