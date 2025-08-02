@@ -14,13 +14,13 @@
                     <Button Type="@ButtonType.Link"
                             OnClick="@(() => Navigation.NavigateTo("admin/dashboard"))"
                             Style="display: flex;
-							justify-content:flex-start;
-							width:160px;
-							align-items:center;
-							padding: 0;
-							border-radius: 8px;
-							margin-bottom: 10px;
-							margin-left: 5px;"
+                            justify-content:flex-start;
+                            width:160px;
+                            align-items:center;
+                            padding: 0;
+                            border-radius: 8px;
+                            margin-bottom: 10px;
+                            margin-left: 5px;"
                             Block>
                         <div class="button">
                             <svg width="15" height="15" viewBox="0 0 18 18" fill="#4d4d4d">
@@ -34,14 +34,14 @@
                     <Button Type="@ButtonType.Link"
                             OnClick="@(() => Navigation.NavigateTo("/admin/users"))"
                             Style="display: flex;
-							justify-content:flex-start;
-							width:160px;
-							align-items:center;
-							background-color:#0095ff;
-							padding: 0;
-							border-radius: 8px;
-							margin-bottom: 10px;
-							margin-left: 5px;"
+                            justify-content:flex-start;
+                            width:160px;
+                            align-items:center;
+                            background-color:#0095ff;
+                            padding: 0;
+                            border-radius: 8px;
+                            margin-bottom: 10px;
+                            margin-left: 5px;"
                             Block>
 
                         <div class="button" style="margin-left:6px;">
@@ -57,13 +57,13 @@
                     <Button Type="@ButtonType.Link"
                             OnClick="@(() => Navigation.NavigateTo("/admin/halls"))"
                             Style="display: flex;
-							justify-content:flex-start;
-							width:160px;
-							align-items:center;
-							padding: 0;
-							border-radius: 8px;
-							margin-bottom: 10px;
-							margin-left: 5px;"
+                            justify-content:flex-start;
+                            width:160px;
+                            align-items:center;
+                            padding: 0;
+                            border-radius: 8px;
+                            margin-bottom: 10px;
+                            margin-left: 5px;"
                             Block>
                         <div class="button" style="margin-left:6px;">
                             <svg width="20" height="16" viewBox="0 0 20 24" fill="#4d4d4d">
@@ -206,77 +206,80 @@
                     </Button>
                 </div>
             </Modal>
-            <div class="users-panel">
-                <div>
-                    <div style="display:flex;justify-content: space-between;align-items: center;">
-                        <div class="table-header">Kullanıcılar</div>
-                        <div class="create-user-button" style="margin-bottom:14px; display:flex; gap:12px;">
-                            <Button Type="ButtonType.Primary" OnClick="@OpenCreateModal">
-                                Yeni Kullanıcı Oluştur
-                            </Button>
-                            <Button Type="ButtonType.Primary" OnClick="@ShowReservationModal">
-                                Rezervasyon Oluştur
-                            </Button>
+            <div>
+                <div class="user-search" style="display:flex;justify-content:center">
+                    <Input Placeholder="Ara"
+                           @bind-Value="searchTerm"
+                           Style="width:100%; width:80vw; height:30px; border-radius:10px; background:#fafafa; border:1px solid #e6e6e6; font-size:16px; padding-left:36px; box-sizing:border-box; margin-top:8px;"
+                           PrefixIcon="search"
+                           OnInput="@(e => OnSearchChanged(e.Value?.ToString()))" />
+                </div>
+                <div class="users-panel">
+
+                    <div>
+
+                        <div style="display:flex;justify-content: space-between;align-items: center;">
+                            <div class="table-header">Kullanıcılar</div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Şirket İsmi</th>
+                                        <th>Yetkili</th>
+                                        <th>Aylık Kalan Haklar</th>
+                                        <th>Email</th>
+                                        <th>Telefon</th>
+                                        <th>Durum</th>
+                                        <th>İşlemler</th>
+                                    </tr>
+                                </thead>
+                                <tbody style="font-weight:normal">
+                                    @foreach (var user in PagedUsers)
+                                    {
+                                        <tr>
+                                            <td>@user.Company</td>
+                                            <td>@user.CompanyOfficial</td>
+                                            <td>@user.UsedThisMonth/@user.MonthlyUsageLimit saat</td>
+                                            <td>@user.Email</td>
+                                            <td>@(!string.IsNullOrEmpty(user.ContactPhone) ? $"+90{user.ContactPhone}" : "-")</td>
+                                            <td>
+                                                @if (user.IsActive)
+                                                {
+                                                    <Tag Color="TagColor.Lime" Style="cursor:pointer;" OnClick="@(() => ToggleStatus(user))">Aktif</Tag>
+                                                }
+                                                else
+                                                {
+                                                    <Tag Color="TagColor.Red" Style="cursor:pointer;" OnClick="@(() => ToggleStatus(user))">Pasif</Tag>
+                                                }
+                                            </td>
+                                            <td>
+                                                <Space>
+                                                    <Button Style="margin-right:4px;margin-bottom:4px" Icon="edit" Shape="ButtonShape.Circle"
+                                                            OnClick="@(() => EditUser(user))">
+                                                    </Button>
+                                                    <Popconfirm Title="Bu kullanıcı silinsin mi?"
+                                                                OnConfirm="@(() => DeleteUser(user.Id))">
+                                                        <Button Icon="delete" Shape="ButtonShape.Circle" Danger></Button>
+                                                    </Popconfirm>
+                                                </Space>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Şirket İsmi</th>
-                                    <th>Yetkili</th>
-                                    <th>Aylık Kalan Haklar</th>
-                                    <th>Email</th>
-                                    <th>Telefon</th>
-                                    <th>Durum</th>
-                                    <th>İşlemler</th>
-                                </tr>
-                            </thead>
-                            <tbody style="font-weight:normal">
-                                @foreach (var user in PagedUsers)
-                                {
-                                    <tr>
-                                        <td>@user.Company</td>
-                                        <td>@user.CompanyOfficial</td>
-                                        <td>@user.UsedThisMonth/@user.MonthlyUsageLimit saat</td>
-                                        <td>@user.Email</td>
-                                        <td>@(!string.IsNullOrEmpty(user.ContactPhone) ? $"+90{user.ContactPhone}" : "-")</td>
-                                        <td>
-                                            @if (user.IsActive)
-                                            {
-                                                <Tag Color="TagColor.Lime" Style="cursor:pointer;" OnClick="@(() => ToggleStatus(user))">Aktif</Tag>
-                                            }
-                                            else
-                                            {
-                                                <Tag Color="TagColor.Red" Style="cursor:pointer;" OnClick="@(() => ToggleStatus(user))">Pasif</Tag>
-                                            }
-                                        </td>
-                                        <td>
-                                            <Space>
-                                                <Button Style="margin-right:4px;margin-bottom:4px" Icon="edit" Shape="ButtonShape.Circle"
-                                                        OnClick="@(() => EditUser(user))">
-                                                </Button>
-                                                <Popconfirm Title="Bu kullanıcı silinsin mi?"
-                                                            OnConfirm="@(() => DeleteUser(user.Id))">
-                                                    <Button Icon="delete" Shape="ButtonShape.Circle" Danger></Button>
-                                                </Popconfirm>
-                                            </Space>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="pages">
-                    <div>
-                        <Pagination Total="@TotalUserCount"
-                                    PageSize="@PageSize"
-                                    Current="@CurrentPage"
-                                    OnChange="@HandlePaginationChange"
-                                    ShowSizeChanger="true"
-                                    PageSizeOptions="@(new int[] {5, 10, 20, 50, 100})"
-                                    Style="margin-right:10px" />
+                    <div class="pages">
+                        <div>
+                            <Pagination Total="@TotalUserCount"
+                                        PageSize="@PageSize"
+                                        Current="@CurrentPage"
+                                        OnChange="@HandlePaginationChange"
+                                        ShowSizeChanger="true"
+                                        PageSizeOptions="@(new int[] {5, 10, 20, 50, 100})"
+                                        Style="margin-right:10px" />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -311,6 +314,7 @@
 @code {
     private List<UserDto> AllUsers = new();
     private List<UserDto> PagedUsers = new();
+    private string searchTerm = string.Empty;
     private int PageSize = 10;
     private int CurrentPage = 1;
     private int TotalUserCount = 0;
@@ -332,6 +336,34 @@
     {
         await UserService.UpdateMonthlyUsageAsync();
         await LoadUsers();
+        _shouldCheckModalQuery = true;
+    }
+
+    private bool _shouldCheckModalQuery = false;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_shouldCheckModalQuery)
+        {
+            _shouldCheckModalQuery = false;
+            var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+            var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+            bool opened = false;
+            if (query.Get("createModal") == "true")
+            {
+                Console.WriteLine("OpenCreateModal() called from OnAfterRenderAsync due to query string.");
+                OpenCreateModal();
+                opened = true;
+            }
+            if (query.Get("reservationModal") == "true")
+            {
+                ShowReservationModal();
+                opened = true;
+            }
+            if (opened)
+            {
+                await InvokeAsync(StateHasChanged);
+            }
+        }
     }
 
     private void OpenCreateModal()
@@ -342,7 +374,8 @@
         phoneValidationMessage = string.Empty;
         emailValidationMessage = string.Empty;
         ValidateEmailInput(NewUser.Email);
-        StateHasChanged();
+        // Only call StateHasChanged if not already in a render cycle
+        // StateHasChanged();
     }
 
     private void ShowReservationModal()
@@ -394,19 +427,42 @@
     {
         AllUsers = await UserService.GetAllUsersAsync();
         TotalUserCount = AllUsers.Count;
-        LoadPage();
+        ApplySearchAndPage();
     }
 
-    private void LoadPage()
+    private void OnSearchChanged(string? value)
     {
-        // Sayfa sayısı otomatik hesaplanıyor
+        searchTerm = value ?? string.Empty;
+        ApplySearchAndPage();
+    }
+
+    private void ApplySearchAndPage()
+    {
+        IEnumerable<UserDto> filtered = AllUsers;
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            var term = searchTerm.Trim().ToLowerInvariant();
+            filtered = filtered.Where(u =>
+                (!string.IsNullOrEmpty(u.Company) && u.Company.ToLowerInvariant().Contains(term)) ||
+                (!string.IsNullOrEmpty(u.CompanyOfficial) && u.CompanyOfficial.ToLowerInvariant().Contains(term)) ||
+                (!string.IsNullOrEmpty(u.Email) && u.Email.ToLowerInvariant().Contains(term)) ||
+                (!string.IsNullOrEmpty(u.ContactPhone) && u.ContactPhone.Contains(term))
+            );
+        }
+        TotalUserCount = filtered.Count();
         int totalPages = (int)Math.Ceiling((double)TotalUserCount / PageSize);
         if (CurrentPage > totalPages) CurrentPage = totalPages > 0 ? totalPages : 1;
-        PagedUsers = AllUsers
+        PagedUsers = filtered
             .OrderByDescending(r => r.Id)
             .Skip((CurrentPage - 1) * PageSize)
             .Take(PageSize)
             .ToList();
+        StateHasChanged();
+    }
+
+    private void LoadPage()
+    {
+        ApplySearchAndPage();
     }
 
     private async Task ToggleStatus(UserDto user)

@@ -283,7 +283,8 @@ namespace MeetinRoomRezervation.Services.ReservationService
                     EndTime = reservation.EndTime,
                     User = userDto,
                     Room = roomDto,
-                    Location = reservation.Location
+                    Location = reservation.Location,
+                    Status = reservation.Status
                 });
             }
 
@@ -346,7 +347,8 @@ namespace MeetinRoomRezervation.Services.ReservationService
                             ContactPhone = user.ContactPhone,
                             FirstName = user.FirstName,
                             LastName = user.LastName
-                        } : null
+                        } : null,
+                        Status = reservation.Status
                     };
 
                     reservationDtos.Add(reservationDto);
