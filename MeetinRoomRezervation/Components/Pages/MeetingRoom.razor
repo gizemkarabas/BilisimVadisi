@@ -9,11 +9,12 @@
 @inject NavigationManager Navigation
 @inject NavigationManager NavManager
 
+<PageTitle>Toplantı Odaları</PageTitle>
 <div class="calender">
-	<DatePicker DefaultValue="@TodayDate" Style="width:90vw; height:41px" @bind-Value="SelectedDate"
+    <DatePicker DefaultValue="@TodayDate" Style="width:85vw; height:41px" @bind-Value="SelectedDate"
 		DisabledDate="DisablePastDates" Format="dd.MM.yyyy" />
 </div>
-<div class="reservation-panel-buttons">
+@* <div class="reservation-panel-buttons">
 	<Button Type="@ButtonType.Link" OnClick="@(() => Navigation.NavigateTo("/user/meetingRooms"))" Style="display: flex;
 							justify-content:flex-start;
 							width:200px;
@@ -44,11 +45,9 @@
 			</div>
 		</div>
 	</Button>
-</div>
+</div> *@
 
 <div class="reservation-panel">
-	<PageTitle>Toplantı Odaları</PageTitle>
-
 	<div class="reservation-panel-header">Lütfen Tarihi Seçin</div>
 	<div class="weekly-no-bg" style="background:unset">
 		<WeeklyDayPicker @bind-SelectedDate="SelectedDateItem" />

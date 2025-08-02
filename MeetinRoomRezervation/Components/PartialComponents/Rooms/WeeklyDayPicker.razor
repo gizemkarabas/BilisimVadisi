@@ -1,12 +1,11 @@
 ﻿@using AntDesign
 
 <div class="date-selector">
-    <Space>
+    <Space class="equal-space">
         @foreach (var date in Dates)
         {
-            <Button Type="ButtonType.Default"
-                    @onclick="() => OnDateSelected(date)"
-                    class="@(SelectedDate == date ? "selected-date" : "")">
+            <Button Type="ButtonType.Default" @onclick="() => OnDateSelected(date)"
+                class="@($"equal-button {(SelectedDate.Date == date.Date ? "selected-date" : "")}")">
                 @date.Label
             </Button>
         }
@@ -26,15 +25,23 @@
         {
             0 => "Bugün",
             1 => "Yarın",
-            _ => date.ToString("dd.MM.yyyy dddd", new System.Globalization.CultureInfo("tr-TR"))
+            _ => GetShortDateLabel(date)
         };
         return new DateItem(label, date);
     })
     .ToList();
 
+    private static string GetShortDateLabel(DateTime date)
+    {
+        var dayName = date.ToString("ddd", new System.Globalization.CultureInfo("tr-TR"));
+        var dateStr = date.ToString("dd.MM", new System.Globalization.CultureInfo("tr-TR"));
+        return $"{dateStr} {dayName}";
+    }
+
 
     private async Task OnDateSelected(DateItem date)
     {
+        SelectedDate = date;
         await SelectedDateChanged.InvokeAsync(date);
         await DateSelected.InvokeAsync(date);
     }
