@@ -86,47 +86,47 @@
 </style>
 
 @code {
-	private List<MeetingRoomDto> Rooms = new();
+    private List<MeetingRoomDto> Rooms = new();
 	private DateTime _selectedDate = DateTime.Today;
 	private DateTime TodayDate = DateTime.Today;
 	private string? UserIdFromQuery;
 
-	private DateItem SelectedDateItem
-	{
-		get => new DateItem(
+    private DateItem SelectedDateItem
+    {
+        get => new DateItem(
 			SelectedDate == DateTime.Today ? "Bugün" :
 			SelectedDate == DateTime.Today.AddDays(1) ? "Yarın" :
-			SelectedDate.ToString("dd.MM.yyyy dddd", new System.Globalization.CultureInfo("tr-TR")),
-			SelectedDate);
-		set
-		{
-			if (SelectedDate != value.Date)
-			{
-				SelectedDate = value.Date;
-			}
-		}
-	}
+            SelectedDate.ToString("dd.MM.yyyy dddd", new System.Globalization.CultureInfo("tr-TR")),
+            SelectedDate);
+        set
+        {
+            if (SelectedDate != value.Date)
+            {
+                SelectedDate = value.Date;
+            }
+        }
+    }
 
-	private DateTime SelectedDate
-	{
-		get => _selectedDate;
-		set
-		{
-			_selectedDate = value;
-			InvokeAsync(LoadRooms);
-		}
-	}
+    private DateTime SelectedDate
+    {
+        get => _selectedDate;
+        set
+        {
+            _selectedDate = value;
+            InvokeAsync(LoadRooms);
+        }
+    }
 
-	protected override async Task OnInitializedAsync()
-	{
-		// Read userId from query string if present
-		var uri = NavManager.ToAbsoluteUri(NavManager.Uri);
-		if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("userId", out var userId))
-		{
-			UserIdFromQuery = userId.ToString();
-		}
-		await LoadRooms();
-	}
+    protected override async Task OnInitializedAsync()
+    {
+        // Read userId from query string if present
+        var uri = NavManager.ToAbsoluteUri(NavManager.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("userId", out var userId))
+        {
+            UserIdFromQuery = userId.ToString();
+        }
+        await LoadRooms();
+    }
 
 	private async Task LoadRooms()
 	{
