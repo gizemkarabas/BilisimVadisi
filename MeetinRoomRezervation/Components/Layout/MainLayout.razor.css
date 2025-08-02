@@ -1,229 +1,234 @@
 .page {
-  position: relative;
-  display: flex;
-  flex-direction: column;
+    position: relative;
+    display: flex;
+    flex-direction: column;
 }
 
 .main-layout-logo {
-  font-size: 13px;
-  color: white;
-  font-weight: bold;
-  display: flex;
+    font-size: 13px;
+    color: white;
+    font-weight: bold;
+    display: flex;
 }
 
 .main-layout-bar {
-  background: #0095ff;
-  height: 80px;
-  padding: 0 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+    background: #0095ff;
+    height: 80px;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .register {
-  background-color: unset;
-  color: white !important;
+    background-color: unset;
+    color: white !important;
 }
 
 .login {
-  background-color: unset;
-  color: white !important;
+    background-color: unset;
+    color: white !important;
 }
 
 .wellcome {
-  background-color: unset;
-  color: white !important;
+    background-color: unset;
+    color: white !important;
 }
 
 .rooms {
-  background-color: unset;
-  color: white !important;
+    background-color: unset;
+    color: white !important;
 }
 
 .my-reservations {
-  display: flex;
-  border: 0px solid;
-  border-radius: 10px;
-  background-color: #d9d9d9;
-  color: #000000;
-  width: 20vw;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  align-items: center;
-  justify-content: center;
-  margin-right: 10px;
+    display: flex;
+    border: 0px solid;
+    border-radius: 10px;
+    background-color: #d9d9d9;
+    color: #000000;
+    width: 20vw;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
 }
 
 .exit {
-  filter: invert(100);
-  background-color: unset;
-  color: white !important;
+    filter: invert(100);
+    background-color: unset;
+    color: white !important;
 }
 
 .panel-gray {
-  background-color: #e6e6e6;
-  border-radius: 10px;
-  margin-top: 65px;
-  margin-left: 75px;
-  margin-right: 75px;
-  min-height: 350px;
-  box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.05);
+    background-color: #e6e6e6;
+    border-radius: 10px;
+    margin-top: 65px;
+    margin-left: 75px;
+    margin-right: 75px;
+    min-height: 350px;
+    box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.05);
 }
 
 .ref {
-  background-color: #f0f2f5;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  position: fixed;
-  width: 100%;
+    background-color: #f0f2f5;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    position: fixed;
+    width: 100%;
 }
 
 .top-row {
-  background-color: #f7f7f7;
-  color: white !important;
-  border-bottom: 1px solid #d6d5d5;
-  justify-content: flex-end;
-  height: 3.5rem;
-  display: flex;
-  align-items: center;
+    background-color: #f7f7f7;
+    color: white !important;
+    border-bottom: 1px solid #d6d5d5;
+    justify-content: flex-end;
+    height: 3.5rem;
+    display: flex;
+    align-items: center;
 }
 
-.top-row ::deep a,
-.top-row ::deep .btn-link {
-  white-space: nowrap;
-  margin-left: 1.5rem;
-  text-decoration: none;
-}
+    .top-row ::deep a,
+    .top-row ::deep .btn-link {
+        white-space: nowrap;
+        margin-left: 1.5rem;
+        text-decoration: none;
+    }
 
-.top-row ::deep a:hover,
-.top-row ::deep .btn-link:hover {
-  text-decoration: underline;
-}
+        .top-row ::deep a:hover,
+        .top-row ::deep .btn-link:hover {
+            text-decoration: underline;
+        }
 
-.top-row ::deep a:first-child {
-  overflow: hidden;
-  text-overflow: ellipsis;
+        .top-row ::deep a:first-child {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+@media(max-width:768px) {
+    .my-reservations {
+        font-size: 12px
+    }
 }
 
 @media (max-width: 600px) {
-  .main {
-    max-height: 50px;
-    display: flex;
-    justify-content: flex-end;
-    flex-direction: row;
-    align-content: stretch;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    margin-left: 50px;
-  }
+    .main {
+        max-height: 50px;
+        display: flex;
+        justify-content: flex-end;
+        flex-direction: row;
+        align-content: stretch;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        margin-left: 50px;
+    }
 
-  .register {
-    display: none;
-  }
+    .register {
+        display: none;
+    }
 
-  .login {
-    display: none;
-  }
+    .login {
+        display: none;
+    }
 
-  .wellcome {
-    display: none;
-  }
+    .wellcome {
+        display: none;
+    }
 
-  .rooms {
-    display: none;
-  }
+    .rooms {
+        display: none;
+    }
 
-  .my-reservations {
-    display: none;
-  }
+    .my-reservations {
+        display: none;
+    }
 
-  .exit {
-    background-color: unset;
-    color: white !important;
-    margin-top: 0;
-  }
+    .exit {
+        background-color: unset;
+        color: white !important;
+        margin-top: 0;
+    }
 
-  .page {
-    flex-direction: row;
-  }
+    .page {
+        flex-direction: row;
+    }
 
-  .sidebar {
-    width: 350px;
-    height: 100vh;
-    position: sticky;
-    top: 0;
-  }
+    .sidebar {
+        width: 350px;
+        height: 100vh;
+        position: sticky;
+        top: 0;
+    }
 
-  .main-layout-logo {
-    min-width: 55vw;
-    color: white;
-    font-size: 13px;
-    font-weight: bold;
-  }
+    .main-layout-logo {
+        min-width: 55vw;
+        color: white;
+        font-size: 13px;
+        font-weight: bold;
+    }
 
-  .main-layout-bar {
-    background: #0095ff;
-    padding: 0 24px;
-    display: flex;
-    max-height: 8vh;
-    align-items: center;
-    justify-content: space-between;
-  }
+    .main-layout-bar {
+        background: #0095ff;
+        padding: 0 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
 
-  .ref {
-    background-color: #f0f2f5;
-    height: 10vh;
-    display: flex;
-    align-items: center;
-    margin-top: 10vh;
-    justify-content: center;
-  }
+    .ref {
+        background-color: #f0f2f5;
+        height: 10vh;
+        display: flex;
+        align-items: center;
+        margin-top: 10vh;
+        justify-content: center;
+    }
 
-  .top-row {
-    position: sticky;
-    top: 0;
-    z-index: 1;
-  }
+    .top-row {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
 
-  .top-row.auth ::deep a:first-child {
-    flex: 1;
-    text-align: right;
-    width: 0;
-  }
+        .top-row.auth ::deep a:first-child {
+            flex: 1;
+            text-align: right;
+            width: 0;
+        }
 
-  .top-row,
-  article {
-    padding-left: 2rem !important;
-    padding-right: 1.5rem !important;
-  }
+    .top-row,
+    article {
+        padding-left: 2rem !important;
+        padding-right: 1.5rem !important;
+    }
 }
 
 #blazor-error-ui {
-  color-scheme: light only;
-  background: lightyellow;
-  bottom: 0;
-  box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
-  box-sizing: border-box;
-  display: none;
-  left: 0;
-  padding: 0.6rem 1.25rem 0.7rem 1.25rem;
-  position: fixed;
-  width: 100%;
-  z-index: 1000;
+    color-scheme: light only;
+    background: lightyellow;
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
 }
 
-#blazor-error-ui .dismiss {
-  cursor: pointer;
-  position: absolute;
-  right: 0.75rem;
-  top: 0.5rem;
-}
+    #blazor-error-ui .dismiss {
+        cursor: pointer;
+        position: absolute;
+        right: 0.75rem;
+        top: 0.5rem;
+    }
 
 .home-icon {
-  width: 36px;
-  height: 36px;
-  filter: brightness(0) invert(1);
+    width: 36px;
+    height: 36px;
+    filter: brightness(0) invert(1);
 }

@@ -61,7 +61,7 @@
         }
 
         .date-selector ::deep .ant-btn {
-            background: #cbe3f8;
+            background: #0095FF40;
             color: #222;
             border: none;
             border-radius: 24px;
