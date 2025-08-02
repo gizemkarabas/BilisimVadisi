@@ -1,0 +1,31 @@
+<div class="room-card" @onclick="HandleRoomClick">
+    <div class="status-tag @(IsAvailable ? "available" : "occupied")">
+        @(IsAvailable ? "Müsait" : "Dolu")
+    </div>
+
+    <h3 class="room-title">@RoomName</h3>
+
+    <div class="room-location">
+        <img src="/images/corporate-icon.svg" alt="Building" class="location-icon" />
+        <span class="location-text">@Location</span>
+    </div>
+
+    <div class="room-occupancy">
+        <img src="/images/people-icon.svg" alt="People" class="occupancy-icon" />
+        <span class="occupancy-text">Doluluk Oranı: @OccupancyRate%</span>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string RoomName { get; set; } = "Toplantı Salonu 1";
+    [Parameter] public string Location { get; set; } = "Bina 1 Koridor 2";
+    [Parameter] public double? OccupancyRate { get; set; }
+    [Parameter] public bool IsAvailable { get; set; } = true;
+    [Parameter] public EventCallback<string> OnRoomSelected { get; set; }
+
+    private async Task HandleRoomClick()
+    {
+        await OnRoomSelected.InvokeAsync(RoomName);
+    }
+}
+    

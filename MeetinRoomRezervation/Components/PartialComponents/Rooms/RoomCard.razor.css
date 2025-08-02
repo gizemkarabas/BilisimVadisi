@@ -1,0 +1,103 @@
+﻿.room-card {
+    width: 100%;
+    height: 136px;
+    background-color: #F1F1F5;
+    border-radius: 6px;
+    position: relative;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    margin-bottom: 16px;
+}
+
+.status-tag {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 14px;
+    text-align: center;
+    z-index: 10;
+}
+
+.status-tag.available {
+    background-color: #E7F6E7;
+    color: #2E8B2E;
+    border: 1px solid #90EE90;
+}
+
+.status-tag.occupied {
+    background-color: #5C5C5C;
+    color: #FFFFFF;
+}
+
+.room-title {
+    position: absolute;
+    left: 17px;
+    top: 42px;
+    height: 16px;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 16.41px;
+    color: #000000;
+    margin: 0;
+    padding: 0;
+    text-align: left;
+}
+
+.room-occupancy {
+    position: absolute;
+    left: 19px;
+    top: 74px;
+    width: 154px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.occupancy-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.occupancy-text {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 16.41px;
+    color: #000000;
+    text-align: left;
+}
+
+.room-location {
+    position: absolute;
+    left: 17px;
+    top: 98px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.location-icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.location-text {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 16.41px;
+    color: #000000;
+    text-align: left;
+}
