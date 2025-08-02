@@ -38,23 +38,39 @@
 					</a>
 
 					<div class="main" style="max-height:50px; display:flex">
-						<MenuItem Key="1">
-						<div class="wellcome" style="color: white;">
-							<Icon Type="user" Theme="IconThemeType.Outline" />
-							<span>Hoş geldin, @CurrentUserCompany</span>
-						</div>
-						</MenuItem>
-						<MenuItem Key="2" RouterLink="/user/myReservations" RouterMatch="NavLinkMatch.All"
-							style="color: white!important;">
-						<div class="my-reservations">
-							<Icon Type="home" Theme="IconThemeType.Outline" Style="margin-right:5px" />
-							Rezervasyonlarım
-						</div>
-						</MenuItem>
+						@if (context.User != null && context.User.IsInRole("Admin"))
+						{
+							<MenuItem Key="admin-1">
+								<Button Type="ButtonType.Primary" Style="margin-right:10px; background-color:#e6e6e6; color:#0095ff; border-radius:6px; height:36px; font-weight:bold; font-family:'Segoe UI', 'Arial', 'sans-serif'; font-size:16px;" OnClick="@(() => Navigation.NavigateTo("/admin/users?createModal=true", true))">
+									Yeni Bir Kullanıcı Oluştur
+								</Button>
+							</MenuItem>
+							<MenuItem Key="admin-2">
+								<Button Type="ButtonType.Primary" Style="background-color:#e6e6e6; color:#0095ff; border-radius:6px; height:36px; font-weight:bold; font-family:'Segoe UI', 'Arial', 'sans-serif'; font-size:16px;" OnClick="@(() => Navigation.NavigateTo("/admin/users?reservationModal=true", true))">
+									Bir Toplantı Ayarla
+								</Button>
+							</MenuItem>
+						}
+						else
+						{
+							<MenuItem Key="1">
+								<div class="wellcome" style="color: white;">
+									<Icon Type="user" Theme="IconThemeType.Outline" />
+									<span>Hoş geldin, @CurrentUserCompany</span>
+								</div>
+							</MenuItem>
+							<MenuItem Key="2" RouterLink="/user/myReservations" RouterMatch="NavLinkMatch.All"
+								style="color: white!important;">
+								<div class="my-reservations">
+									<Icon Type="home" Theme="IconThemeType.Outline" Style="margin-right:5px" />
+									Rezervasyonlarım
+								</div>
+							</MenuItem>
+						}
 						<MenuItem Key="3">
-						<div class="exit" style="cursor: pointer; color: white;" @onclick="HandleLogout">
-							<img src="Exit-Icon.png" alt="Açıklama" style="width: 30px" />
-						</div>
+							<div class="exit" style="cursor: pointer; color: white;" @onclick="HandleLogout">
+								<img src="Exit-Icon.png" alt="Açıklama" style="width: 30px" />
+							</div>
 						</MenuItem>
 					</div>
 				</div>
@@ -91,10 +107,10 @@
 	protected override async Task OnInitializedAsync()
 	{
 		await LoadCurrentUserInfo();
-        AuthProvider.AuthenticationStateChanged += OnAuthenticationStateChanged;
+		AuthProvider.AuthenticationStateChanged += OnAuthenticationStateChanged;	
 	}
 
-    private async Task LoadCurrentUserInfo(AuthenticationState authState = null)
+	private async Task LoadCurrentUserInfo(AuthenticationState authState = null)
 	{
 		try
 		{
@@ -113,24 +129,24 @@
 		{
 			Console.WriteLine($"Error loading current user info: {ex.Message}");
 		}
-        await InvokeAsync(StateHasChanged);
+		await InvokeAsync(StateHasChanged);
 	}
 
-    private async void OnAuthenticationStateChanged(Task<AuthenticationState> task)
-    {
-        try
-        {
-            var authState = await task;
-            
-            await LoadCurrentUserInfo(authState);
+	private async void OnAuthenticationStateChanged(Task<AuthenticationState> task)
+	{
+		try
+		{
+			var authState = await task;
+			
+			await LoadCurrentUserInfo(authState);
 
-            await InvokeAsync(StateHasChanged);
-        }
-        catch (Exception ex)
-        {
-            // Sessizce hata yakala
-        }
-    }
+			await InvokeAsync(StateHasChanged);
+		}
+		catch (Exception ex)
+		{
+			// Sessizce hata yakala
+		}
+	}
 
 	private async Task HandleLogout()
 	{

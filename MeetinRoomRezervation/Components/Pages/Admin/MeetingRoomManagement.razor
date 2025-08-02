@@ -159,19 +159,24 @@
 											@foreach (var res in room.Reservations)
 											{
 												<div class="reservation-slot" style="margin-bottom:8px;">
-													<Button Type="ButtonType.Default" Style="width:100%;
-                                                    height:4.5vh;
-                                                    background-color:#e6f7ff;
-                                                    border:1px solid #1890ff;
-                                                    border-radius:10px;
-                                                    color:#1890ff;">
-														@res.StartTime.ToString("HH:mm") - @res.EndTime.ToString("HH:mm")
-													</Button>
+													<div style="display:flex; align-items:center; gap:8px;">
+														<Button Type="ButtonType.Default" Style="width:100%;
+															height:4.5vh;
+															background-color:#e6f7ff;
+															border:1px solid #1890ff;
+															border-radius:10px;
+															color:#1890ff;">
+															@res.StartTime.ToString("HH:mm") - @res.EndTime.ToString("HH:mm")
+														</Button>
+													</div>
+														<Button Danger Type="ButtonType.Primary" Style="min-width:120px; background:unset; color:red; border:1px solid #ff4d4f;" OnClick="@(() => CancelReservation(res.Id))">
+															Rezervasyonu İptal Et
+														</Button>
 												</div>
 											}
+
 										</div>
 									}
-
 									else
 									{
 										<Tag Style="width: vw10px;
@@ -267,17 +272,16 @@
 						</div>
 					</Modal>
 
-					<Modal @bind-Visible="@IsCancelModalVisible"
-					OnOk="ConfirmCancelReservation"
-					OnCancel="CloseCancelModal"
-					OkText="@deleteButtonText"
-					CancelText="@cancelButtonText"
-					OkType="@ButtonType.Primary">
-
-						<div style="text-align: center; padding: 20px;">
-							<p style="font-size: 16px; margin-bottom: 8px;">Bu rezervasyonu iptal etmek istediğinizden emin misiniz?</p>
-						</div>
-					</Modal>
+				   <Modal @bind-Visible="@IsCancelModalVisible"
+				   OnOk="ConfirmCancelReservation"
+				   OnCancel="CloseCancelModal"
+				   OkText="@deleteButtonText"
+				   CancelText="@cancelButtonText"
+				   OkType="@ButtonType.Primary">
+					   <div style="text-align: center; padding: 20px;">
+						   <p style="font-size: 16px; margin-bottom: 8px;">Bu rezervasyonu iptal etmek istediğinizden emin misiniz?</p>
+					   </div>
+				   </Modal>
 				</div>
 			</div>
 		</div>
@@ -377,10 +381,11 @@
 
 			foreach (var room in allRooms)
 			{
-				var roomReservations = reservations
-					.Where(r => r.RoomId == room.Id)
-					.OrderBy(r => r.StartTime)
-					.ToList();
+
+			   var roomReservations = reservations
+				   .Where(r => r.RoomId == room.Id && r.Status != ReservationStatus.Cancelled)
+				   .OrderBy(r => r.StartTime)
+				   .ToList();
 
 				room.Reservations = roomReservations;
 				room.AvailableSlots = GenerateAvailableSlots(roomReservations);
@@ -431,7 +436,7 @@
 	{
 		if (!string.IsNullOrEmpty(ReservationToCancel))
 		{
-			await ReservationService.DeleteReservationAsync(ReservationToCancel);
+			   await ReservationService.AdminDeleteReservationAsync(ReservationToCancel);
 			await LoadRoomData();
 		}
 		CloseCancelModal();
