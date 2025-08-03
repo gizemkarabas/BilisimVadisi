@@ -1,4 +1,6 @@
-﻿using MeetinRoomRezervation.Data;
+﻿using MeetinRoomReservation.Constants;
+using MeetinRoomRezervation.Data;
+using MeetinRoomRezervation.Extensions;
 using MeetinRoomRezervation.Models;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -153,7 +155,7 @@ namespace MeetinRoomRezervation.Services.ReservationService
                     };
 
                     // Bugün için geçmiş saatleri devre dışı bırak ama rezerve olarak işaretleme
-                    if (isToday && startTime <= now.AddHours(3))
+                    if (isToday && startTime <= now.ConvertToTimeZone(DateConstants.DefaultTimeZone))
                     {
                         slot.IsDisabled = true;
                         slot.IsReserved = false; // Geçmiş saatler rezerve değil, sadece devre dışı

@@ -1,11 +1,13 @@
 ﻿@using AntDesign
+@using MeetinRoomReservation.Constants
+@using MeetinRoomRezervation.Extensions
 
 <div class="date-selector">
     <Space class="equal-space">
         @foreach (var date in Dates)
         {
             <Button Type="ButtonType.Default" @onclick="() => OnDateSelected(date)"
-                class="@($"equal-button {(SelectedDate.Date == date.Date ? "selected-date" : "")}")">
+                class="@($"equal-button {(SelectedDate.Date == date.Date.Date ? "selected-date" : "")}")">
                 @date.Label
             </Button>
         }
@@ -20,7 +22,7 @@
     private readonly List<DateItem> Dates = Enumerable.Range(0, 5)
     .Select(i =>
     {
-        var date = DateTime.Today.AddDays(i);
+        var date = DateTime.UtcNow.ConvertToTimeZone(DateConstants.DefaultTimeZone).AddDays(i);
         string label = i switch
         {
             0 => "Bugün",

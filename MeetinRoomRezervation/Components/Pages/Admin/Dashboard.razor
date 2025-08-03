@@ -276,7 +276,7 @@
         var allRooms = await RoomService.GetAllRoomsAsync();
         var allUsers = await UserService.GetAllUsersAsync();
         FillReservationDetailsFromCache(reservations, allRooms, allUsers);
-        await LoadDashboardDataAsync(reservations, allRooms, allUsers);
+        LoadDashboardDataAsync(reservations, allRooms, allUsers);
         LoadPage();
         StateHasChanged();
     }
@@ -296,10 +296,10 @@
     }
 
 
-    private async Task LoadDashboardDataAsync(List<ReservationDto> reservations, List<MeetingRoomDto> allRooms, List<UserDto> allUsers)
+    private void LoadDashboardDataAsync(List<ReservationDto> reservations, List<MeetingRoomDto> allRooms, List<UserDto> allUsers)
     {
         LastReservations = reservations
-            .Where(r => r.StartTime.Date >= DateTime.Now)
+            .Where(r => r.StartTime.Date >= DateTime.UtcNow)
             .OrderBy(r => r.StartTime)
             .Take(10)
             .ToList();

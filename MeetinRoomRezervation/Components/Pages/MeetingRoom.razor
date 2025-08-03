@@ -1,4 +1,6 @@
 ﻿@page "/user/meetingRooms"
+@using MeetinRoomReservation.Constants
+@using MeetinRoomRezervation.Extensions
 @using Microsoft.AspNetCore.WebUtilities
 @using AntDesign
 @using MeetinRoomRezervation.Components.PartialComponents.Rooms
@@ -87,15 +89,15 @@
 
 @code {
     private List<MeetingRoomDto> Rooms = new();
-	private DateTime _selectedDate = DateTime.Today;
-	private DateTime TodayDate = DateTime.Today;
+    private DateTime _selectedDate = DateTime.UtcNow.ConvertToTimeZone(DateConstants.DefaultTimeZone).Date;
+    private DateTime TodayDate = DateTime.UtcNow.ConvertToTimeZone(DateConstants.DefaultTimeZone).Date;
 	private string? UserIdFromQuery;
 
     private DateItem SelectedDateItem
     {
         get => new DateItem(
-			SelectedDate == DateTime.Today ? "Bugün" :
-			SelectedDate == DateTime.Today.AddDays(1) ? "Yarın" :
+            SelectedDate == DateTime.UtcNow.ConvertToTimeZone(DateConstants.DefaultTimeZone).Date ? "Bugün" :
+            SelectedDate == DateTime.UtcNow.ConvertToTimeZone(DateConstants.DefaultTimeZone).AddDays(1).Date ? "Yarın" :
             SelectedDate.ToString("dd.MM.yyyy dddd", new System.Globalization.CultureInfo("tr-TR")),
             SelectedDate);
         set
@@ -157,5 +159,5 @@
 		Navigation.NavigateTo(url);
 	}
 
-	private bool DisablePastDates(DateTime date) => date < DateTime.Today;
+    private bool DisablePastDates(DateTime date) => date < DateTime.UtcNow.ConvertToTimeZone(DateConstants.DefaultTimeZone).Date;
 }
