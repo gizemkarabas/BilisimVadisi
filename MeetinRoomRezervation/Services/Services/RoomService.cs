@@ -27,8 +27,7 @@ namespace MeetinRoomRezervation.Services.ReservationService
         {
             try
             {
-                //var objectId = new ObjectId(roomId);
-                var filter = Builders<Data.MeetingRoom>.Filter.Eq("_id", roomId);
+                var filter = Builders<MeetingRoom>.Filter.Eq(r => r.Id, roomId);
                 var room = await _context.Rooms.Find(filter).FirstOrDefaultAsync();
 
                 if (room == null)

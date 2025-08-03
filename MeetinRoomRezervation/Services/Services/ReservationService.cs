@@ -234,7 +234,7 @@ namespace MeetinRoomRezervation.Services.ReservationService
                 string userEmail = null;
                 if (!string.IsNullOrEmpty(reservation.UserId))
                 {
-                    var userFilter = Builders<User>.Filter.Eq("_id", reservation.UserId);
+                    var userFilter = Builders<User>.Filter.Eq(p => p.Id, reservation.UserId);
                     var user = await _context.Users.Find(userFilter).FirstOrDefaultAsync();
                     userEmail = user?.Email;
                     if (user != null)
@@ -256,7 +256,7 @@ namespace MeetinRoomRezervation.Services.ReservationService
                 MeetingRoomDto roomDto = null;
                 if (!string.IsNullOrEmpty(reservation.RoomId))
                 {
-                    var roomFilter = Builders<Data.MeetingRoom>.Filter.Eq("_id", reservation.RoomId);
+                    var roomFilter = Builders<Data.MeetingRoom>.Filter.Eq(p => p.Id, reservation.RoomId);
                     var room = await _context.Rooms.Find(roomFilter).FirstOrDefaultAsync();
                     roomName = room?.Name;
                     if (room != null)

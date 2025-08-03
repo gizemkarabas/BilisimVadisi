@@ -88,7 +88,6 @@ namespace MeetinRoomRezervation.Services
 
                 var user = new User
                 {
-                    Id = Guid.NewGuid().ToString(),
                     Email = model.Email,
                     FirstName = model.Name,
                     LastName = model.Surname,
