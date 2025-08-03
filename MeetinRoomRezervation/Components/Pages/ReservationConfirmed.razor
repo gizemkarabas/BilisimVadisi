@@ -16,55 +16,64 @@
 @inject IUserService UserService
 @inject IRoomService RoomService
 
-<Space Direction="SpaceDirection.Vertical" Align="SpaceAlign.Center" Style="width:100%; height:100%">
-    <div class="background-gradient"></div>
-
-    <div class="logo-container">
-        <img src="/images/bv_logo.png" alt="Bilişim Vadisi" class="logo" />
-    </div>
-
-    @if (reservation != null && !string.IsNullOrEmpty(reservation.Id))
-    {
-        <div class="confirmation-card">
-            <div class="card-header">
-                <h2>Rezervasyonunuz Onaylandı</h2>
+<div>
+    <GridRow>
+        <GridCol Span="24">
+            <div class="background-gradient">
+                <img src="/images/bv_logo.png" alt="Bilişim Vadisi" class="logo" />
             </div>
+        </GridCol>
+    </GridRow>
+    <GridRow>
+        <GridCol Span="24" Style="display:flex; justify-content:center">
+            @if (reservation != null && !string.IsNullOrEmpty(reservation.Id))
+            {
+                <div class="confirmation-card">
+                    <div class="card-header">
+                        <h2>Rezervasyonunuz Onaylandı</h2>
+                    </div>
 
-            <div class="time-badge">
-                @reservation.StartTime.ToString("HH:mm") - @reservation.EndTime.ToString("HH:mm")
+                    <div class="time-badge">
+                        @reservation.StartTime.ToString("HH:mm") - @reservation.EndTime.ToString("HH:mm")
+                    </div>
+
+                    <Summary Info="new()
+                             {
+                                 Label1 = StringConstants.Location,
+                                 Label2 = StringConstants.Saloon,
+                                 Label3 = StringConstants.Date,
+                                 Value1 = StringConstants.LocationName,
+                                 Value2 = reservation.Room.Name,
+                                 Value3 = reservation.StartTime.ToString(DateConstants.DateTimeFormatWithDayName)
+                             }" />
+                </div>
+            }
+            else if (isLoading)
+            {
+                <div class="loading-card">
+                    <div class="loading-spinner"></div>
+                    <p>Rezervasyon bilgileri yükleniyor...</p>
+                </div>
+            }
+            else
+            {
+                <div class="error-card">
+                    <h3>Rezervasyon bulunamadı</h3>
+                    <p>Belirtilen rezervasyon ID'si ile ilgili bir kayıt bulunamadı.</p>
+                </div>
+            }
+        </GridCol>
+    </GridRow>
+    <GridRow Justify="RowJustify.Center">
+        <GridCol Span="24" Style="display:flex; justify-content:center">
+            <div class="action-button-container">
+                <button class="action-button" @onclick="NavigateToMyReservations">
+                    Rezervasyonlarıma Git
+                </button>
             </div>
-
-            <Summary Info="new() 
-            { 
-                Label1 = StringConstants.Location,
-                Label2 = StringConstants.Saloon,
-                Label3 = StringConstants.Date,
-                Value1 = StringConstants.LocationName,
-                Value2 = reservation.Room.Name,
-                Value3 = reservation.StartTime.ToString(DateConstants.DateTimeFormatWithDayName) 
-            }" />
-        </div>
-    }
-    else if (isLoading)
-    {
-        <div class="loading-card">
-            <div class="loading-spinner"></div>
-            <p>Rezervasyon bilgileri yükleniyor...</p>
-        </div>
-    }
-    else
-    {
-        <div class="error-card">
-            <h3>Rezervasyon bulunamadı</h3>
-            <p>Belirtilen rezervasyon ID'si ile ilgili bir kayıt bulunamadı.</p>
-        </div>
-    }
-    <div class="action-button-container">
-        <button class="action-button" @onclick="NavigateToMyReservations">
-            Rezervasyonlarıma Git
-        </button>
-    </div>
-</Space>
+        </GridCol>
+    </GridRow>
+</div>
 
 @code {
     [Parameter] public string ReservationId { get; set; } = string.Empty;
