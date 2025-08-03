@@ -1,4 +1,5 @@
 ﻿using MeetinRoomReservation.Constants;
+using MeetinRoomRezervation.Constants;
 using MeetinRoomRezervation.Data;
 using MeetinRoomRezervation.Extensions;
 using MeetinRoomRezervation.Models;
@@ -198,58 +199,53 @@ namespace MeetinRoomRezervation.Services.ReservationService
         {
             try
             {
-                var startOfDay = new DateTime(date.Year, date.Month, date.Day, 0, 0, 0, DateTimeKind.Local);
-                var endOfDay = startOfDay.AddDays(1).AddTicks(-1);
-
                 var rooms = await _context.Rooms.Find(_ => true).ToListAsync();
                 var result = new List<MeetingRoomDto>();
 
-                foreach (var room in rooms)
+                bool isToday = date.Date == DateTime.Today;
+                double passedHour = 0;
+
+                FilterDefinition<Reservation> reservationFilter = Builders<Reservation>.Filter.Empty;
+                if (isToday)
                 {
-                    // Belirli bir tarih için rezervasyonları al
-                    var reservationFilter = Builders<Reservation>.Filter.And(
-                        Builders<Reservation>.Filter.Eq(r => r.RoomId, room.Id),
+                    DateTime now = DateTime.UtcNow;
+                    DateTime nextHour = new DateTime(now.Year, now.Month, now.Day, now.Hour, 0, 0).AddHours(1);
+                    DateTime startOfNextDay = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0).AddDays(1);
+                    reservationFilter = Builders<Reservation>.Filter.And(
+                        Builders<Reservation>.Filter.Gte(r => r.StartTime, nextHour),
+                        Builders<Reservation>.Filter.Lte(r => r.StartTime, startOfNextDay),
+                        Builders<Reservation>.Filter.Eq(r => r.Status, ReservationStatus.Active));
+                    DateTime timeZoneDate = DateTime.UtcNow.ConvertToTimeZone(DateConstants.DefaultTimeZone);
+                    passedHour = Math.Floor((timeZoneDate.AddHours(1) - timeZoneDate.Date).TotalHours);
+                }
+                else
+                {
+                    DateTime startOfDay = new DateTime(date.Year, date.Month, date.Day, 0, 0, 0, DateTimeKind.Local);
+                    DateTime endOfDay = startOfDay.AddDays(1).AddTicks(-1);
+                    reservationFilter = Builders<Reservation>.Filter.And(
                         Builders<Reservation>.Filter.Gte(r => r.StartTime, startOfDay),
                         Builders<Reservation>.Filter.Lte(r => r.StartTime, endOfDay),
-                        Builders<Reservation>.Filter.Eq(r => r.Status, ReservationStatus.Active)
-                    );
-                    var roomReservations = await _context.Reservations.Find(reservationFilter).ToListAsync();
+                        Builders<Reservation>.Filter.Eq(r => r.Status, ReservationStatus.Active));
+                }
 
+                var resevations = await _context.Reservations.Find(reservationFilter).ToListAsync();
+                foreach (var room in rooms)
+                {
                     int reservedHoursCount = 0;
-                    var now = DateTime.UtcNow;
-                    bool isToday = date.Date == DateTime.Today;
+                    var roomReservations = resevations.Where(p => p.RoomId == room.Id);
 
-                    for (int hour = 0; hour < 24; hour++)
-                    {
-                        var slotStart = new DateTime(date.Year, date.Month, date.Day, hour, 0, 0);
-                        var slotEnd = slotStart.AddHours(1);
-
-                        // Rezervasyon kontrolü
-                        bool isReserved = roomReservations.Any(r =>
-                            (r.StartTime.ToLocalTime() < slotEnd) && (r.EndTime.ToLocalTime() > slotStart)
-                        );
-
-                        // Bugün için geçmiş saatleri veya rezerve edilmiş saatleri say
-                        if (isToday && slotStart <= now)
-                        {
-                            reservedHoursCount++; // Geçmiş saatler doluluk oranına dahil
-                        }
-                        else if (isReserved)
-                        {
-                            reservedHoursCount++; // Rezerve edilmiş saatler
-                        }
-                    }
-
-                    double totalHours = 24;
+                    var totalReservedHours = roomReservations.Sum(r =>
+                        Math.Floor((r.EndTime.AddMinutes(1) - r.StartTime).TotalHours));
+                    totalReservedHours += passedHour;
                     double reservedHours = reservedHoursCount;
-                    double occupancyRate = Math.Min(100, Math.Round((reservedHours / totalHours) * 100, 2));
+                    double occupancyRate = Math.Min(100, Math.Round((totalReservedHours / 24) * 100, 2));
 
                     result.Add(new MeetingRoomDto
                     {
                         Id = room.Id!,
                         Name = room.Name,
                         Capacity = room.Capacity,
-                        Location = room.Location ?? "İzmir Bilisim Vadisi",
+                        Location = room.Location ?? StringConstants.LocationName,
                         OccupancyRate = occupancyRate,
                         IsAvailable = occupancyRate < 100
                     });

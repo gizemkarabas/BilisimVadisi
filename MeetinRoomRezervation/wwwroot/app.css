@@ -1,7 +1,121 @@
-html,
-body {
-
+/* FOUC Prevention Styles - More Aggressive */
+html {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transition: opacity 0.3s ease-in-out;
 }
+
+html.blazor-loaded {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Fallback for slow connections */
+html {
+    animation: auto-show 3s forwards;
+}
+
+@keyframes auto-show {
+    0% {
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    99% {
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    100% {
+        opacity: 1;
+        visibility: visible;
+    }
+}
+
+html.blazor-loaded {
+    animation: none;
+}
+
+/* Prevent flash of unstyled content */
+body {
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: white;
+    transition: opacity 0.2s ease-in-out;
+    min-height: 100vh;
+}
+
+body.blazor-loaded {
+    opacity: 1;
+}
+
+/* Loading spinner for initial load */
+.blazor-loading {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    display: none;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #006bb7;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Basic layout styles to prevent layout shift */
+.main-layout-bar {
+    min-height: 60px;
+    background-color: #006bb7;
+}
+
+.ant-menu {
+    background-color: transparent !important;
+    border-bottom: none !important;
+}
+
+.ant-btn {
+    border-radius: 8px !important;
+}
+
+/* Ensure consistent font loading */
+.fonts-loaded body {
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* Loading states */
+.loading-skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
 .text2 {
     font-family: 'Poppins', sans-serif;
 }
@@ -157,4 +271,73 @@ h1:focus {
     padding: 0;
     font-weight: 500;
     text-align: center;
+}
+
+/* Skeleton Loading Animation */
+.skeleton-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    padding: 20px;
+}
+
+.skeleton-form {
+    width: 100%;
+    max-width: 400px;
+}
+
+.skeleton-title {
+    width: 70%;
+    height: 32px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+
+.skeleton-input {
+    width: 100%;
+    height: 50px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+    border-radius: 7px;
+    margin-bottom: 20px;
+}
+
+.skeleton-button {
+    width: 100%;
+    height: 50px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+    border-radius: 7px;
+    margin: 25px 0;
+}
+
+.skeleton-links {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.skeleton-link {
+    width: 45%;
+    height: 20px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+    border-radius: 4px;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
 }

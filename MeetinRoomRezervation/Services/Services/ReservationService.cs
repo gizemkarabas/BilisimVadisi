@@ -164,7 +164,6 @@ namespace MeetinRoomRezervation.Services.ReservationService
 
                     var reservation = new Reservation
                     {
-                        Id = Guid.NewGuid().ToString(),
                         UserId = targetUser.Id,
                         RoomId = reservationDto.RoomId,
                         StartTime = utcStartTime,

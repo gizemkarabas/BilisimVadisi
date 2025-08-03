@@ -1,13 +1,89 @@
 ﻿@page "/"
 @using MeetinRoomRezervation.Components.Layout
 @using MeetinRoomRezervation.Components.PartialComponents.Auth
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
 @layout EmptyLayout
+@inject AuthenticationStateProvider AuthProvider
+@inject NavigationManager Navigation
 
 <GridLayout>
     <LeftContent>
-        <LoginForm />
+        @if (!isAuthenticated)
+        {
+            <LoginForm />
+        }
+        else
+        {
+            <div class="skeleton-container">
+                <div class="skeleton-form">
+                    <div class="skeleton-title"></div>
+                    <div class="skeleton-input"></div>
+                    <div class="skeleton-input"></div>
+                    <div class="skeleton-button"></div>
+                    <div class="skeleton-links">
+                        <div class="skeleton-link"></div>
+                        <div class="skeleton-link"></div>
+                    </div>
+                </div>
+            </div>
+        }
     </LeftContent>
     <RightContent>
         <ImageContent ImageUrl="/W-Home-Hand.png" SquareImageUrl="/W-Home-Hand-Square.png" />
     </RightContent>
 </GridLayout>
+
+@code
+{
+    private bool hasCheckedAuth = false;
+    private string redirectUrl = null;
+    private bool isAuthenticated = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!hasCheckedAuth)
+        {
+            hasCheckedAuth = true;
+            await CheckExistingAuthentication();
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (!string.IsNullOrEmpty(redirectUrl))
+        {
+            var url = redirectUrl;
+            redirectUrl = null; // Reset to prevent infinite loops
+            Navigation.NavigateTo(url, false);
+        }
+    }
+
+    private async Task CheckExistingAuthentication()
+    {
+        try
+        {
+            var authState = await AuthProvider.GetAuthenticationStateAsync();
+            if (authState.User.Identity?.IsAuthenticated == true)
+            {
+                isAuthenticated = true;
+                var role = authState.User.FindFirst(ClaimTypes.Role)?.Value;
+
+                if (!string.IsNullOrEmpty(role) && role.ToLower().Contains("admin"))
+                {
+                    redirectUrl = "/admin/dashboard";
+                }
+                else
+                {
+                    redirectUrl = "/user/meetingRooms";
+                }
+
+                StateHasChanged(); // Trigger re-render to execute OnAfterRender
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error checking existing authentication: {ex.Message}");
+        }
+    }
+}

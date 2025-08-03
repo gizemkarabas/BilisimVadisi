@@ -1,11 +1,9 @@
 ﻿@using MeetinRoomRezervation.Components.PartialComponents.Input
 @using MeetinRoomRezervation.Components.PartialComponents.Title
 @using MeetinRoomRezervation.Data
-@using System.Security.Claims
-@using static MeetinRoomRezervation.Components.Pages.Login
 @inject AuthenticationStateProvider AuthProvider
-@inject IAuthService AuthService
 @inject NavigationManager Navigation
+@inject IAuthService AuthService
 
 <div>
     @if (!string.IsNullOrEmpty(ErrorMessage))
@@ -44,40 +42,6 @@
     private bool IsLoading = false;
     private string ErrorMessage = "";
     private bool hasRendered = false;
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender && !hasRendered)
-        {
-            hasRendered = true;
-            await CheckExistingAuthentication();
-        }
-    }
-
-    private async Task CheckExistingAuthentication()
-    {
-        try
-        {
-            var authState = await AuthProvider.GetAuthenticationStateAsync();
-            if (authState.User.Identity?.IsAuthenticated == true)
-            {
-                var role = authState.User.FindFirst(ClaimTypes.Role)?.Value;
-
-                if (!string.IsNullOrEmpty(role) && role.ToLower().Contains("admin"))
-                {
-                    Navigation.NavigateTo("/admin/dashboard", true);
-                }
-                else
-                {
-                    Navigation.NavigateTo("/user/meetingRooms", true);
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error checking existing authentication: {ex.Message}");
-        }
-    }
 
     private async Task HandleLogin()
     {
