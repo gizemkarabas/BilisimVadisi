@@ -1,21 +1,4 @@
-﻿
-.reservation-panel {
-    display: flex;
-    flex-direction: column;
-    align-content: center;
-    justify-content: center;
-    justify-self: center;
-    background-color: #e6e6e6;
-    margin-top: 30px;
-    box-shadow: 5px 5px 10px rgba(87, 87, 87, 0.1);
-    border-radius: 10px;
-    border-color: #d2d2d2;
-    border: 1.2px solid #e2dfdf;
-    padding: 15px;
-    height: auto;
-    width: 85vw;
-}
-::deep .weekly-day-picker {
+﻿::deep .weekly-day-picker {
     background-color: transparent !important;
     background: transparent !important;
 }
@@ -63,23 +46,6 @@
 
 @media (max-width: 600px) {
     
-    .reservation-panel {
-        display: flex;
-        flex-direction: column;
-        align-content: center;
-        justify-content: center;
-        background-color: #e6e6e6;
-        box-shadow: 5px 5px 10px rgba(87, 87, 87, 0.1);
-        border-radius: 10px;
-        border-color: #d2d2d2;
-        border: 1.2px solid #e2dfdf;
-        padding: 15px;
-        width: 90%;
-        height: auto;
-        margin-top: 30px;
-        margin-left: 20px;
-        margin-right: 20px;
-    }
     .reservation-panel-header {
         font-size: 14px;
         font-weight: bold;

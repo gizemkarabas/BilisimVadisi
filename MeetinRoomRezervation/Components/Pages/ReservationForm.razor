@@ -1,5 +1,6 @@
 ﻿@page "/user/reservationForm"
 @using System.Security.Claims
+@using MeetinRoomRezervation.Components.PartialComponents.Shared
 @using MeetinRoomRezervation.Models
 @using MeetinRoomRezervation.Services.ReservationService
 
@@ -32,7 +33,7 @@ else
 						DisabledDate="DisablePastDates" />
 		</div>
 	</div>
-	<div class="reservation-panel">
+	<BackPanel>
 		<Form Model="this" OnFinish="GoToSummary">
 			<b>Lütfen Tarihi Seçin</b>
 			<div class="availability-panel">
@@ -93,7 +94,7 @@ else
 				</Button>
 			</div>
 		</Form>
-	</div>
+    </BackPanel>
 }
 
 

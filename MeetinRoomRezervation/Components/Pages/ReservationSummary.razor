@@ -1,5 +1,8 @@
 ﻿@page "/user/reservation-summary"
+@using MeetinRoomReservation.Constants
 @using MeetinRoomRezervation.Components.PartialComponents.Reservations
+@using MeetinRoomRezervation.Components.PartialComponents.Shared
+@using MeetinRoomRezervation.Constants
 @using MeetinRoomRezervation.Models
 @using MeetinRoomRezervation.Services.ReservationService
 @using AntDesign
@@ -11,66 +14,74 @@
 @inject AuthenticationStateProvider AuthProvider
 @inject IMessageService MessageService
 
-<div class="reservation-panel">
+<BackPanel>
     <div class="reservation-header">Rezervasyonunuzu Onaylayın</div>
-    <div class="reservation-card-center">
-        @if (ReservationState.SelectedSlots.Any())
-        {
-            <div class="reservation-card">
-                <!-- Hata mesajı gösterimi -->
-                @if (!string.IsNullOrEmpty(errorMessage))
-                {
-                    <div style="margin-bottom: 20px;">
-                        <Alert Message="@errorMessage" Type="@AlertType.Error" ShowIcon="true" Closable="true"
-                               OnClose="() => errorMessage = string.Empty" />
-                    </div>
-                }
-
-                <div class="slots-list">
-                    @foreach (var slot in ReservationState.SelectedSlots)
+        <div class="reservation-card-center">
+            @if (ReservationState.SelectedSlots.Any())
+            {
+                <div class="reservation-card">
+                    <!-- Hata mesajı gösterimi -->
+                    @if (!string.IsNullOrEmpty(errorMessage))
                     {
-                        <div style="background-color: #1890ff;text-align:left; color: white;width:100%; padding: 8px 16px; border-radius: 5px; min-width: 100px;">
-                            @slot.StartTime.ToString("HH:mm") - @slot.EndTime.ToString("HH:mm")
+                        <div style="margin-bottom: 20px;">
+                            <Alert Message="@errorMessage" Type="@AlertType.Error" ShowIcon="true" Closable="true"
+                                   OnClose="() => errorMessage = string.Empty" />
                         </div>
                     }
-                </div>
 
-                <Summary Info="new(){RoomName = ReservationState.RoomName, SelectedDate = ReservationState.SelectedDate}" />
+                    <div class="slots-list">
+                        @foreach (var slot in ReservationState.SelectedSlots)
+                        {
+                            <div style="background-color: #1890ff;text-align:left; color: white;width:100%; padding: 8px 16px; border-radius: 5px; min-width: 100px;">
+                                @slot.StartTime.ToString("HH:mm") - @slot.EndTime.ToString("HH:mm")
+                            </div>
+                        }
+                    </div>
+
+                    <Summary Info=" new()
+                             {
+                                 Label1 = StringConstants.Location,
+                                 Label2 = StringConstants.Saloon,
+                                 Label3 = StringConstants.Date,
+                                 Value1 = StringConstants.LocationName,
+                                 Value2 = ReservationState.RoomName,
+                                 Value3 = ReservationState.SelectedDate.ToString(DateConstants.DateTimeFormatWithDayName)
+                             }" />
 
                 <div style="margin-top: 16px; text-align:center;">
                     <b>Kullanıcı:</b>
                     @(ReservationState.User != null ? $"{ReservationState.User.FirstName} {ReservationState.User.LastName} ({ReservationState.User.Email})" : ReservationState.UserEmail)
                 </div>
 
-                <h4 style="text-align:center; font-weight:700">
-                    Toplam @ReservationState.SelectedSlots.Count Saat
-                </h4>
+                    <h4 style="text-align:center; font-weight:700">
+                        Toplam @ReservationState.SelectedSlots.Count Saat
+                    </h4>
 
-                <div style="margin-top: 20px; text-align:center;">
-                    <Button Type="ButtonType.Primary" OnClick="ConfirmReservation"
-                            Style="width: 200px;" Shape="ButtonShape.Round" Loading="@isLoading">
+                    <div style="margin-top: 20px; text-align:center;">
+                        <Button Type="ButtonType.Primary" OnClick="ConfirmReservation"
+                                Style="width: 200px;" Shape="ButtonShape.Round" Loading="@isLoading">
                         @if (isLoading)
-                        {
-                            <span>Onaylanıyor...</span>
-                        }
-                        else
-                        {
-                            <span>Onayla</span>
-                        }
-                    </Button>
-                </div>
+                            {
+                                <span>Onaylanıyor...</span>
+                            }
+                            else
+                            {
+                                <span>Onayla</span>
+                            }
+                        </Button>
+                    </div>
 
-                <div style="margin-top: 10px; text-align:center;">
-                    <Button Type="ButtonType.Default" OnClick="GoBack" Style="width: 200px;" Disabled="@isLoading">Geri</Button>
+                    <div style="margin-top: 10px; text-align:center;">
+                        <Button Type="ButtonType.Default" OnClick="GoBack" Style="width: 200px;" Disabled="@isLoading">Geri</Button>
+                    </div>
                 </div>
-            </div>
-        }
-        else
-        {
-            <Alert Message="Seçili saat bulunamadı." Type="@AlertType.Warning" ShowIcon="true" />
-        }
-    </div>
-</div>
+            }
+            else
+            {
+                <Alert Message="Seçili saat bulunamadı." Type="@AlertType.Warning" ShowIcon="true" />
+            }
+        </div>
+</BackPanel>
 
 @code {
     private static readonly CultureInfo turkishCulture = new CultureInfo("tr-TR");

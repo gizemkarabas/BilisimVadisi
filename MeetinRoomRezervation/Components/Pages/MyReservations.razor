@@ -1,5 +1,9 @@
 ﻿@page "/user/myreservations"
 @using AntDesign
+@using MeetinRoomReservation.Constants
+@using MeetinRoomRezervation.Components.PartialComponents.Reservations
+@using MeetinRoomRezervation.Components.PartialComponents.Shared
+@using MeetinRoomRezervation.Constants
 @using MeetinRoomRezervation.Models
 @using MeetinRoomRezervation.Services.ReservationService
 @using System.Security.Claims
@@ -10,339 +14,259 @@
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
 @inject IUserService UserService
-
+<PageTitle>Rezervasyonlarım</PageTitle>
 <div class="reservation-panel-buttons">
-	<Button Type="@ButtonType.Link"
-	OnClick="@(() => Navigation.NavigateTo("/user/meetingRooms"))"
-	Style="display: flex;
-							justify-content:flex-start;
-							width:200px;
-							justify-content: center;
-							align-items: center;
-							padding: 0;
-							border-radius: 8px;
-							box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-							margin-right: 15px;"
-	Block>
-		<div class="reservation-button">
-			<div class="reservation-button-title">
-				Toplantı Odaları
-			</div>
-		</div>
-	</Button>
-	<Button Type="@ButtonType.Link"
-	OnClick="@(() => Navigation.NavigateTo("/user/myreservations"))"
-	Style="display: flex;
-							width:200px;
-							background-color:#0095ff;
-							justify-content: center;
-							align-items: center;
-							padding: 0;
-							border-radius: 8px;
-							box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-							margin-bottom: 10px;
-							margin-left: 15px;"
-	Block>
-		<div class="reservation-button" style="margin-left:6px;">
-			<div class="active-reservation-button-title">
-				Rezervasyonlarım
-			</div>
-		</div>
-	</Button>
+    <Button Type="@ButtonType.Link"
+            OnClick="@(() => Navigation.NavigateTo("/user/meetingRooms"))"
+            Style="display: flex;
+       justify-content:flex-start;
+       width:200px;
+       justify-content: center;
+       align-items: center;
+       padding: 0;
+       border-radius: 8px;
+       box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+       margin-right: 15px;"
+            Block>
+        <div class="reservation-button">
+            <div class="reservation-button-title">
+                Toplantı Odaları
+            </div>
+        </div>
+    </Button>
+    <Button Type="@ButtonType.Link"
+            OnClick="@(() => Navigation.NavigateTo("/user/myreservations"))"
+            Style="display: flex;
+       width:200px;
+       background-color:#0095ff;
+       justify-content: center;
+       align-items: center;
+       padding: 0;
+       border-radius: 8px;
+       box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+       margin-bottom: 10px;
+       margin-left: 15px;"
+            Block>
+        <div class="reservation-button" style="margin-left:6px;">
+            <div class="active-reservation-button-title">
+                Rezervasyonlarım
+            </div>
+        </div>
+    </Button>
 </div>
 
-<div class="reservation-panel">
-	<PageHeader Style="background-color: unset;padding:0px" Title="Rezervasyonlarım" />
+<BackPanel style="background-color:white; box-shadow:none; border:none;">
+    <PageHeader Style="background-color: unset;padding:0px" Title="Rezervasyonlarım" />
 
-	@if (isLoading)
-	{
-		<div style="text-align: center; padding: 50px;">
-			<Spin Size="SpinSize.Large" />
-			<p>Yükleniyor...</p>
-		</div>
-	}
-	else
-	{
-		<Tabs DefaultActiveKey="1">
-			<TabPane Key="1" Tab="Aktif Rezervasyonlarım" Style="min-width:10vw;">
-				@if (FutureReservations.Any())
-				{
-					<Row Gutter="16">
-						@foreach (var reservation in FutureReservations)
-						{
-							<AntDesign.Col Xs="24" Sm="24" Md="12" Lg="8" Xl="6">
-								<Card Title="@($"{reservation.StartTime.ToLocalTime().ToString("HH:mm")} - {reservation.EndTime.ToLocalTime().ToString("HH:mm")}")"
-								Class="reservation-card"
-								Style="margin-bottom: 16px;
-                                                border-radius: 6px;
-                                                background-color: unset;
-                                                color: #333;
-                                                box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);">
-									<div class="reservation-detail-panel">
-										<div class="icon-bar">
-											<div>
-												<svg width="15" height="15" viewBox="0 0 18 18" fill="white">
-													<path d="M8.61111 15.0003L7.94444 15.5003L8.65114 16.4426L9.30448 15.4626L8.61111 15.0003ZM9.27777 14.5003L5.66667 9.68551L4.33333 10.6855L7.94444 15.5003L9.27777 14.5003ZM15.14 3.70474L7.91773 14.5381L9.30448 15.4626L16.5267 4.62924L15.14 3.70474Z" fill="white" />
-												</svg>
-											</div>
-											<div>
-												<svg width="14" height="17" viewBox="0 0 14 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-													<path d="M2.41699 12.333L3.25033 4.41634C3.87215 3.68983 5.30709 3.16634 7.00034 3.16634M11.5837 12.333L10.7503 4.41634C10.1285 3.68983 8.69359 3.16634 7.00034 3.16634M7.00034 3.16634L7.00033 1.49968" stroke="white" stroke-width="1.66667" stroke-linecap="square" stroke-linejoin="round" />
-													<path d="M1.16699 13.167H4.85765M12.8337 13.167H9.14337M9.14337 13.167L9.03869 13.8994C8.89372 14.9136 8.02504 15.667 7.00046 15.667V15.667C5.97577 15.667 5.10702 14.9135 4.96218 13.8991L4.85765 13.167M9.14337 13.167H4.85765" stroke="white" stroke-width="1.66667" stroke-linecap="square" stroke-linejoin="round" />
-												</svg>
-											</div>
-											<div>
-												<svg width="24" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-													<path d="M7.99967 2.33301L10.1157 6.08721L14.34 6.93956L11.4235 10.1121L11.9182 14.3931L7.99967 12.5997L4.08111 14.3931L4.57587 10.1121L1.6593 6.93956L5.88365 6.08721L7.99967 2.33301Z" stroke="white" stroke-width="1.66667" />
-												</svg>
-											</div>
-										</div>
-										<div>
-											<dl class="descriptions">
-												<div>
-													<p>
-														Şirket :
-														@{
-															// Current user bilgilerini al (UsersInfo listesinde sadece 1 kullanıcı var)
-															var currentUser = UsersInfo.FirstOrDefault();
-														}
-														@(currentUser?.Company ?? "Bilinmiyor")
-													</p>
-												</div>
-												<div>
-													<p>
-														Yetkili :
-														@(currentUser?.CompanyOfficial ?? currentUser?.Email ?? "Bilinmiyor")
-													</p>
-												</div>
-												<div>
-													<p>
-														Telefon:
-														@(currentUser?.ContactPhone ?? "")
-													</p>
-												</div>
+    @if (isLoading)
+    {
+        <div style="text-align: center; padding: 50px;">
+            <Spin Size="SpinSize.Large" />
+            <p>Yükleniyor...</p>
+        </div>
+    }
+    else
+    {
+        <Tabs DefaultActiveKey="1">
+            <TabPane Key="1" Tab="Aktif Rezervasyonlarım" Style="min-width:10vw;">
+                @if (FutureReservations.Any())
+                {
+                    <Row Gutter="16">
+                        @foreach (var reservation in FutureReservations)
+                        {
+                            <AntDesign.Col Xs="24" Sm="24" Md="12" Lg="8" Xl="6">
+                                <Card Title="@($"{reservation.StartTime.ToLocalTime().ToString("HH:mm")} - {reservation.EndTime.ToLocalTime().ToString("HH:mm")}")"
+                                      Class="reservation-card"
+                                      Style="margin-bottom: 16px;
+                                                         border-radius: 6px;
+                                                         background-color: unset;
+                                                         color: #333;
+                                                         box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);">
+                                    <Summary Info="new()
+                                             {
+                                                 Label1 = StringConstants.Company,
+                                                 Label2 = StringConstants.Authorized,
+                                                 Label3 = StringConstants.Phone,
+                                                 Value1 = currentUser.Company,
+                                                 Value2 = reservation.User.CompanyOfficial,
+                                                 Value3 = reservation.User.ContactPhone
+                                             }" />
 
-											</dl>
-										</div>
-									</div>
-									<Button Danger Type="ButtonType.Primary"
-									OnClick="() => ShowCancelConfirmation(reservation.Id)"
-									Style="margin-top:30px; width: 100%;background-color:unset;color:red;"
-									Loading="@isCancelling">
-										Rezervasyonu İptal Et
-									</Button>
-								</Card>
-							</AntDesign.Col>
-						}
-					</Row>
-				}
-				else
-				{
-					<Alert Message="Henüz bir rezervasyonunuz bulunmamaktadır." Type="AlertType.Info" ShowIcon="true" />
-				}
-			</TabPane>
+                        <Button Type="ButtonType.Primary"
+                                OnClick="() => ShowCancelConfirmation(reservation.Id)"
+                                Style="margin-top:30px; width: 100%;background-color:unset;color:#A90808; border-color:#A90808;"
+                                Loading="@isCancelling">
+                            Rezervasyonu İptal Et
+                        </Button>
+                    </Card>
+                </AntDesign.Col>
+                                }
+                    </Row>
+                }
+                else
+                {
+                    <Alert Message="Henüz bir rezervasyonunuz bulunmamaktadır." Type="AlertType.Info" ShowIcon="true" />
+                }
+            </TabPane>
 
-			<TabPane Key="2" Tab="Geçmiş Rezervasyonlarım" Style="min-width:10vw;">
-				@if (PastReservations.Any())
-				{
-					<Row Gutter="16">
-						@foreach (var reservation in PastReservations)
-						{
-							<AntDesign.Col Xs="24" Sm="24" Md="12" Lg="8" Xl="6">
-								<Card Title="@($"{reservation.StartTime.ToString("HH:mm")} - {reservation.EndTime.ToString("HH:mm")}")"
-								Style="margin-bottom: 16px;
-                                                  border-radius: 6px;
-                                                  background-color: unset;
-                                                  color: #666;
-                                                  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.05);">
-									<div class="reservation-detail-panel">
-										<div class="icon-bar">
-											<div>
-												<svg width="15" height="15" viewBox="0 0 18 18" fill="white">
-													<path d="M8.61111 15.0003L7.94444 15.5003L8.65114 16.4426L9.30448 15.4626L8.61111 15.0003ZM9.27777 14.5003L5.66667 9.68551L4.33333 10.6855L7.94444 15.5003L9.27777 14.5003ZM15.14 3.70474L7.91773 14.5381L9.30448 15.4626L16.5267 4.62924L15.14 3.70474Z" fill="white" />
-												</svg>
-											</div>
-											<div>
-												<svg width="14" height="17" viewBox="0 0 14 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-													<path d="M2.41699 12.333L3.25033 4.41634C3.87215 3.68983 5.30709 3.16634 7.00034 3.16634M11.5837 12.333L10.7503 4.41634C10.1285 3.68983 8.69359 3.16634 7.00034 3.16634M7.00034 3.16634L7.00033 1.49968" stroke="white" stroke-width="1.66667" stroke-linecap="square" stroke-linejoin="round" />
-													<path d="M1.16699 13.167H4.85765M12.8337 13.167H9.14337M9.14337 13.167L9.03869 13.8994C8.89372 14.9136 8.02504 15.667 7.00046 15.667V15.667C5.97577 15.667 5.10702 14.9135 4.96218 13.8991L4.85765 13.167M9.14337 13.167H4.85765" stroke="white" stroke-width="1.66667" stroke-linecap="square" stroke-linejoin="round" />
-												</svg>
-											</div>
-											<div>
-												<svg width="24" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-													<path d="M7.99967 2.33301L10.1157 6.08721L14.34 6.93956L11.4235 10.1121L11.9182 14.3931L7.99967 12.5997L4.08111 14.3931L4.57587 10.1121L1.6593 6.93956L5.88365 6.08721L7.99967 2.33301Z" stroke="white" stroke-width="1.66667" />
-												</svg>
-											</div>
-										</div>
-										<div>
-											<dl class="descriptions">
-												<div>
-													<p>
-														Şirket :<br>
-														@{
-															var user = UsersInfo.FirstOrDefault(u => u.Id == reservation.UserId);
-														}
-														@(user?.Company ?? "Bilinmiyor")
-													</p>
-												</div>
-												<div>
-													<p>
-														Yetkili :
-														@(reservation.User?.CompanyOfficial ?? "")
-													</p>
-												</div>
-												<div>
-													<p>
-														Telefon:
-														@(reservation.User?.ContactPhone ?? "")
-													</p>
-												</div>
-											</dl>
-										</div>
-									</div>
-
-									<Tag Style="width: 100%;
-												height:33px;
-												margin-top:30px;
-												display: flex;
-												justify-content: center;
-												align-items: center;
-												font-size:12px;
-												font-weight:bold;
-												color:darkgray;"
-									Color="TagColor.Default">Tamamlandı</Tag>
-								</Card>
-							</AntDesign.Col>
-						}
-					</Row>
-				}
-				else
-				{
-					<Alert Message="Geçmiş bir rezervasyonunuz bulunmamaktadır." Type="AlertType.Info" ShowIcon="true" />
-				}
-			</TabPane>
-		</Tabs>
-	}
-</div>
+            <TabPane Key="2" Tab="Geçmiş Rezervasyonlarım" Style="min-width:10vw;">
+                @if (PastReservations.Any())
+                {
+                    <Row Gutter="16">
+                        @foreach (var reservation in PastReservations)
+                        {
+                            <AntDesign.Col Xs="24" Sm="24" Md="12" Lg="8" Xl="6">
+                                <Card Title="@($"{reservation.StartTime.ToString("HH:mm")} - {reservation.EndTime.ToString("HH:mm")}")"
+                                      Style="margin-bottom: 16px;
+                                                                          border-radius: 6px;
+                                                                          background-color: unset;
+                                                                          color: #666;
+                                                                          box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.05);">
+                                    <Summary Info="new()
+                                             {
+                                                 Label1 = StringConstants.Company,
+                                                 Label2 = StringConstants.Authorized,
+                                                 Label3 = StringConstants.Phone,
+                                                 Value1 = currentUser.Company,
+                                                 Value2 = reservation.User.CompanyOfficial,
+                                                 Value3 = reservation.User.ContactPhone
+                                             }" />
+                        <Tag Style="width: 100%;
+                                                height:33px;
+                                                margin-top:30px;
+                                                display: flex;
+                                                justify-content: center;
+                                                align-items: center;
+                                                font-size:12px;
+                                                font-weight:bold;
+                                                color:darkgray;"
+                             Color="TagColor.Default">
+                            Tamamlandı
+                        </Tag>
+                    </Card>
+                </AntDesign.Col>
+                                }
+                    </Row>
+                }
+                else
+                {
+                    <Alert Message="Geçmiş bir rezervasyonunuz bulunmamaktadır." Type="AlertType.Info" ShowIcon="true" />
+                }
+            </TabPane>
+        </Tabs>
+    }
+</BackPanel>
 
 
 @code {
-	private static readonly CultureInfo turkishCulture = new CultureInfo("tr-TR");
+    private static readonly CultureInfo turkishCulture = new CultureInfo("tr-TR");
 
-	private List<ReservationDto> FutureReservations = new();
-	private List<UserDto> UsersInfo = new();
-	private List<ReservationDto> PastReservations = new();
-	private bool isLoading = true;
-	private bool isCancelling = false;
+    private List<ReservationDto> FutureReservations = new();
+    private UserDto currentUser;
+    private List<ReservationDto> PastReservations = new();
+    private bool isLoading = true;
+    private bool isCancelling = false;
 
-	protected override async Task OnInitializedAsync()
-	{
-		try
-		{
-			await LoadReservations();
-		}
-		catch (Exception ex)
-		{
-			Console.WriteLine($"Error loading reservations: {ex.Message}");
-		}
-		finally
-		{
-			isLoading = false;
-			StateHasChanged();
-		}
-	}
-
-	private async Task LoadReservations()
-	{
-		try
-		{
-			var authState = await AuthProvider.GetAuthenticationStateAsync();
-			if (!authState.User.Identity?.IsAuthenticated == true)
-			{
-				return;
-			}
-
-			var allReservations = await ReservationService.GetUserReservationsAsync();
-
-			var currentUser = await ReservationService.GetCurrentUserAsync();
-			if (currentUser != null)
-			{
-				UsersInfo = new List<UserDto>
-			{
-				new UserDto
-				{
-					Id = currentUser.Id,
-					FirstName = currentUser.FirstName,
-					LastName = currentUser.LastName,
-					Email = currentUser.Email,
-					Company = currentUser.Company,
-					CompanyOfficial = currentUser.CompanyOfficial,
-					ContactPhone = currentUser.ContactPhone
-				}
-			};
-			}
-			var nowUtc = DateTime.UtcNow;
-
-			FutureReservations = allReservations
-				.Where(r => r.EndTime > nowUtc)
-				.OrderBy(r => r.StartTime)
-				.ToList();
-
-			PastReservations = allReservations
-				.Where(r => r.EndTime <= nowUtc)
-				.OrderByDescending(r => r.StartTime)
-				.ToList();
-    }
-    catch (Exception ex)
+    protected override async Task OnInitializedAsync()
     {
-        Console.WriteLine($"Error in LoadReservations: {ex.Message}");
+        try
+        {
+            await LoadReservations();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading reservations: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
     }
-}
+
+    private async Task LoadReservations()
+    {
+        try
+        {
+            var authState = await AuthProvider.GetAuthenticationStateAsync();
+            if (!authState.User.Identity?.IsAuthenticated == true)
+            {
+                return;
+            }
+
+            var allReservations = await ReservationService.GetUserReservationsAsync();
+
+            var user = await ReservationService.GetCurrentUserAsync();
+            currentUser = new()
+            {
+                Company = user.Company,
+                CompanyOfficial = user.CompanyOfficial,
+                ContactPhone = user.ContactPhone,
+                Email = user.Email,
+                Id = user.Id,
+            };
+            var nowUtc = DateTime.UtcNow;
+
+            FutureReservations = allReservations
+                .Where(r => r.EndTime > nowUtc)
+                .OrderBy(r => r.StartTime)
+                .ToList();
+
+            PastReservations = allReservations
+                .Where(r => r.EndTime <= nowUtc)
+                .OrderByDescending(r => r.StartTime)
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in LoadReservations: {ex.Message}");
+        }
+    }
 
 
-	private async Task ShowCancelConfirmation(string reservationId)
-	{
-		var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Bu rezervasyonu iptal etmek istediğinizden emin misiniz?");
+    private async Task ShowCancelConfirmation(string reservationId)
+    {
+        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Bu rezervasyonu iptal etmek istediğinizden emin misiniz?");
 
-		if (confirmed)
-		{
-			await CancelReservation(reservationId);
-		}
-	}
+        if (confirmed)
+        {
+            await CancelReservation(reservationId);
+        }
+    }
 
-	private async Task CancelReservation(string reservationId)
-	{
-		if (string.IsNullOrEmpty(reservationId))
-		{
-			return;
-		}
+    private async Task CancelReservation(string reservationId)
+    {
+        if (string.IsNullOrEmpty(reservationId))
+        {
+            return;
+        }
 
-		isCancelling = true;
-		StateHasChanged();
+        isCancelling = true;
+        StateHasChanged();
 
-		try
-		{
-			var success = await ReservationService.DeleteReservationAsync(reservationId);
+        try
+        {
+            var success = await ReservationService.DeleteReservationAsync(reservationId);
 
-			if (success)
-			{
-				await LoadReservations();
-			}
-			else
-			{
-				Console.WriteLine("Failed to cancel reservation");
-			}
-		}
-		catch (Exception ex)
-		{
-			Console.WriteLine($"Error cancelling reservation: {ex.Message}");
-		}
-		finally
-		{
-			isCancelling = false;
-			StateHasChanged();
-		}
-	}
+            if (success)
+            {
+                await LoadReservations();
+            }
+            else
+            {
+                Console.WriteLine("Failed to cancel reservation");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error cancelling reservation: {ex.Message}");
+        }
+        finally
+        {
+            isCancelling = false;
+            StateHasChanged();
+        }
+    }
 }
 
 

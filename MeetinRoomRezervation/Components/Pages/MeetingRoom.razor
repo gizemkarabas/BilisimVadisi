@@ -1,5 +1,6 @@
 ﻿@page "/user/meetingRooms"
 @using MeetinRoomReservation.Constants
+@using MeetinRoomRezervation.Components.PartialComponents.Shared
 @using MeetinRoomRezervation.Extensions
 @using Microsoft.AspNetCore.WebUtilities
 @using AntDesign
@@ -49,7 +50,7 @@
 	</Button>
 </div> *@
 
-<div class="reservation-panel">
+<BackPanel>
 	<div class="reservation-panel-header">Lütfen Tarihi Seçin</div>
 	<div class="weekly-no-bg" style="background:unset">
 		<WeeklyDayPicker @bind-SelectedDate="SelectedDateItem" />
@@ -75,7 +76,7 @@
 			}
 		}
 	</Row>
-</div>
+</BackPanel>
 <style>
 	.unavailable-room {
 		opacity: 0.7;

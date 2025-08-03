@@ -1,4 +1,5 @@
 ﻿@using System.Globalization
+@using MeetinRoomReservation.Constants
 <div class="reservation-detail-panel">
     <div class="icon-bar">
         <div>
@@ -21,16 +22,16 @@
     <div>
         <dl class="descriptions">
             <div style="height:33%">
-                <dt><span style="font-weight:700;">Bölge</span></dt>
-                <dd>İzmir Bilişim Vadisi</dd>
+                <dt><span style="font-weight:700;">@Info.Label1</span></dt>
+                <dd>@Info.Value1</dd>
             </div>
             <div style="height:33%">
-                <dt><span style="font-weight:700;">Salon</span></dt>
-                <dd>@Info.RoomName</dd>
+                <dt><span style="font-weight:700;">@Info.Label2</span></dt>
+                <dd>@Info.Value2</dd>
             </div>
             <div style="height:33%">
-                <dt><span style="font-weight:700;">Tarih</span></dt>
-                <dd>@Info.SelectedDate.ToString("dd.MM.yyyy dddd", turkishCulture)</dd>
+                <dt><span style="font-weight:700;">@Info.Label3</span></dt>
+                <dd>@Info.Value3</dd>
             </div>
         </dl>
     </div>
@@ -43,7 +44,11 @@
 
     public class SummaryInfo
     {
-        public string RoomName { get; set; }
-        public DateTime SelectedDate { get; set; }
+        public string Label1 { get; set; }
+        public string Value1 { get; set; }
+        public string Label2 { get; set; }
+        public string Value2 { get; set; }
+        public string Label3 { get; set; }
+        public string Value3 { get; set; }
     }
 }

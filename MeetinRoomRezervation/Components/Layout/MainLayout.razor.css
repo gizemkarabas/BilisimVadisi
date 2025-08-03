@@ -178,15 +178,6 @@
         justify-content: space-between;
     }
 
-    .ref {
-        background-color: #f0f2f5;
-        height: 10vh;
-        display: flex;
-        align-items: center;
-        margin-top: 10vh;
-        justify-content: center;
-    }
-
     .top-row {
         position: sticky;
         top: 0;
