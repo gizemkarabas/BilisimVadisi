@@ -6,6 +6,7 @@
     margin: 0;
     width: 100%;
 }
+
 .admin-button-title {
     margin-left: 5px;
     margin-right: 2px;
@@ -19,6 +20,7 @@
     font-size: 13px;
     font-weight: bold;
 }
+
 .admin-panel-buttons {
     margin-left: 20px;
     margin-top: 20px;
@@ -44,27 +46,32 @@
     border-radius: 10px;
     border-color: #d2d2d2;
     border: 1.2px solid #e2dfdf;
-    width: 18.5vw;
     height: 130px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     position: relative;
 }
+
 .count-panel-title {
-    font-size: 12px;
+    font-size: 16px;
     color: black;
     padding: 10px;
+    font-weight: 500;
     align-self: flex-start;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
 }
+
 .count-panel-value {
-    font-size: 25px;
+    font-size: 32px;
     font-weight: bold;
     color: #0095ff;
     padding: 10px;
     align-self: flex-end;
-    text-align:right;
+    text-align: right;
+    font-family: 'Roboto', sans-serif;
 }
+
 .last-reservation-panel {
     background-color: #e6e6e6;
     margin-top: 30px;
@@ -73,19 +80,19 @@
     border-color: #d2d2d2;
     border: 1.2px solid #e2dfdf;
     padding: 15px;
-    height:60vh;
-    
+    height: 60vh;
 }
+
 .last-reservation-panel-header {
-    font-size:25px;
-    font-weight:bold;
+    font-size: 25px;
+    font-weight: bold;
 }
+
 .table-responsive {
-    margin-bottom:20px;
-    width: 95vw;
-    max-width: 95vw;
+    margin-bottom: 20px;
     height: auto;
 }
+
 .table {
     display: table;
     table-layout: fixed;
@@ -94,6 +101,7 @@
     width: 74vw;
     height: 10vh;
 }
+
 .table-header {
     display: table;
     table-layout: fixed;
@@ -102,14 +110,16 @@
     width: 74vw;
     height: 10vh;
 }
+
 .table-contents-panel {
-    overflow-y:auto;
+    overflow-y: auto;
     font-size: 12px;
     width: 100%;
     height: 250px;
     text-align: center;
     vertical-align: middle;
 }
+
 .table-contents {
     overflow-y: auto;
     display: table;
@@ -123,28 +133,27 @@
     border-collapse: separate;
     border-spacing: 0 12px;
 }
+
 .dashboard-panel {
-    margin-left: 50px;
-    margin-top: 50px;
-    width: 76vw;
+    width: 100%;
+    margin-bottom: 30px;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
     .container {
-        display:flex;
-        width:auto;
+        display: flex;
+        width: auto;
         flex-direction: column;
         margin: 0px;
     }
 
     .admin-panel {
-        width: 95vw;
-        height: 5vh;
         background-color: unset;
         box-shadow: unset;
         padding: 0;
         margin: 0;
     }
+
     .admin-button-title {
         margin-left: 5px;
         margin-right: 2px;
@@ -170,64 +179,45 @@
         align-items: center;
         display: flex;
     }
-    .count-panel {
-        box-shadow: 5px 5px 10px rgba(87, 87, 87, 0.1);
-        border-radius: 10px;
-        border-color: #d2d2d2;
-        border: 1.2px solid #e2dfdf;
-        width: 46vw;
-        height: 15vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        position: relative;
-    }
+
     .count-panel-title {
         font-size: 14px;
-        font-weight:bold;
-        height: 50%;
+        font-weight: 500;
         color: black;
         padding: 10px;
         align-self: center;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
     }
 
     .count-panel-value {
         font-size: 32px;
-        font-weight: bold;
-        height: 50%;
+        font-weight: 500;
         color: #0095ff;
         padding-top: 0px;
         padding: 0px;
         align-self: center;
         text-align: center;
     }
-    .table-responsive {
-        margin-bottom: 20px;
-        width: 90vw;
-        max-width: 95vw;
-        height: auto;
-        overflow-x: auto;
-        overflow-y: hidden;
-        white-space: nowrap;
-    }
+
+
     .table {
-        width: 200vw;
-        max-width: 200vw;
         height: auto;
         font-size: 13px;
-        
     }
+
     .table-header {
         width: 200vw;
         max-width: 200vw;
         height: auto;
         font-size: 13px;
     }
+
     .last-reservation-panel-header {
         font-size: 24px;
         font-weight: bold;
-        margin-bottom:5px;
+        margin-bottom: 5px;
     }
+
     .last-reservation-panel {
         width: 95vw;
         max-width: 95vw;
@@ -235,15 +225,6 @@
         padding: 5vw 2vw;
         box-sizing: border-box;
         box-shadow: 5px 5px 10px rgba(87, 87, 87, 0.1);
-        background-color:unset;
+        background-color: unset;
     }
-    .dashboard-panel {
-        width: 95vw;
-        max-width: 95vw;
-        margin-left: 2vw;
-        margin-top: 2vh;
-
-    }
-    
-
 }

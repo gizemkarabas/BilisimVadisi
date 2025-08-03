@@ -1,10 +1,12 @@
 ﻿@page "/admin/halls"
+@layout AdminLayout
 @inject IReservationService ReservationService
- @inject IRoomService RoomService
- @inject IUserService UserService
+@inject IRoomService RoomService
+@inject IUserService UserService
 @inject IAuthService AuthService
 @inject AuthenticationStateProvider AuthProvider
 @using AntDesign
+@using MeetinRoomRezervation.Components.Layout
 @using MeetinRoomRezervation.Data
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Security.Claims
@@ -14,85 +16,21 @@
 	<Authorized Context="authContext">
 
 		<div class="containerW">
-			<div class="admin-panel">
-				<div class="admin-panel-buttons">
-					<Button Type="@ButtonType.Link"
-					OnClick="@(() => Navigation.NavigateTo("admin/dashboard"))"
-					Style="display: flex;
-							justify-content:flex-start;
-							width:160px;
-							align-items:center;
-							padding: 0;
-							border-radius: 8px;
-							margin-bottom: 10px;
-							margin-left: 5px;"
-					Block>
-						<div class="button">
-							<svg width="15" height="15" viewBox="0 0 18 18" fill="#4d4d4d">
-								<path d="M10 6V0H18V6H10ZM0 10V0H8V10H0ZM10 18V8H18V18H10ZM0 18V12H8V18H0Z" />
-							</svg>
-							<div class="admin-button-title">
-								Gösterge Paneli
-							</div>
-						</div>
-					</Button>
-					<Button Type="@ButtonType.Link"
-					OnClick="@(() => Navigation.NavigateTo("/admin/users"))"
-					Style="display: flex;
-							justify-content:flex-start;
-							width:160px;
-							align-items:center;
-							padding: 0;
-							border-radius: 8px;
-							margin-bottom: 10px;
-							margin-left: 5px;"
-					Block>
-
-						<div class="button" style="margin-left:6px;">
-							<svg width="20" height="20" viewBox="0 0 20 23" fill="#4d4d4d">
-								<path fill-rule="evenodd" clip-rule="evenodd" d="M9.15831 7.6665C9.15831 9.25734 8.04998 10.5415 6.66665 10.5415C5.28331 10.5415 4.16665 9.25734 4.16665 7.6665C4.16665 6.07567 5.28331 4.7915 6.66665 4.7915C8.04998 4.7915 9.15831 6.07567 9.15831 7.6665ZM15.825 7.6665C15.825 9.25734 14.7166 10.5415 13.3333 10.5415C11.95 10.5415 10.8333 9.25734 10.8333 7.6665C10.8333 6.07567 11.95 4.7915 13.3333 4.7915C14.7166 4.7915 15.825 6.07567 15.825 7.6665ZM6.66665 12.4582C4.72498 12.4582 0.833313 13.5794 0.833313 15.8123V17.2498C0.833313 17.7769 1.20831 18.2082 1.66665 18.2082H11.6666C12.125 18.2082 12.5 17.7769 12.5 17.2498V15.8123C12.5 13.5794 8.60831 12.4582 6.66665 12.4582ZM12.525 12.5061C12.8166 12.4773 13.0916 12.4582 13.3333 12.4582C15.275 12.4582 19.1666 13.5794 19.1666 15.8123V17.2498C19.1666 17.7769 18.7916 18.2082 18.3333 18.2082H14.0166C14.1083 17.9111 14.1666 17.5853 14.1666 17.2498V15.8123C14.1666 14.4036 13.5083 13.3398 12.5583 12.5444C12.5558 12.5415 12.5533 12.5377 12.5505 12.5336C12.5442 12.5241 12.5366 12.5128 12.525 12.5061Z" />
-							</svg>
-							<div class="admin-button-title">
-								Kullanıcı Yönetimi
-							</div>
-						</div>
-
-					</Button>
-					<Button Type="@ButtonType.Link"
-					OnClick="@(() => Navigation.NavigateTo("/admin/halls"))"
-					Style="display: flex;
-							justify-content:flex-start;
-							width:160px;
-							align-items:center;
-							padding: 0;
-							border-radius: 8px;
-							margin-bottom: 10px;
-							background-color:#0095ff;
-							margin-left: 5px;"
-					Block>
-						<div class="button" style="margin-left:6px;">
-							<svg width="20" height="16" viewBox="0 0 20 24" fill="white">
-								<path d="M0.8715 10.4H2.614V21.6H5.2285V12H7.843V21.6H10.457V12H13.072V21.6H15.6865V10.4H17.4285C17.91 10.4 18.3005 10.042 18.3005 9.6C18.3005 9.333 18.1565 9.098 17.937 8.953L17.9385 8.9515L17.9255 8.944L17.903 8.9305L9.5855 4.626V3.365C11.1215 4.071 12.386 2.855 14.378 3.586V0.8005C12.385 0.0695 11.121 1.2845 9.5855 0.579V0.4C9.5855 0.1785 9.391 0 9.15 0C8.909 0 8.715 0.1785 8.715 0.4V4.626L0.3975 8.9295L0.375 8.943L0.3625 8.9515V8.953C0.144 9.098 0.000499964 9.3335 0.000499964 9.6C-3.62634e-08 10.042 0.3905 10.4 0.8715 10.4ZM1.7425 22.4005L0 24H18.301L16.5575 22.4005H1.7425Z" />
-							</svg>
-							<div class="active-admin-button-title">
-								Salon Yönetimi
-							</div>
-						</div>
-					</Button>
-				</div>
-			</div>
 			<div class="containerH">
 				<div class="date-newreservation-panel">
 					<div class="calender">
 						<AntDesign.Col>
 							<Button OnClick="SelectToday">Bugün</Button>
 							<Button OnClick="SelectTomorrow" Style="margin-left: 8px;">Yarın</Button>
-							<DatePicker DefaultValue=@TodayDate @bind-Value="SelectedDate" Style="margin-left: 8px; margin-top:8px" />
+							<DatePicker DefaultValue=@TodayDate @bind-Value="SelectedDate"
+								Style="margin-left: 8px; margin-top:8px" />
 						</AntDesign.Col>
 					</div>
 					<div class="new-reservation">
 						<AntDesign.Col>
-							<Button Type="ButtonType.Primary" OnClick="OpenCreateRoomModal"><div class="new-reservation">Yeni Toplantı Odası Oluştur</div></Button>
+							<Button Type="ButtonType.Primary" OnClick="OpenCreateRoomModal">
+								<div class="new-reservation">Yeni Toplantı Odası Oluştur</div>
+							</Button>
 						</AntDesign.Col>
 					</div>
 				</div>
@@ -105,8 +43,11 @@
 							<AntDesign.Col Xs="24" Sm="24" Md="12" Lg="8" Xl="6" Style="padding-left:1%;padding-right:1%;">
 								<div class="halls">
 									<div style="display:flex;justify-content:end">
-										<Button Size="ButtonSize.Small" Style="align-self:end;margin-bottom: 20px; margin-right: 5px;" OnClick="@(() => OpenEditModal(room))" Icon="edit" />
-										<Button Size="ButtonSize.Small" Style="align-self:end;margin-bottom: 20px;" OnClick="@(() => DeleteRoom(room.Id))" Icon="delete" Danger />
+										<Button Size="ButtonSize.Small"
+											Style="align-self:end;margin-bottom: 20px; margin-right: 5px;"
+											OnClick="@(() => OpenEditModal(room))" Icon="edit" />
+										<Button Size="ButtonSize.Small" Style="align-self:end;margin-bottom: 20px;"
+											OnClick="@(() => DeleteRoom(room.Id))" Icon="delete" Danger />
 									</div>
 									<div class="halls-header">@room.Name</div>
 									@if (room.Reservations.Any())
@@ -116,18 +57,30 @@
 											<div class="icon-bar">
 												<div>
 													<svg width="15" height="15" viewBox="0 0 18 18" fill="white">
-														<path d="M8.61111 15.0003L7.94444 15.5003L8.65114 16.4426L9.30448 15.4626L8.61111 15.0003ZM9.27777 14.5003L5.66667 9.68551L4.33333 10.6855L7.94444 15.5003L9.27777 14.5003ZM15.14 3.70474L7.91773 14.5381L9.30448 15.4626L16.5267 4.62924L15.14 3.70474Z" fill="white" />
+														<path
+															d="M8.61111 15.0003L7.94444 15.5003L8.65114 16.4426L9.30448 15.4626L8.61111 15.0003ZM9.27777 14.5003L5.66667 9.68551L4.33333 10.6855L7.94444 15.5003L9.27777 14.5003ZM15.14 3.70474L7.91773 14.5381L9.30448 15.4626L16.5267 4.62924L15.14 3.70474Z"
+															fill="white" />
 													</svg>
 												</div>
 												<div>
-													<svg width="14" height="17" viewBox="0 0 14 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-														<path d="M2.41699 12.333L3.25033 4.41634C3.87215 3.68983 5.30709 3.16634 7.00034 3.16634M11.5837 12.333L10.7503 4.41634C10.1285 3.68983 8.69359 3.16634 7.00034 3.16634M7.00034 3.16634L7.00033 1.49968" stroke="white" stroke-width="1.66667" stroke-linecap="square" stroke-linejoin="round" />
-														<path d="M1.16699 13.167H4.85765M12.8337 13.167H9.14337M9.14337 13.167L9.03869 13.8994C8.89372 14.9136 8.02504 15.667 7.00046 15.667V15.667C5.97577 15.667 5.10702 14.9135 4.96218 13.8991L4.85765 13.167M9.14337 13.167H4.85765" stroke="white" stroke-width="1.66667" stroke-linecap="square" stroke-linejoin="round" />
+													<svg width="14" height="17" viewBox="0 0 14 17" fill="none"
+														xmlns="http://www.w3.org/2000/svg">
+														<path
+															d="M2.41699 12.333L3.25033 4.41634C3.87215 3.68983 5.30709 3.16634 7.00034 3.16634M11.5837 12.333L10.7503 4.41634C10.1285 3.68983 8.69359 3.16634 7.00034 3.16634M7.00034 3.16634L7.00033 1.49968"
+															stroke="white" stroke-width="1.66667" stroke-linecap="square"
+															stroke-linejoin="round" />
+														<path
+															d="M1.16699 13.167H4.85765M12.8337 13.167H9.14337M9.14337 13.167L9.03869 13.8994C8.89372 14.9136 8.02504 15.667 7.00046 15.667V15.667C5.97577 15.667 5.10702 14.9135 4.96218 13.8991L4.85765 13.167M9.14337 13.167H4.85765"
+															stroke="white" stroke-width="1.66667" stroke-linecap="square"
+															stroke-linejoin="round" />
 													</svg>
 												</div>
 												<div>
-													<svg width="24" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-														<path d="M7.99967 2.33301L10.1157 6.08721L14.34 6.93956L11.4235 10.1121L11.9182 14.3931L7.99967 12.5997L4.08111 14.3931L4.57587 10.1121L1.6593 6.93956L5.88365 6.08721L7.99967 2.33301Z" stroke="white" stroke-width="1.66667" />
+													<svg width="24" height="16" viewBox="0 0 16 16" fill="none"
+														xmlns="http://www.w3.org/2000/svg">
+														<path
+															d="M7.99967 2.33301L10.1157 6.08721L14.34 6.93956L11.4235 10.1121L11.9182 14.3931L7.99967 12.5997L4.08111 14.3931L4.57587 10.1121L1.6593 6.93956L5.88365 6.08721L7.99967 2.33301Z"
+															stroke="white" stroke-width="1.66667" />
 													</svg>
 												</div>
 											</div>
@@ -136,7 +89,8 @@
 													<div style="font-weight:bold; font-size:16px;">Şirket :</div>
 													<div>
 														@{
-															var reservationUser = UsersInfo.FirstOrDefault(u => u.Id == firstRes.UserId);
+															var reservationUser = UsersInfo.FirstOrDefault(u => u.Id ==
+															firstRes.UserId);
 														}
 														@(reservationUser?.Company ?? firstRes.User?.Company ?? "Bilinmiyor")
 													</div>
@@ -146,11 +100,13 @@
 													@{
 														var slotUser = UsersInfo.FirstOrDefault(u => u.Id == firstRes.UserId);
 													}
-													@(slotUser?.CompanyOfficial ?? firstRes.User?.CompanyOfficial ?? firstRes.UserEmail ?? "Bilinmiyor")
+												@(slotUser?.CompanyOfficial ?? firstRes.User?.CompanyOfficial ??
+																							firstRes.UserEmail ?? "Bilinmiyor")
 												</div>
 												<div>
 													<div style="font-weight:bold; margin-top:8px;">Telefon :</div>
-													<div>@(reservationUser?.ContactPhone ?? firstRes.User?.ContactPhone ?? "")</div>
+													<div>@(reservationUser?.ContactPhone ?? firstRes.User?.ContactPhone ?? "")
+													</div>
 												</div>
 											</div>
 										</div>
@@ -161,17 +117,19 @@
 												<div class="reservation-slot" style="margin-bottom:8px;">
 													<div style="display:flex; align-items:center; gap:8px;">
 														<Button Type="ButtonType.Default" Style="width:100%;
-															height:4.5vh;
-															background-color:#e6f7ff;
-															border:1px solid #1890ff;
-															border-radius:10px;
-															color:#1890ff;">
+																		height:4.5vh;
+																		background-color:#e6f7ff;
+																		border:1px solid #1890ff;
+																		border-radius:10px;
+																		color:#1890ff;">
 															@res.StartTime.ToString("HH:mm") - @res.EndTime.ToString("HH:mm")
 														</Button>
 													</div>
-														<Button Danger Type="ButtonType.Primary" Style="min-width:120px; background:unset; color:red; border:1px solid #ff4d4f;" OnClick="@(() => CancelReservation(res.Id))">
-															Rezervasyonu İptal Et
-														</Button>
+													<Button Danger Type="ButtonType.Primary"
+														Style="min-width:120px; background:unset; color:red; border:1px solid #ff4d4f;"
+														OnClick="@(() => CancelReservation(res.Id))">
+														Rezervasyonu İptal Et
+													</Button>
 												</div>
 											}
 
@@ -180,34 +138,33 @@
 									else
 									{
 										<Tag Style="width: vw10px;
-													height:auto;
-													text-align:center;
-													white-space: normal;
-													display: flex;
-													justify-content: center;
-													align-items: center;
-													margin-top:10px;
-													padding:5px;"
-										Color="TagColor.Green">
+															height:auto;
+															text-align:center;
+															white-space: normal;
+															display: flex;
+															justify-content: center;
+															align-items: center;
+															margin-top:10px;
+															padding:5px;" Color="TagColor.Green">
 											Bugün için rezervasyon bulunmamaktadır.
 										</Tag>
 									}
 
 									<Divider />
-									<Collapse DefaultActiveKey="@(new[]{"2"})" OnChange="Callback" Animation>
+									<Collapse DefaultActiveKey="@(new[] { "2" })" OnChange="Callback" Animation>
 										<Panel Header="Müsait Saatler" Key="1">
 											<p>
 												@foreach (var slot in room.AvailableSlots)
 												{
 													<Tag Style="width: 100%;
-														height:4.5vh;
-														border:1px solid;
-														border-radius:10px;
-														border-color:#0095FF;
-														margin-bottom:8px;
-														display: flex;
-														justify-content: center;
-														align-items: center;">
+																height:4.5vh;
+																border:1px solid;
+																border-radius:10px;
+																border-color:#0095FF;
+																margin-bottom:8px;
+																display: flex;
+																justify-content: center;
+																align-items: center;">
 														@slot
 													</Tag>
 												}
@@ -221,12 +178,8 @@
 						}
 
 					</Row>
-					<Modal Title="Yeni Toplantı Odası Oluştur"
-					@bind-Visible="@IsCreateModalVisible"
-					OnOk="CreateRoom"
-					OnCancel="CloseCreateModal"
-					OkText="@okButtonText"
-					CancelText="@cancelButtonText">
+					<Modal Title="Yeni Toplantı Odası Oluştur" @bind-Visible="@IsCreateModalVisible" OnOk="CreateRoom"
+						OnCancel="CloseCreateModal" OkText="@okButtonText" CancelText="@cancelButtonText">
 
 						<Form Model="@NewRoom">
 							<FormItem Label="Oda Adı" Required>
@@ -237,12 +190,8 @@
 							</FormItem>
 						</Form>
 					</Modal>
-					<Modal Title="Toplantı Odası Düzenle"
-					@bind-Visible="@IsEditModalVisible"
-					OnOk="UpdateRoom"
-					OnCancel="CloseEditModal"
-					OkText="@okButtonText"
-					CancelText="@cancelButtonText">
+					<Modal Title="Toplantı Odası Düzenle" @bind-Visible="@IsEditModalVisible" OnOk="UpdateRoom"
+						OnCancel="CloseEditModal" OkText="@okButtonText" CancelText="@cancelButtonText">
 
 						<Form Model="@EditingRoom">
 							<FormItem Label="Oda Adı" Required>
@@ -253,46 +202,42 @@
 							</FormItem>
 						</Form>
 					</Modal>
-					<Modal @bind-Visible="@IsDeleteModalVisible"
-					OnOk="ConfirmDeleteRoom"
-					OnCancel="CloseDeleteModal"
-					OkText="deleteButtonText"
-					CancelText="@cancelButtonText"
-					OkType="@ButtonType.Primary"
-					OkButtonProps="@(new ButtonProps { Danger = true })">
+					<Modal @bind-Visible="@IsDeleteModalVisible" OnOk="ConfirmDeleteRoom" OnCancel="CloseDeleteModal"
+						OkText="deleteButtonText" CancelText="@cancelButtonText" OkType="@ButtonType.Primary"
+						OkButtonProps="@(new ButtonProps { Danger = true })">
 
 						<div style="text-align: center; padding: 20px;">
-							<Icon Type="exclamation-circle" Theme="IconThemeType.Outline" Style="font-size: 48px; color: #ff4d4f; margin-bottom: 16px;" />
-							<p style="font-size: 16px; margin-bottom: 8px;">Bu toplantı odasını silmek istediğinizden emin misiniz?</p>
-							<p style="color: #666; font-size: 14px;">Bu işlem geri alınamaz ve odaya ait tüm rezervasyonlar silinecektir.</p>
+							<Icon Type="exclamation-circle" Theme="IconThemeType.Outline"
+								Style="font-size: 48px; color: #ff4d4f; margin-bottom: 16px;" />
+							<p style="font-size: 16px; margin-bottom: 8px;">Bu toplantı odasını silmek istediğinizden
+								emin misiniz?</p>
+							<p style="color: #666; font-size: 14px;">Bu işlem geri alınamaz ve odaya ait tüm
+								rezervasyonlar silinecektir.</p>
 							@if (!string.IsNullOrEmpty(RoomToDeleteName))
 							{
-								<p style="font-weight: bold; color: #ff4d4f; margin-top: 12px;">Silinecek Oda: @RoomToDeleteName</p>
+								<p style="font-weight: bold; color: #ff4d4f; margin-top: 12px;">Silinecek Oda:
+									@RoomToDeleteName</p>
 							}
 						</div>
 					</Modal>
 
-				   <Modal @bind-Visible="@IsCancelModalVisible"
-				   OnOk="ConfirmCancelReservation"
-				   OnCancel="CloseCancelModal"
-				   OkText="@deleteButtonText"
-				   CancelText="@cancelButtonText"
-				   OkType="@ButtonType.Primary">
-					   <div style="text-align: center; padding: 20px;">
-						   <p style="font-size: 16px; margin-bottom: 8px;">Bu rezervasyonu iptal etmek istediğinizden emin misiniz?</p>
-					   </div>
-				   </Modal>
+					<Modal @bind-Visible="@IsCancelModalVisible" OnOk="ConfirmCancelReservation"
+						OnCancel="CloseCancelModal" OkText="@deleteButtonText" CancelText="@cancelButtonText"
+						OkType="@ButtonType.Primary">
+						<div style="text-align: center; padding: 20px;">
+							<p style="font-size: 16px; margin-bottom: 8px;">Bu rezervasyonu iptal etmek istediğinizden
+								emin misiniz?</p>
+						</div>
+					</Modal>
 				</div>
 			</div>
 		</div>
 	</Authorized>
 	<NotAuthorized>
 		<div style="padding: 24px; max-width: 600px; margin: 0 auto;">
-			<Alert Type="@AlertType.Warning"
-			Message="Yetkisiz Erişim"
-			Description="Bu sayfaya erişim yetkiniz bulunmamaktadır. Admin yetkisi gereklidir."
-			ShowIcon="true"
-			Style="margin-bottom: 16px;" />
+			<Alert Type="@AlertType.Warning" Message="Yetkisiz Erişim"
+				Description="Bu sayfaya erişim yetkiniz bulunmamaktadır. Admin yetkisi gereklidir." ShowIcon="true"
+				Style="margin-bottom: 16px;" />
 
 			<div style="text-align: center;">
 				<Space>
@@ -302,7 +247,8 @@
 						</Button>
 					</SpaceItem>
 					<SpaceItem>
-						<Button Type="ButtonType.Default" OnClick="@(() => Navigation.NavigateTo("/user/meetingRooms"))" Icon="home">
+						<Button Type="ButtonType.Default" OnClick="@(() => Navigation.NavigateTo("/user/meetingRooms"))"
+							Icon="home">
 							Ana Sayfaya Dön
 						</Button>
 					</SpaceItem>
@@ -376,16 +322,16 @@
 			{
 				Console.WriteLine($"Reservation: {res.Id} - UserId: {res.UserId} - UserEmail: {res.UserEmail}");
 				var matchedUser = UsersInfo.FirstOrDefault(u => u.Id == res.UserId);
-				Console.WriteLine($"  Matched user: {(matchedUser != null ? matchedUser.Email : "NOT FOUND")}");
+				Console.WriteLine($" Matched user: {(matchedUser != null ? matchedUser.Email : "NOT FOUND")}");
 			}
 
 			foreach (var room in allRooms)
 			{
 
-			   var roomReservations = reservations
-				   .Where(r => r.RoomId == room.Id && r.Status != ReservationStatus.Cancelled)
-				   .OrderBy(r => r.StartTime)
-				   .ToList();
+				var roomReservations = reservations
+				.Where(r => r.RoomId == room.Id && r.Status != ReservationStatus.Cancelled)
+				.OrderBy(r => r.StartTime)
+				.ToList();
 
 				room.Reservations = roomReservations;
 				room.AvailableSlots = GenerateAvailableSlots(roomReservations);
@@ -410,7 +356,7 @@
 			var end = new TimeSpan(hour + 1, 0, 0);
 
 			bool isOccupied = reservations.Any(r =>
-				r.StartTime.TimeOfDay < end && r.EndTime.TimeOfDay > start);
+			r.StartTime.TimeOfDay < end && r.EndTime.TimeOfDay > start);
 
 			if (!isOccupied)
 			{
@@ -436,7 +382,7 @@
 	{
 		if (!string.IsNullOrEmpty(ReservationToCancel))
 		{
-			   await ReservationService.AdminDeleteReservationAsync(ReservationToCancel);
+			await ReservationService.AdminDeleteReservationAsync(ReservationToCancel);
 			await LoadRoomData();
 		}
 		CloseCancelModal();
@@ -468,12 +414,12 @@
 	private void OpenEditModal(MeetingRoomDto room)
 	{
 		EditingRoom = new MeetingRoomDto
-			{
-				Id = room.Id,
-				Name = room.Name,
-				Capacity = room.Capacity,
-				Location = room.Location
-			};
+		{
+			Id = room.Id,
+			Name = room.Name,
+			Capacity = room.Capacity,
+			Location = room.Location
+		};
 
 		IsEditModalVisible = true;
 	}

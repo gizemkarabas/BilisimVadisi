@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 /* FOUC Prevention Styles - More Aggressive */
 html {
     opacity: 0 !important;
@@ -339,5 +341,11 @@ h1:focus {
 
     100% {
         background-position: 200% 0;
+    }
+}
+
+@media (max-width: 768px) {
+    body:has(.admin-layout-wrapper) .main-layout-bar {
+        display: none !important;
     }
 }
