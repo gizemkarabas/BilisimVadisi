@@ -2,6 +2,7 @@
 {
     public static class StringConstants
     {
+        public const string Dash = "-";
         public const string LocationName = "İzmir Bilişim Vadisi";
         public const string Company = "Şirket";
         public const string Authorized = "Yetkili";

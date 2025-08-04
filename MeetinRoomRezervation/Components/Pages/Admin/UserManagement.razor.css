@@ -50,8 +50,6 @@
     display:flex;
 }
 .users-panel {
-    width: 80vw;
-    height: 80vh;
     background-color: #e6e6e6;
     border-radius: 20px;
     padding: 25px;
@@ -135,7 +133,6 @@
         border-color: #d2d2d2;
         border: 1.2px solid #e2dfdf;
         width: 22vw;
-        height: 130px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;

@@ -46,7 +46,6 @@
     border-radius: 10px;
     border-color: #d2d2d2;
     border: 1.2px solid #e2dfdf;
-    height: 130px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -80,7 +79,6 @@
     border-color: #d2d2d2;
     border: 1.2px solid #e2dfdf;
     padding: 15px;
-    height: 60vh;
 }
 
 .last-reservation-panel-header {
@@ -137,6 +135,13 @@
 .dashboard-panel {
     width: 100%;
     margin-bottom: 30px;
+    padding: 16px;
+}
+
+@media(max-width:1133px) {
+    .count-panel {
+        min-height: 167px;
+    }
 }
 
 @media (max-width: 768px) {
@@ -219,8 +224,6 @@
     }
 
     .last-reservation-panel {
-        width: 95vw;
-        max-width: 95vw;
         height: auto;
         padding: 5vw 2vw;
         box-sizing: border-box;

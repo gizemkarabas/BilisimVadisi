@@ -140,63 +140,61 @@
                 <div style="display:flex;justify-content: space-between;align-items: center;">
                     <div class="table-header">Kullanıcılar</div>
                 </div>
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Şirket İsmi</th>
-                                <th>Yetkili</th>
-                                <th>Aylık Kalan Haklar</th>
-                                <th>Email</th>
-                                <th>Telefon</th>
-                                <th>Durum</th>
-                                <th>İşlemler</th>
-                            </tr>
-                        </thead>
-                        <tbody style="font-weight:normal">
-                            @foreach (var user in PagedUsers)
-                            {
-                                <tr>
-                                    <td>@user.Company</td>
-                                    <td>@user.CompanyOfficial</td>
-                                    <td>@user.UsedThisMonth/@user.MonthlyUsageLimit saat</td>
-                                    <td>@user.Email</td>
-                                    <td>@(!string.IsNullOrEmpty(user.ContactPhone) ? $"+90{user.ContactPhone}" : "-")</td>
-                                    <td>
-                                        @if (user.IsActive)
-                                        {
-                                            <Tag Color="TagColor.Lime" Style="cursor:pointer;"
-                                                 OnClick="@(() => ToggleStatus(user))">Aktif</Tag>
-                                        }
-                                        else
-                                        {
-                                            <Tag Color="TagColor.Red" Style="cursor:pointer;"
-                                                 OnClick="@(() => ToggleStatus(user))">Pasif</Tag>
-                                        }
-                                    </td>
-                                    <td>
-                                        <Space>
-                                            <Button Style="margin-right:4px;margin-bottom:4px" Icon="edit"
-                                                    Shape="ButtonShape.Circle" OnClick="@(() => EditUser(user))">
-                                            </Button>
-                                            <Popconfirm Title="Bu kullanıcı silinsin mi?"
-                                                        OnConfirm="@(() => DeleteUser(user.Id))">
-                                                <Button Icon="delete" Shape="ButtonShape.Circle" Danger></Button>
-                                            </Popconfirm>
-                                        </Space>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="pages">
-                <div>
-                    <Pagination Total="@TotalUserCount" PageSize="@PageSize" Current="@CurrentPage"
-                                OnChange="@HandlePaginationChange" ShowSizeChanger="true"
-                                PageSizeOptions="@(new int[] { 5, 10, 20, 50, 100 })" Style="margin-right:10px" />
-                </div>
+                <Table TItem="UserDto"
+                       DataSource="@PagedUsers"
+                       Responsive
+                       PaginationPosition="bottomRight">
+                    <PaginationTemplate>
+                        <div style="display: flex; justify-content: flex-end; padding-top: 16px;">
+                            <Pagination Total="@TotalUserCount"
+                                        PageSize="@PageSize"
+                                        Current="@CurrentPage"
+                                        OnChange="HandlePaginationChange"
+                                        ShowSizeChanger="true"
+                                        PageSizeOptions="@(new int[] { 5, 10, 20, 50 })" />
+                        </div>
+                    </PaginationTemplate>
+                    <ChildContent>
+                        <Column TData="string" DataIndex="@nameof(UserDto.Company)" Title="Şirket İsmi" />
+                        <Column TData="string" DataIndex="@nameof(UserDto.CompanyOfficial)" Title="Yetkili" />
+                        <Column TData="string" Title="Aylık Kalan Haklar">
+                            <Template>
+                                @context.UsedThisMonth/@context.MonthlyUsageLimit saat
+                            </Template>
+                        </Column>
+                        <Column TData="string" DataIndex="@nameof(UserDto.Email)" Title="Email" />
+                        <Column TData="string" Title="Telefon">
+                            <Template>
+                                @(!string.IsNullOrEmpty(context.ContactPhone) ? $"+90{context.ContactPhone}" : "-")
+                            </Template>
+                        </Column>
+                        <Column TData="string" Title="Telefon">
+                            <Template>
+                                @if (context.IsActive)
+                                {
+                                    <Tag Color="TagColor.Lime" Style="cursor:pointer;"
+                                         OnClick="@(() => ToggleStatus(context))">Aktif</Tag>
+                                }
+                                else
+                                {
+                                    <Tag Color="TagColor.Red" Style="cursor:pointer;"
+                                         OnClick="@(() => ToggleStatus(context))">Pasif</Tag>
+                                }
+                            </Template>
+                        </Column>
+                        <ActionColumn>
+                            <Space>
+                                <Button Style="margin-right:4px;margin-bottom:4px" Icon="edit"
+                                        Shape="ButtonShape.Circle" OnClick="@(() => EditUser(context))">
+                                </Button>
+                                <Popconfirm Title="Bu kullanıcı silinsin mi?"
+                                            OnConfirm="@(() => DeleteUser(context.Id))">
+                                    <Button Icon="delete" Shape="ButtonShape.Circle" Danger></Button>
+                                </Popconfirm>
+                            </Space>
+                        </ActionColumn>
+                    </ChildContent>
+                </Table>
             </div>
         </div>
     </div>

@@ -3,6 +3,7 @@
 @using AntDesign.TableModels
 @using MeetinRoomRezervation.Components.Layout
 @using MeetinRoomRezervation.Components.PartialComponents.Admin
+@using MeetinRoomRezervation.Constants
 @using MeetinRoomRezervation.Models
 @inject IReservationService ReservationService
 @inject IRoomService RoomService
@@ -15,118 +16,97 @@
     <Authorized Context="authContext">
         <div class="container">
             <div class="dashboard-panel">
-                <GridRow>
+                <GridRow Gutter="(16, 16)" Style="align-items: stretch;">
                     <GridCol xs="12" md="6" lg="6">
-                    <div class="count-panel">
-                        <div class="count-panel-title">Toplam Toplantı Odası</div>
-                        <div class="count-panel-value">@TotalRoomCount</div>
-                    </div>
+                        <div class="count-panel">
+                            <div class="count-panel-title">Toplam Toplantı Odası</div>
+                            <div class="count-panel-value">@TotalRoomCount</div>
+                        </div>
                     </GridCol>
                     <GridCol xs="12" md="6" lg="6">
-                    <div class="count-panel">
-                        <div class="count-panel-title">Toplam Kullanıcı Sayısı</div>
-                        <div class="count-panel-value">@TotalUserCount</div>
-                    </div>
+                        <div class="count-panel">
+                            <div class="count-panel-title">Toplam Kullanıcı Sayısı</div>
+                            <div class="count-panel-value">@TotalUserCount</div>
+                        </div>
                     </GridCol>
                     <GridCol xs="12" md="6" lg="6">
-                    <div class="count-panel">
-                        <div class="count-panel-title">Bugünkü Doluluk</div>
-                        <div class="count-panel-value">@TodayOccupancy%</div>
-                    </div>
+                        <div class="count-panel">
+                            <div class="count-panel-title">Bugünkü Doluluk</div>
+                            <div class="count-panel-value">@TodayOccupancy%</div>
+                        </div>
                     </GridCol>
                     <GridCol xs="12" md="6" lg="6">
-                    <div class="count-panel">
-                        <div class="count-panel-title">Haftalık Doluluk Oranı</div>
-                        <div class="count-panel-value">@WeeklyOccupancy%</div>
-                    </div>
+                        <div class="count-panel">
+                            <div class="count-panel-title">Haftalık Doluluk Oranı</div>
+                            <div class="count-panel-value">@WeeklyOccupancy%</div>
+                        </div>
                     </GridCol>
                 </GridRow>
                 <div class="last-reservation-panel">
                     <div class="last-reservation-panel-header">Son Rezervasyonlar</div>
-                    <div class="table-responsive">
-                        <div class="table-contents-panel">
-                            <table class="table-header">
-                                <thead class="table">
-                                    <tr>
-                                        <th>Konum</th>
-                                        <th>Salon</th>
-                                        <th>Tarih</th>
-                                        <th>Saat</th>
-                                        <th>Şirket</th>
-                                        <th>Yetkili</th>
-                                        <th>Telefon</th>
-                                        <th>Eylem</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="table-contents">
-                                    @foreach (var res in PagedReservations)
-                                    {
-                                        <tr>
-                                            <td>@res.Location</td>
-                                            <td>@(res.Room != null ? res.Room.Name : "-")</td>
-                                            <td>
-                                                @res.StartTime.ToLocalTime().ToString("dd MMMM yyyy dddd", new
-                                                System.Globalization.CultureInfo("tr-TR"))
-                                        </td>
-                                        <td>
-                                            <Tag Color="TagColor.Blue">
-                                                @res.StartTime.ToLocalTime().ToString("HH:mm") -
-                                                @res.EndTime.ToLocalTime().ToString("HH:mm")
-                                            </Tag>
-                                        </td>
-                                        <td>@(res.User != null ? res.User.Company : "-")</td>
-                                        <td>@(res.User != null ? res.User.CompanyOfficial : "-")</td>
-                                        <td>@(res.User != null ? res.User.ContactPhone : "-")</td>
-                                        <td>
-                                            <Space>
-                                                <Button Style="margin-right:4px;" Icon="edit" Shape="ButtonShape.Circle"
-                                                        OnClick="@(() => OpenEditModal(res))" />
-                                                <Button Icon="delete" Shape="ButtonShape.Circle" Danger
-                                                        OnClick="@(() => ConfirmDelete(res))" />
-                            </ActionColumn>
-                                        </td>
-                                    </tr>
-                                                                        }
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                    @if (PagedReservations?.Count > 0)
+                    {
+                        <Table TItem="ReservationDto"
+                               DataSource="@PagedReservations"
+                               Responsive
+                               PaginationPosition="bottomRight">
+                            <PaginationTemplate>
+                                <div style="display: flex; justify-content: flex-end; padding-top: 16px;">
+                                    <Pagination Total="@TotalReservationCount"
+                                                PageSize="@PageSize"
+                                                Current="@CurrentPage"
+                                                OnChange="HandlePaginationChange"
+                                                ShowSizeChanger="true"
+                                                PageSizeOptions="@(new int[] { 5, 10, 20, 50 })" />
+                                </div>
+                            </PaginationTemplate>
+                            <ChildContent>
 
-                    <div class="pages" style="margin-top: 42px; text-align: right;">
-                        @if (FilteredReservations.Count > 0)
-                        {
-                            <Pagination Total="@FilteredReservations.Count" PageSize="@PageSize" Current="@CurrentPage"
-                                        OnChange="HandlePaginationChange" ShowSizeChanger="true"
-                                        PageSizeOptions="@(new int[] { 5, 10, 20, 50 })" ShowLessItems="true" />
-                        }
-                    </div>
+                                <Column TData="string" DataIndex="@nameof(ReservationDto.Location)" Title="Konum"></Column>
+                                <Column TData="string" DataIndex="@nameof(ReservationDto.RoomName)" Title="Salon"></Column>
+                                <Column TData="string" Title="Saat">
+                                    <Template>
+                                        @context.StartTime.ToLocalTime().ToString("dd MMMM yyyy dddd")
+                                    </Template>
+                                </Column>
+                                <Column TData="string" Title="Saat">
+                                    <Template>
+                                        <Tag Color="TagColor.Blue">
+                                            @context.StartTime.ToLocalTime().ToString("HH:mm") -
+                                            @context.EndTime.ToLocalTime().ToString("HH:mm")
+                                        </Tag>
+                                    </Template>
+                                </Column>
+                                <Column TData="string" Title="Şirket">
+                                    <Template>
+                                        @(context?.User?.Company ?? StringConstants.Dash)
+                                    </Template>
+                                </Column>
+                                <Column TData="string" Title="Yetkili">
+                                    <Template>
+                                        @(context?.User?.CompanyOfficial ?? StringConstants.Dash)
+                                    </Template>
+                                </Column>
+                                <Column TData="string" Title="Telefon">
+                                    <Template>
+                                        @(context?.User?.ContactPhone ?? StringConstants.Dash)
+                                    </Template>
+                                </Column>
+                                <ActionColumn>
+                                    <Space>
+                                        <Button Style="margin-right:4px;" Icon="edit" Shape="ButtonShape.Circle"
+                                                OnClick="@(() => OpenEditModal(context))" />
+                                        <Button Icon="delete" Shape="ButtonShape.Circle" Danger
+                                                OnClick="@(() => ConfirmDelete(context))" />
+                                    </Space>
+                                </ActionColumn>
+                            </ChildContent>
+                        </Table>
+                    }
                 </div>
             </div>
         </div>
     </Authorized>
-    <NotAuthorized>
-        <div style="padding: 24px; max-width: 600px; margin: 0 auto;">
-            <Alert Type="@AlertType.Warning" Message="Yetkisiz Erişim"
-                   Description="Bu sayfaya erişim yetkiniz bulunmamaktadır. Admin yetkisi gereklidir." ShowIcon="true"
-                   Style="margin-bottom: 16px;" />
-
-            <div style="text-align: center;">
-                <Space>
-                    <SpaceItem>
-                        <Button Type="ButtonType.Primary" OnClick="@(() => Navigation.NavigateTo("/"))" Icon="login">
-                            Giriş Yap
-                        </Button>
-                    </SpaceItem>
-                    <SpaceItem>
-                        <Button Type="ButtonType.Default" OnClick="@(() => Navigation.NavigateTo("/user/meetingRooms"))"
-                                Icon="home">
-                            Ana Sayfaya Dön
-                        </Button>
-                    </SpaceItem>
-                </Space>
-            </div>
-        </div>
-    </NotAuthorized>
 </AuthorizeView>
 
 <Modal Title="Rezervasyonu Düzenle" @bind-Visible="@IsEditModalVisible" OnOk="SubmitEdit" OnCancel="@CloseEditModal">
@@ -212,8 +192,9 @@
     private int TotalPages => (int)Math.Ceiling((double)FilteredReservations.Count / PageSize);
     private List<ReservationDto> FilteredReservations => AllReservations.Where(x => x.StartTime > DateTime.UtcNow).OrderBy(r
     => r.StartTime).ToList();
-
-
+    string[] columns = ["Location"];
+    private Func<PaginationTotalContext, string> ShowTotalText => context =>
+         $"{context.Range.from}-{context.Range.to} / {context.Total}";
     protected override async Task OnInitializedAsync()
     {
         var reservations = await ReservationService.GetAllReservationsAsync();
@@ -272,7 +253,6 @@
 
         AllReservations = reservations;
         TotalReservationCount = AllReservations.Count;
-        // LoadPage burada kaldırıldı, sadece veri güncellendiğinde çağrılacak
     }
 
     private double CalculateOccupancyPercentage(List<ReservationDto> reservations, int totalRoomDays)
