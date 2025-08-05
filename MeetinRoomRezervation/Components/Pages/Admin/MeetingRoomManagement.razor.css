@@ -64,7 +64,6 @@
 
 
 .halls-panel {
-    width: 80vw;
     height: 100%;
     background-color: #e6e6e6;
     border-radius:20px;
@@ -79,7 +78,7 @@
     background-color: white;
     margin-top: 30px;
     box-shadow: 5px 5px 10px rgba(87, 87, 87, 0.1);
-    border-radius: 10px;
+    border-radius: 20px;
     border-color: #d2d2d2;
     border: 1.2px solid #e2dfdf;
     padding: 25px;
@@ -217,10 +216,9 @@
         justify-content: center;
         background-color: white;
         box-shadow: 5px 5px 10px rgba(87, 87, 87, 0.1);
-        border-radius: 10px;
+        border-radius: 20px;
         border-color: #d2d2d2;
         border: 1.2px solid #e2dfdf;
-        width: 95%;
         height: auto;
         padding: 15px;
         margin-top: 30px;
@@ -272,4 +270,13 @@
         justify-content: center;
         width:88vw;
     }
+}
+
+
+.reservation-slot {
+    margin-bottom: 8px;
+    display:flex;
+    flex-direction:column;
+    height:70px;
+    justify-content:space-between;
 }

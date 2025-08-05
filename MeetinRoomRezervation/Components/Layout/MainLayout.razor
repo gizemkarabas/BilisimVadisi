@@ -12,14 +12,9 @@
 
 	<Menu Mode="MenuMode.Horizontal" style="background-color: unset;border-bottom:unset;">
 		<AuthorizeView>
-			<NotAuthorized>
-
-
-			</NotAuthorized>
 			<Authorized>
 				<div class="main-layout-bar">
 					<a href="@(GetHomePageUrl(context.User))">
-
 						<div class="main-layout-logo">
 							<svg width="36" height="36" viewBox="0 0 46 46" fill="white"
 								xmlns="http://www.w3.org/2000/svg">
@@ -36,7 +31,6 @@
 							</svg>
 						</div>
 					</a>
-
 					<div class="main" style="max-height:50px; display:flex">
 						@if (context.User != null && context.User.IsInRole("Admin"))
 						{
@@ -69,7 +63,11 @@
 						}
 						<MenuItem Key="3">
 							<div class="exit" style="cursor: pointer; color: white;" @onclick="HandleLogout">
-								<img src="Exit-Icon.png" alt="Açıklama" style="width: 30px" />
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M16 17L21 12L16 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
 							</div>
 						</MenuItem>
 					</div>

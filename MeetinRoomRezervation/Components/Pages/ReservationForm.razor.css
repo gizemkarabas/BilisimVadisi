@@ -44,7 +44,6 @@
     background-color: #f0f0f0;
     color: black;
     font-weight: bold;
-
 }
 
 .blue-circle {
@@ -74,6 +73,7 @@
     width: 20px;
     height: 20px;
 }
+
 .test {
     width: 12px;
     height: 12px;
@@ -87,6 +87,7 @@
     width: 18.5vw;
     align-items: center;
     font-weight: bold;
+    padding:10px;
 }
 
 
@@ -194,12 +195,13 @@
         min-width: 0;
         max-width: none;
     }
+
     .button-detail {
         display: flex;
         justify-content: space-between;
         width: 75vw;
         align-items: center;
-        font-weight:bold;
+        font-weight: bold;
     }
 
 

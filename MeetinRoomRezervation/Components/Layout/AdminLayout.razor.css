@@ -119,6 +119,11 @@
         border-radius: 0;
         padding: 15px;
     }
+
+    .exit {
+        display: flex !important;
+        align-items: center;
+    }
 }
 
 @media (max-width:600px) {
@@ -169,3 +174,16 @@
     background-color: #fafafa;
     font-weight: 600;
 }
+
+.exit {
+    display: flex;
+    align-items: center;
+    display: none;
+    margin-left: 10px;
+}
+
+    .exit svg {
+        width: 25px;
+        color: #6c757d;
+        height: 25px;
+    }

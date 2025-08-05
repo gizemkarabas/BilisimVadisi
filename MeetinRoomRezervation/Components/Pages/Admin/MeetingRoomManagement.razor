@@ -13,468 +13,473 @@
 @inject NavigationManager Navigation
 
 <AuthorizeView Roles="Admin" Context="authContext">
-	<Authorized Context="authContext">
+    <Authorized Context="authContext">
 
-		<div class="containerW">
-			<div class="containerH">
-				<div class="date-newreservation-panel">
-					<div class="calender">
-						<AntDesign.Col>
-							<Button OnClick="SelectToday">Bugün</Button>
-							<Button OnClick="SelectTomorrow" Style="margin-left: 8px;">Yarın</Button>
-							<DatePicker DefaultValue=@TodayDate @bind-Value="SelectedDate"
-								Style="margin-left: 8px; margin-top:8px" />
-						</AntDesign.Col>
-					</div>
-					<div class="new-reservation">
-						<AntDesign.Col>
-							<Button Type="ButtonType.Primary" OnClick="OpenCreateRoomModal">
-								<div class="new-reservation">Yeni Toplantı Odası Oluştur</div>
-							</Button>
-						</AntDesign.Col>
-					</div>
-				</div>
+        <div class="containerW">
+            <div class="containerH">
+                <div class="date-newreservation-panel">
+                    <div class="calender">
+                        <AntDesign.Col>
+                            <Button OnClick="SelectToday">Bugün</Button>
+                            <Button OnClick="SelectTomorrow" Style="margin-left: 8px;">Yarın</Button>
+                            <DatePicker DefaultValue=@TodayDate @bind-Value="SelectedDate" TValue="DateTime"
+                                        OnChange="OnDateChanged" Style="margin-left: 8px; margin-top:8px" />
+                        </AntDesign.Col>
+                    </div>
+                    <AntDesign.Col>
+                        <Button Type="ButtonType.Primary" OnClick="OpenCreateRoomModal" Style="width:100%">
+                            <div class="new-reservation">Yeni Toplantı Odası Oluştur</div>
+                        </Button>
+                    </AntDesign.Col>
+                </div>
 
-				<div class="halls-panel">
-					<Row Gutter="16">
+                <div class="halls-panel">
+                    <Row Gutter="16">
 
-						@foreach (var room in Rooms)
-						{
-							<AntDesign.Col Xs="24" Sm="24" Md="12" Lg="8" Xl="6" Style="padding-left:1%;padding-right:1%;">
-								<div class="halls">
-									<div style="display:flex;justify-content:end">
-										<Button Size="ButtonSize.Small"
-											Style="align-self:end;margin-bottom: 20px; margin-right: 5px;"
-											OnClick="@(() => OpenEditModal(room))" Icon="edit" />
-										<Button Size="ButtonSize.Small" Style="align-self:end;margin-bottom: 20px;"
-											OnClick="@(() => DeleteRoom(room.Id))" Icon="delete" Danger />
-									</div>
-									<div class="halls-header">@room.Name</div>
-									@if (room.Reservations.Any())
-									{
-										var firstRes = room.Reservations.First();
-										<div style="display:flex ;margin-top: 20px;margin-bottom: 20px;">
-											<div class="icon-bar">
-												<div>
-													<svg width="15" height="15" viewBox="0 0 18 18" fill="white">
-														<path
-															d="M8.61111 15.0003L7.94444 15.5003L8.65114 16.4426L9.30448 15.4626L8.61111 15.0003ZM9.27777 14.5003L5.66667 9.68551L4.33333 10.6855L7.94444 15.5003L9.27777 14.5003ZM15.14 3.70474L7.91773 14.5381L9.30448 15.4626L16.5267 4.62924L15.14 3.70474Z"
-															fill="white" />
-													</svg>
-												</div>
-												<div>
-													<svg width="14" height="17" viewBox="0 0 14 17" fill="none"
-														xmlns="http://www.w3.org/2000/svg">
-														<path
-															d="M2.41699 12.333L3.25033 4.41634C3.87215 3.68983 5.30709 3.16634 7.00034 3.16634M11.5837 12.333L10.7503 4.41634C10.1285 3.68983 8.69359 3.16634 7.00034 3.16634M7.00034 3.16634L7.00033 1.49968"
-															stroke="white" stroke-width="1.66667" stroke-linecap="square"
-															stroke-linejoin="round" />
-														<path
-															d="M1.16699 13.167H4.85765M12.8337 13.167H9.14337M9.14337 13.167L9.03869 13.8994C8.89372 14.9136 8.02504 15.667 7.00046 15.667V15.667C5.97577 15.667 5.10702 14.9135 4.96218 13.8991L4.85765 13.167M9.14337 13.167H4.85765"
-															stroke="white" stroke-width="1.66667" stroke-linecap="square"
-															stroke-linejoin="round" />
-													</svg>
-												</div>
-												<div>
-													<svg width="24" height="16" viewBox="0 0 16 16" fill="none"
-														xmlns="http://www.w3.org/2000/svg">
-														<path
-															d="M7.99967 2.33301L10.1157 6.08721L14.34 6.93956L11.4235 10.1121L11.9182 14.3931L7.99967 12.5997L4.08111 14.3931L4.57587 10.1121L1.6593 6.93956L5.88365 6.08721L7.99967 2.33301Z"
-															stroke="white" stroke-width="1.66667" />
-													</svg>
-												</div>
-											</div>
-											<div class="descriptions">
-												<div>
-													<div style="font-weight:bold; font-size:16px;">Şirket :</div>
-													<div>
-														@{
-															var reservationUser = UsersInfo.FirstOrDefault(u => u.Id ==
-															firstRes.UserId);
-														}
-														@(reservationUser?.Company ?? firstRes.User?.Company ?? "Bilinmiyor")
-													</div>
-												</div>
-												<div>
-													<div style="font-weight:bold; margin-top:8px;">Yetkili :</div>
-													@{
-														var slotUser = UsersInfo.FirstOrDefault(u => u.Id == firstRes.UserId);
-													}
-												@(slotUser?.CompanyOfficial ?? firstRes.User?.CompanyOfficial ??
-																							firstRes.UserEmail ?? "Bilinmiyor")
-												</div>
-												<div>
-													<div style="font-weight:bold; margin-top:8px;">Telefon :</div>
-													<div>@(reservationUser?.ContactPhone ?? firstRes.User?.ContactPhone ?? "")
-													</div>
-												</div>
-											</div>
-										</div>
+                        @foreach (var room in Rooms)
+                        {
+                            <AntDesign.Col Xs="24" Sm="24" Md="12" Lg="8" Xl="6">
+                                <div class="halls">
+                                    <div style="display:flex;justify-content:end">
+                                        <Button Size="ButtonSize.Small"
+                                                Style="align-self:end;margin-bottom: 20px; margin-right: 5px;"
+                                                OnClick="@(() => OpenEditModal(room))" Icon="edit" />
+                                        <Button Size="ButtonSize.Small" Style="align-self:end;margin-bottom: 20px;"
+                                                OnClick="@(() => DeleteRoom(room.Id))" Icon="delete" Danger />
+                                    </div>
+                                    <div class="halls-header">@room.Name</div>
+                                    @if (room.Reservations.Any())
+                                    {
+                                        var firstRes = room.Reservations.First();
+                                        <div style="display:flex ;margin-top: 20px;margin-bottom: 20px;">
+                                            <div class="icon-bar">
+                                                <div>
+                                                    <svg width="15" height="15" viewBox="0 0 18 18" fill="white">
+                                                        <path d="M8.61111 15.0003L7.94444 15.5003L8.65114 16.4426L9.30448 15.4626L8.61111 15.0003ZM9.27777 14.5003L5.66667 9.68551L4.33333 10.6855L7.94444 15.5003L9.27777 14.5003ZM15.14 3.70474L7.91773 14.5381L9.30448 15.4626L16.5267 4.62924L15.14 3.70474Z"
+                                                              fill="white" />
+                                                    </svg>
+                                                </div>
+                                                <div>
+                                                    <svg width="14" height="17" viewBox="0 0 14 17" fill="none"
+                                                         xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M2.41699 12.333L3.25033 4.41634C3.87215 3.68983 5.30709 3.16634 7.00034 3.16634M11.5837 12.333L10.7503 4.41634C10.1285 3.68983 8.69359 3.16634 7.00034 3.16634M7.00034 3.16634L7.00033 1.49968"
+                                                              stroke="white" stroke-width="1.66667" stroke-linecap="square"
+                                                              stroke-linejoin="round" />
+                                                        <path d="M1.16699 13.167H4.85765M12.8337 13.167H9.14337M9.14337 13.167L9.03869 13.8994C8.89372 14.9136 8.02504 15.667 7.00046 15.667V15.667C5.97577 15.667 5.10702 14.9135 4.96218 13.8991L4.85765 13.167M9.14337 13.167H4.85765"
+                                                              stroke="white" stroke-width="1.66667" stroke-linecap="square"
+                                                              stroke-linejoin="round" />
+                                                    </svg>
+                                                </div>
+                                                <div>
+                                                    <svg width="24" height="16" viewBox="0 0 16 16" fill="none"
+                                                         xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M7.99967 2.33301L10.1157 6.08721L14.34 6.93956L11.4235 10.1121L11.9182 14.3931L7.99967 12.5997L4.08111 14.3931L4.57587 10.1121L1.6593 6.93956L5.88365 6.08721L7.99967 2.33301Z"
+                                                              stroke="white" stroke-width="1.66667" />
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                            <div class="descriptions">
+                                                <div>
+                                                    <div style="font-weight:bold; font-size:16px;">Şirket :</div>
+                                                    <div>
+                                                        @{
+                                                            var reservationUser = UsersInfo.FirstOrDefault(u => u.Id ==
+                                                            firstRes.UserId);
+                                                        }
+                                                        @(reservationUser?.Company ?? firstRes.User?.Company ?? "Bilinmiyor")
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div style="font-weight:bold; margin-top:8px;">Yetkili :</div>
+                                                    @{
+                                                        var slotUser = UsersInfo.FirstOrDefault(u => u.Id == firstRes.UserId);
+                                                    }
+                                                @(slotUser?.CompanyOfficial ?? firstRes.User?.CompanyOfficial ??
+                                                                                            firstRes.UserEmail ?? "Bilinmiyor")
+                                        </div>
+                                        <div>
+                                            <div style="font-weight:bold; margin-top:8px;">Telefon :</div>
+                                            <div>
+                                                @(reservationUser?.ContactPhone ?? firstRes.User?.ContactPhone ?? "")
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
-										<div class="reservation-slots-panel">
-											@foreach (var res in room.Reservations)
-											{
-												<div class="reservation-slot" style="margin-bottom:8px;">
-													<div style="display:flex; align-items:center; gap:8px;">
-														<Button Type="ButtonType.Default" Style="width:100%;
-																		height:4.5vh;
-																		background-color:#e6f7ff;
-																		border:1px solid #1890ff;
-																		border-radius:10px;
-																		color:#1890ff;">
-															@res.StartTime.ToString("HH:mm") - @res.EndTime.ToString("HH:mm")
-														</Button>
-													</div>
-													<Button Danger Type="ButtonType.Primary"
-														Style="min-width:120px; background:unset; color:red; border:1px solid #ff4d4f;"
-														OnClick="@(() => CancelReservation(res.Id))">
-														Rezervasyonu İptal Et
-													</Button>
-												</div>
-											}
+                                        <div class="reservation-slots-panel">
+                                    @foreach (var res in room.Reservations)
+                                            {
+                                                <div class="reservation-slot" style="margin-bottom:8px;">
+                                                    <div style="display:flex; align-items:center; gap:8px;">
+                                                        <Button Type="ButtonType.Default" Style="width:100%;
+                                                                              height:4.5vh;
+                                                                              background-color:#e6f7ff;
+                                                                              border:1px solid #1890ff;
+                                                                              border-radius:10px;
+                                                                              color:#1890ff;">
+                                                            @res.StartTime.ToString("HH:mm") - @res.EndTime.ToString("HH:mm")
+                                                        </Button>
+                                                    </div>
+                                                    <Button Danger Type="ButtonType.Primary"
+                                                            Style="min-width:120px; background:unset; color:red; border:1px solid #ff4d4f;"
+                                                            OnClick="@(() => CancelReservation(res.Id))">
+                                                        Rezervasyonu İptal Et
+                                                    </Button>
+                                                </div>
+                                            }
 
-										</div>
-									}
-									else
-									{
-										<Tag Style="width: vw10px;
-															height:auto;
-															text-align:center;
-															white-space: normal;
-															display: flex;
-															justify-content: center;
-															align-items: center;
-															margin-top:10px;
-															padding:5px;" Color="TagColor.Green">
-											Bugün için rezervasyon bulunmamaktadır.
-										</Tag>
-									}
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <Tag Style="width: vw10px;
+                                                       height:auto;
+                                                       text-align:center;
+                                                       white-space: normal;
+                                                       display: flex;
+                                                       justify-content: center;
+                                                       align-items: center;
+                                                       margin-top:10px;
+                                                       padding:5px;" Color="TagColor.Green">
+                                            Bugün için rezervasyon bulunmamaktadır.
+                                        </Tag>
+                                    }
 
-									<Divider />
-									<Collapse DefaultActiveKey="@(new[] { "2" })" OnChange="Callback" Animation>
-										<Panel Header="Müsait Saatler" Key="1">
-											<p>
-												@foreach (var slot in room.AvailableSlots)
-												{
-													<Tag Style="width: 100%;
-																height:4.5vh;
-																border:1px solid;
-																border-radius:10px;
-																border-color:#0095FF;
-																margin-bottom:8px;
-																display: flex;
-																justify-content: center;
-																align-items: center;">
-														@slot
-													</Tag>
-												}
-											</p>
-										</Panel>
+                                    <Divider />
+                                    <Collapse DefaultActiveKey="@(new[] { "2" })" OnChange="Callback" Animation>
+                                        <Panel Header="Müsait Saatler" Key="1">
+                                            <p>
+                                                @foreach (var slot in room.AvailableSlots)
+                                                {
+                                                    <Tag Style="width: 100%;
+                                                        height:4.5vh;
+                                                        border:1px solid;
+                                                        border-radius:10px;
+                                                        border-color:#0095FF;
+                                                        margin-bottom:8px;
+                                                        display: flex;
+                                                        justify-content: center;
+                                                        align-items: center;">
+                                                        @slot
+                                                    </Tag>
+                                                }
+                                            </p>
+                                        </Panel>
 
-									</Collapse>
+                                    </Collapse>
 
-								</div>
-							</AntDesign.Col>
-						}
+                                </div>
+                            </AntDesign.Col>
+                        }
 
-					</Row>
-					<Modal Title="Yeni Toplantı Odası Oluştur" @bind-Visible="@IsCreateModalVisible" OnOk="CreateRoom"
-						OnCancel="CloseCreateModal" OkText="@okButtonText" CancelText="@cancelButtonText">
+                    </Row>
+                    <Modal Title="Yeni Toplantı Odası Oluştur" @bind-Visible="@IsCreateModalVisible" OnOk="CreateRoom"
+                           OnCancel="CloseCreateModal" OkText="@okButtonText" CancelText="@cancelButtonText">
 
-						<Form Model="@NewRoom">
-							<FormItem Label="Oda Adı" Required>
-								<Input @bind-Value="NewRoom.Name" />
-							</FormItem>
-							<FormItem Label="Kapasite" Required>
-								<AntDesign.InputNumber @bind-Value="NewRoom.Capacity" Min="1" />
-							</FormItem>
-						</Form>
-					</Modal>
-					<Modal Title="Toplantı Odası Düzenle" @bind-Visible="@IsEditModalVisible" OnOk="UpdateRoom"
-						OnCancel="CloseEditModal" OkText="@okButtonText" CancelText="@cancelButtonText">
+                        <Form Model="@NewRoom">
+                            <FormItem Label="Oda Adı" Required>
+                                <Input @bind-Value="NewRoom.Name" />
+                            </FormItem>
+                            <FormItem Label="Kapasite" Required>
+                                <AntDesign.InputNumber @bind-Value="NewRoom.Capacity" Min="1" />
+                            </FormItem>
+                        </Form>
+                    </Modal>
+                    <Modal Title="Toplantı Odası Düzenle" @bind-Visible="@IsEditModalVisible" OnOk="UpdateRoom"
+                           OnCancel="CloseEditModal" OkText="@okButtonText" CancelText="@cancelButtonText">
 
-						<Form Model="@EditingRoom">
-							<FormItem Label="Oda Adı" Required>
-								<Input @bind-Value="EditingRoom.Name" />
-							</FormItem>
-							<FormItem Label="Kapasite" Required>
-								<AntDesign.InputNumber @bind-Value="EditingRoom.Capacity" Min="1" />
-							</FormItem>
-						</Form>
-					</Modal>
-					<Modal @bind-Visible="@IsDeleteModalVisible" OnOk="ConfirmDeleteRoom" OnCancel="CloseDeleteModal"
-						OkText="deleteButtonText" CancelText="@cancelButtonText" OkType="@ButtonType.Primary"
-						OkButtonProps="@(new ButtonProps { Danger = true })">
+                        <Form Model="@EditingRoom">
+                            <FormItem Label="Oda Adı" Required>
+                                <Input @bind-Value="EditingRoom.Name" />
+                            </FormItem>
+                            <FormItem Label="Kapasite" Required>
+                                <AntDesign.InputNumber @bind-Value="EditingRoom.Capacity" Min="1" />
+                            </FormItem>
+                        </Form>
+                    </Modal>
+                    <Modal @bind-Visible="@IsDeleteModalVisible" OnOk="ConfirmDeleteRoom" OnCancel="CloseDeleteModal"
+                           OkText="deleteButtonText" CancelText="@cancelButtonText" OkType="@ButtonType.Primary"
+                           OkButtonProps="@(new ButtonProps { Danger = true })">
 
-						<div style="text-align: center; padding: 20px;">
-							<Icon Type="exclamation-circle" Theme="IconThemeType.Outline"
-								Style="font-size: 48px; color: #ff4d4f; margin-bottom: 16px;" />
-							<p style="font-size: 16px; margin-bottom: 8px;">Bu toplantı odasını silmek istediğinizden
-								emin misiniz?</p>
-							<p style="color: #666; font-size: 14px;">Bu işlem geri alınamaz ve odaya ait tüm
-								rezervasyonlar silinecektir.</p>
-							@if (!string.IsNullOrEmpty(RoomToDeleteName))
-							{
-								<p style="font-weight: bold; color: #ff4d4f; margin-top: 12px;">Silinecek Oda:
-									@RoomToDeleteName</p>
-							}
-						</div>
-					</Modal>
+                        <div style="text-align: center; padding: 20px;">
+                            <Icon Type="exclamation-circle" Theme="IconThemeType.Outline"
+                                  Style="font-size: 48px; color: #ff4d4f; margin-bottom: 16px;" />
+                            <p style="font-size: 16px; margin-bottom: 8px;">
+                                Bu toplantı odasını silmek istediğinizden
+                                emin misiniz?
+                            </p>
+                            <p style="color: #666; font-size: 14px;">
+                                Bu işlem geri alınamaz ve odaya ait tüm
+                                rezervasyonlar silinecektir.
+                            </p>
+                            @if (!string.IsNullOrEmpty(RoomToDeleteName))
+                            {
+                                <p style="font-weight: bold; color: #ff4d4f; margin-top: 12px;">
+                                    Silinecek Oda:
+                                    @RoomToDeleteName
+                                </p>
+                            }
+                        </div>
+                    </Modal>
 
-					<Modal @bind-Visible="@IsCancelModalVisible" OnOk="ConfirmCancelReservation"
-						OnCancel="CloseCancelModal" OkText="@deleteButtonText" CancelText="@cancelButtonText"
-						OkType="@ButtonType.Primary">
-						<div style="text-align: center; padding: 20px;">
-							<p style="font-size: 16px; margin-bottom: 8px;">Bu rezervasyonu iptal etmek istediğinizden
-								emin misiniz?</p>
-						</div>
-					</Modal>
-				</div>
-			</div>
-		</div>
-	</Authorized>
-	<NotAuthorized>
-		<div style="padding: 24px; max-width: 600px; margin: 0 auto;">
-			<Alert Type="@AlertType.Warning" Message="Yetkisiz Erişim"
-				Description="Bu sayfaya erişim yetkiniz bulunmamaktadır. Admin yetkisi gereklidir." ShowIcon="true"
-				Style="margin-bottom: 16px;" />
-
-			<div style="text-align: center;">
-				<Space>
-					<SpaceItem>
-						<Button Type="ButtonType.Primary" OnClick="@(() => Navigation.NavigateTo("/"))" Icon="login">
-							Giriş Yap
-						</Button>
-					</SpaceItem>
-					<SpaceItem>
-						<Button Type="ButtonType.Default" OnClick="@(() => Navigation.NavigateTo("/user/meetingRooms"))"
-							Icon="home">
-							Ana Sayfaya Dön
-						</Button>
-					</SpaceItem>
-				</Space>
-			</div>
-		</div>
-	</NotAuthorized>
+                    <Modal @bind-Visible="@IsCancelModalVisible" OnOk="ConfirmCancelReservation"
+                           OnCancel="CloseCancelModal" OkText="@deleteButtonText" CancelText="@cancelButtonText"
+                           OkType="@ButtonType.Primary">
+                        <div style="text-align: center; padding: 20px;">
+                            <p style="font-size: 16px; margin-bottom: 8px;">
+                                Bu rezervasyonu iptal etmek istediğinizden
+                                emin misiniz?
+                            </p>
+                        </div>
+                    </Modal>
+                </div>
+            </div>
+        </div>
+    </Authorized>
 </AuthorizeView>
-@code {
-	void Callback(string[] keys)
-	{
-		Console.WriteLine(string.Join(',', keys));
-	}
-
-}
 
 @code {
-	private DateTime SelectedDate = DateTime.Today;
-	private string okButtonText = "Kaydet";
-	private string deleteButtonText = "Sil";
-	private string cancelButtonText = "İptal";
-	private void SelectToday() => SelectedDate = DateTime.Today;
-	private void SelectTomorrow() => SelectedDate = DateTime.Today.AddDays(1);
-	private List<MeetingRoomDto> Rooms = new();
-	private bool IsCreateModalVisible = false;
-	private bool IsEditModalVisible = false;
-	private MeetingRoomDto NewRoom = new();
-	private MeetingRoomDto EditingRoom = new();
-	private bool isAdmin = false;
-	private bool IsCancelModalVisible = false;
-	private string ReservationToCancel = "";
-	private bool IsDeleteModalVisible = false;
-	private string RoomToDelete = "";
-	private string RoomToDeleteName = "";
-	private UserDto User = new();
-	private List<UserDto> UsersInfo = new();
-	private UserDto CurrentUser => UsersInfo.FirstOrDefault();
+    private DateTime _selectedDate = DateTime.Today;
+    private DateTime SelectedDate
+    {
+        get => _selectedDate;
+        set
+        {
+            _selectedDate = value;
+        }
+    }
 
-	private DateTime TodayDate = DateTime.Today;
-	private bool DisablePastDates(DateTime date) => date < DateTime.Today;
+    private string okButtonText = "Kaydet";
+    private string deleteButtonText = "Sil";
+    private string cancelButtonText = "İptal";
 
-	protected override async Task OnInitializedAsync()
-	{
-		var authState = await AuthProvider.GetAuthenticationStateAsync();
-		var user = authState.User;
-		var isAdmin = user.IsInRole("Admin");
+    private async Task SelectToday()
+    {
+        SelectedDate = DateTime.Today;
+        await LoadRoomData();
+        StateHasChanged();
+    }
 
-		await LoadRoomData();
-	}
+    private async Task SelectTomorrow()
+    {
+        SelectedDate = DateTime.Today.AddDays(1);
+        await LoadRoomData();
+        StateHasChanged();
+    }
 
-	private async Task LoadRoomData()
-	{
-		try
-		{
-			var allRooms = await RoomService.GetAllRoomsAsync();
-			var reservations = await ReservationService.GetReservationsByDateAsync(SelectedDate);
+    private async Task OnDateChanged(DateTimeChangedEventArgs<DateTime> args)
+    {
+        SelectedDate = args.Date;
+        await LoadRoomData();
+        StateHasChanged();
+    }
+    private List<MeetingRoomDto> Rooms = new();
+    private bool IsCreateModalVisible = false;
+    private bool IsEditModalVisible = false;
+    private MeetingRoomDto NewRoom = new();
+    private MeetingRoomDto EditingRoom = new();
+    private bool isAdmin = false;
+    private bool IsCancelModalVisible = false;
+    private string ReservationToCancel = "";
+    private bool IsDeleteModalVisible = false;
+    private string RoomToDelete = "";
+    private string RoomToDeleteName = "";
+    private UserDto User = new();
+    private List<UserDto> UsersInfo = new();
+    private UserDto CurrentUser => UsersInfo.FirstOrDefault();
 
-			// Tüm kullanıcı bilgilerini yükle (admin sayfası olduğu için tüm kullanıcılar)
-			UsersInfo = await UserService.GetUsersInfoAsync();
+    private DateTime TodayDate = DateTime.Today;
+    private bool DisablePastDates(DateTime date) => date < DateTime.Today;
 
-			// Debug: Kullanıcı bilgilerini kontrol et
-			Console.WriteLine($"Total users loaded: {UsersInfo.Count}");
-			foreach (var user in UsersInfo.Take(5))
-			{
-				Console.WriteLine($"User: {user.Id} - {user.Email} - {user.Company}");
-			}
+    void Callback(string[] keys)
+    {
+        Console.WriteLine(string.Join(',', keys));
+    }
 
-			// Debug: Rezervasyon bilgilerini kontrol et
-			Console.WriteLine($"Total reservations for {SelectedDate:yyyy-MM-dd}: {reservations.Count}");
-			foreach (var res in reservations.Take(5))
-			{
-				Console.WriteLine($"Reservation: {res.Id} - UserId: {res.UserId} - UserEmail: {res.UserEmail}");
-				var matchedUser = UsersInfo.FirstOrDefault(u => u.Id == res.UserId);
-				Console.WriteLine($" Matched user: {(matchedUser != null ? matchedUser.Email : "NOT FOUND")}");
-			}
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        var isAdmin = user.IsInRole("Admin");
 
-			foreach (var room in allRooms)
-			{
+        await LoadRoomData();
+    }
 
-				var roomReservations = reservations
-				.Where(r => r.RoomId == room.Id && r.Status != ReservationStatus.Cancelled)
-				.OrderBy(r => r.StartTime)
-				.ToList();
+    private async Task LoadRoomData()
+    {
+        try
+        {
+            var allRooms = await RoomService.GetAllRoomsAsync();
+            var reservations = await ReservationService.GetReservationsByDateAsync(SelectedDate);
 
-				room.Reservations = roomReservations;
-				room.AvailableSlots = GenerateAvailableSlots(roomReservations);
-			}
+            // Tüm kullanıcı bilgilerini yükle (admin sayfası olduğu için tüm kullanıcılar)
+            UsersInfo = await UserService.GetUsersInfoAsync();
 
-			Rooms = allRooms;
-			Console.WriteLine($"Users info loaded: {UsersInfo.Count}");
-		}
-		catch (Exception ex)
-		{
-			Console.WriteLine($"Error in LoadRoomData: {ex.Message}");
-			Console.WriteLine($"Stack trace: {ex.StackTrace}");
-		}
-	}
+            // Debug: Kullanıcı bilgilerini kontrol et
+            Console.WriteLine($"Total users loaded: {UsersInfo.Count}");
+            foreach (var user in UsersInfo.Take(5))
+            {
+                Console.WriteLine($"User: {user.Id} - {user.Email} - {user.Company}");
+            }
 
-	private List<string> GenerateAvailableSlots(List<ReservationDto> reservations)
-	{
-		var slots = new List<string>();
-		for (int hour = 0; hour < 24; hour++)
-		{
-			var start = new TimeSpan(hour, 0, 0);
-			var end = new TimeSpan(hour + 1, 0, 0);
+            // Debug: Rezervasyon bilgilerini kontrol et
+            Console.WriteLine($"Total reservations for {SelectedDate:yyyy-MM-dd}: {reservations.Count}");
+            foreach (var res in reservations.Take(5))
+            {
+                Console.WriteLine($"Reservation: {res.Id} - UserId: {res.UserId} - UserEmail: {res.UserEmail}");
+                var matchedUser = UsersInfo.FirstOrDefault(u => u.Id == res.UserId);
+                Console.WriteLine($" Matched user: {(matchedUser != null ? matchedUser.Email : "NOT FOUND")}");
+            }
 
-			bool isOccupied = reservations.Any(r =>
-			r.StartTime.TimeOfDay < end && r.EndTime.TimeOfDay > start);
+            foreach (var room in allRooms)
+            {
 
-			if (!isOccupied)
-			{
-				slots.Add($"{start:hh\\:mm} - {end:hh\\:mm}");
-			}
-		}
-		return slots;
-	}
+                var roomReservations = reservations
+                .Where(r => r.RoomId == room.Id && r.Status != ReservationStatus.Cancelled)
+                .OrderBy(r => r.StartTime)
+                .ToList();
 
-	private void CancelReservation(string reservationId)
-	{
-		ReservationToCancel = reservationId;
-		IsCancelModalVisible = true;
-	}
+                room.Reservations = roomReservations;
+                room.AvailableSlots = GenerateAvailableSlots(roomReservations);
+            }
 
-	private void CloseCancelModal()
-	{
-		IsCancelModalVisible = false;
-		ReservationToCancel = "";
-	}
+            Rooms = allRooms;
+            Console.WriteLine($"Users info loaded: {UsersInfo.Count}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in LoadRoomData: {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+        }
+    }
 
-	private async Task ConfirmCancelReservation()
-	{
-		if (!string.IsNullOrEmpty(ReservationToCancel))
-		{
-			await ReservationService.AdminDeleteReservationAsync(ReservationToCancel);
-			await LoadRoomData();
-		}
-		CloseCancelModal();
-	}
+    private List<string> GenerateAvailableSlots(List<ReservationDto> reservations)
+    {
+        var slots = new List<string>();
+        for (int hour = 0; hour < 24; hour++)
+        {
+            var start = new TimeSpan(hour, 0, 0);
+            var end = new TimeSpan(hour + 1, 0, 0);
+
+            bool isOccupied = reservations.Any(r =>
+            r.StartTime.TimeOfDay < end && r.EndTime.TimeOfDay > start);
+
+            if (!isOccupied)
+            {
+                slots.Add($"{start:hh\\:mm} - {end:hh\\:mm}");
+            }
+        }
+        return slots;
+    }
+
+    private void CancelReservation(string reservationId)
+    {
+        ReservationToCancel = reservationId;
+        IsCancelModalVisible = true;
+    }
+
+    private void CloseCancelModal()
+    {
+        IsCancelModalVisible = false;
+        ReservationToCancel = "";
+    }
+
+    private async Task ConfirmCancelReservation()
+    {
+        if (!string.IsNullOrEmpty(ReservationToCancel))
+        {
+            await ReservationService.AdminDeleteReservationAsync(ReservationToCancel);
+            await LoadRoomData();
+        }
+        CloseCancelModal();
+    }
 
 
-	private void OpenCreateRoomModal()
-	{
-		NewRoom = new MeetingRoomDto();
-		IsCreateModalVisible = true;
-	}
+    private void OpenCreateRoomModal()
+    {
+        NewRoom = new MeetingRoomDto();
+        IsCreateModalVisible = true;
+    }
 
-	private void CloseCreateModal()
-	{
-		IsCreateModalVisible = false;
-		NewRoom = new();
-	}
+    private void CloseCreateModal()
+    {
+        IsCreateModalVisible = false;
+        NewRoom = new();
+    }
 
-	private async Task CreateRoom()
-	{
-		if (!string.IsNullOrWhiteSpace(NewRoom.Name) && NewRoom.Capacity > 0)
-		{
-			await RoomService.AddRoomAsync(NewRoom);
-			await LoadRoomData();
-			CloseCreateModal();
-		}
-	}
+    private async Task CreateRoom()
+    {
+        if (!string.IsNullOrWhiteSpace(NewRoom.Name) && NewRoom.Capacity > 0)
+        {
+            await RoomService.AddRoomAsync(NewRoom);
+            await LoadRoomData();
+            CloseCreateModal();
+        }
+    }
 
-	private void OpenEditModal(MeetingRoomDto room)
-	{
-		EditingRoom = new MeetingRoomDto
-		{
-			Id = room.Id,
-			Name = room.Name,
-			Capacity = room.Capacity,
-			Location = room.Location
-		};
+    private void OpenEditModal(MeetingRoomDto room)
+    {
+        EditingRoom = new MeetingRoomDto
+        {
+            Id = room.Id,
+            Name = room.Name,
+            Capacity = room.Capacity,
+            Location = room.Location
+        };
 
-		IsEditModalVisible = true;
-	}
+        IsEditModalVisible = true;
+    }
 
-	private void CloseEditModal()
-	{
-		IsEditModalVisible = false;
-		EditingRoom = new();
-	}
+    private void CloseEditModal()
+    {
+        IsEditModalVisible = false;
+        EditingRoom = new();
+    }
 
-	private async Task UpdateRoom()
-	{
-		if (!string.IsNullOrWhiteSpace(EditingRoom.Name) && EditingRoom.Capacity > 0)
-		{
-			await RoomService.UpdateRoomAsync(EditingRoom);
-			await LoadRoomData();
-			CloseEditModal();
-		}
-	}
-	private UserRole GetUserRole(ClaimsPrincipal user)
-	{
-		var roleString = user.FindFirst(ClaimTypes.Role)?.Value;
-		return Enum.TryParse<UserRole>(roleString, out var role) ? role : UserRole.User;
-	}
+    private async Task UpdateRoom()
+    {
+        if (!string.IsNullOrWhiteSpace(EditingRoom.Name) && EditingRoom.Capacity > 0)
+        {
+            await RoomService.UpdateRoomAsync(EditingRoom);
+            await LoadRoomData();
+            CloseEditModal();
+        }
+    }
+    private UserRole GetUserRole(ClaimsPrincipal user)
+    {
+        var roleString = user.FindFirst(ClaimTypes.Role)?.Value;
+        return Enum.TryParse<UserRole>(roleString, out var role) ? role : UserRole.User;
+    }
 
-	private string GetUserCompany(ClaimsPrincipal user)
-	{
-		return user.FindFirst("Company")?.Value ?? "";
-	}
-	private void DeleteRoom(string roomId)
-	{
-		var room = Rooms.FirstOrDefault(r => r.Id == roomId);
-		if (room != null)
-		{
-			RoomToDelete = roomId;
-			RoomToDeleteName = room.Name;
-			IsDeleteModalVisible = true;
-		}
-	}
+    private string GetUserCompany(ClaimsPrincipal user)
+    {
+        return user.FindFirst("Company")?.Value ?? "";
+    }
+    private void DeleteRoom(string roomId)
+    {
+        var room = Rooms.FirstOrDefault(r => r.Id == roomId);
+        if (room != null)
+        {
+            RoomToDelete = roomId;
+            RoomToDeleteName = room.Name;
+            IsDeleteModalVisible = true;
+        }
+    }
 
-	private void CloseDeleteModal()
-	{
-		IsDeleteModalVisible = false;
-		RoomToDelete = "";
-		RoomToDeleteName = "";
-	}
+    private void CloseDeleteModal()
+    {
+        IsDeleteModalVisible = false;
+        RoomToDelete = "";
+        RoomToDeleteName = "";
+    }
 
-	private async Task ConfirmDeleteRoom()
-	{
-		if (!string.IsNullOrEmpty(RoomToDelete))
-		{
-			await RoomService.DeleteRoomAsync(RoomToDelete);
-			await LoadRoomData();
-		}
-		CloseDeleteModal();
-	}
-}
+    private async Task ConfirmDeleteRoom()
+    {
+        if (!string.IsNullOrEmpty(RoomToDelete))
+        {
+            await RoomService.DeleteRoomAsync(RoomToDelete);
+            await LoadRoomData();
+        }
+        CloseDeleteModal();
+    }
 }

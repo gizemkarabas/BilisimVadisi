@@ -194,12 +194,8 @@
     }
 
     .users-panel {
-        width: 92vw;
-        height: 76vh;
         align-self: center;
-        max-width: 95vw;
         margin-top: 25px;
-        padding: 0px;
         background-color: white;
         box-shadow: -2px 2px 10px rgba(87, 87, 87, 0.3);
     }

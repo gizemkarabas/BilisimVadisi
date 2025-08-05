@@ -55,10 +55,17 @@
 }
 
 .exit {
-    filter: invert(100);
-    background-color: unset;
-    color: white !important;
+    display: flex;
+    align-items: center;
+    height: 100%
 }
+
+    .exit svg {
+        width: 25px;
+        color: white;
+        height: 25px;
+    }
+
 
 .panel-gray {
     background-color: #e6e6e6;
