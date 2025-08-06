@@ -4,6 +4,7 @@ using MeetinRoomRezervation.Data;
 using MeetinRoomRezervation.Models;
 using MeetinRoomRezervation.Services;
 using MeetinRoomRezervation.Services.BackgroundServices;
+using MeetinRoomRezervation.Services.LogService;
 using MeetinRoomRezervation.Services.ReservationService;
 using MeetinRoomRezervation.Services.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -44,6 +45,7 @@ builder.Services.AddScoped<IReservationService, ReservationService>();
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPasswordResetService, PasswordResetService>();
+builder.Services.AddScoped<IReservationLogService, ReservationLogService>();
 
 // Modal State Management
 

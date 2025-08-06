@@ -348,7 +348,7 @@
     {
         if (ReservationToDelete is not null)
         {
-            await ReservationService.DeleteReservationAsync(ReservationToDelete.Id!);
+            await ReservationService.AdminDeleteReservationAsync(ReservationToDelete.Id!);
             await RefreshReservations();
             CancelDelete();
         }
