@@ -11,7 +11,34 @@
 @using AntDesign
 @using MeetinRoomRezervation.Services.ReservationService
 @inject NavigationManager Navigation
+<style>
+    .table-wrapper {
+        border-radius: 20px;
+        overflow: hidden;
+        border: 1px solid #f0f0f0;
+    }
 
+        .table-wrapper .ant-table {
+            border: none !important;
+            border-radius: 0 !important;
+        }
+
+        .table-wrapper .ant-table-container {
+            border-radius: 0 !important;
+        }
+
+        .table-wrapper .ant-table-thead > tr > th {
+            border-top: none !important;
+        }
+
+            .table-wrapper .ant-table-thead > tr > th:first-child {
+                border-left: none !important;
+            }
+
+            .table-wrapper .ant-table-thead > tr > th:last-child {
+                border-right: none !important;
+            }
+</style>
 <AuthorizeView Roles="Admin" Context="authContext">
     <Authorized Context="authContext">
         <div class="container">
@@ -46,62 +73,58 @@
                     <div class="last-reservation-panel-header">Son Rezervasyonlar</div>
                     @if (PagedReservations?.Count > 0)
                     {
-                        <Table TItem="ReservationDto"
-                               DataSource="@PagedReservations"
-                               Responsive
-                               PaginationPosition="bottomRight">
-                            <PaginationTemplate>
-                                <div style="display: flex; justify-content: flex-end; padding-top: 16px;">
-                                    <Pagination Total="@TotalReservationCount"
-                                                PageSize="@PageSize"
-                                                Current="@CurrentPage"
-                                                OnChange="HandlePaginationChange"
-                                                ShowSizeChanger="true"
-                                                PageSizeOptions="@(new int[] { 5, 10, 20, 50 })" />
-                                </div>
-                            </PaginationTemplate>
-                            <ChildContent>
-
-                                <Column TData="string" DataIndex="@nameof(ReservationDto.Location)" Title="Konum"></Column>
-                                <Column TData="string" DataIndex="@nameof(ReservationDto.RoomName)" Title="Salon"></Column>
-                                <Column TData="string" Title="Saat">
-                                    <Template>
-                                        @context.StartTime.ToLocalTime().ToString("dd MMMM yyyy dddd")
-                                    </Template>
-                                </Column>
-                                <Column TData="string" Title="Saat">
-                                    <Template>
-                                        <Tag Color="TagColor.Blue">
-                                            @context.StartTime.ToLocalTime().ToString("HH:mm") -
-                                            @context.EndTime.ToLocalTime().ToString("HH:mm")
-                                        </Tag>
-                                    </Template>
-                                </Column>
-                                <Column TData="string" Title="Şirket">
-                                    <Template>
-                                        @(context?.User?.Company ?? StringConstants.Dash)
-                                    </Template>
-                                </Column>
-                                <Column TData="string" Title="Yetkili">
-                                    <Template>
-                                        @(context?.User?.CompanyOfficial ?? StringConstants.Dash)
-                                    </Template>
-                                </Column>
-                                <Column TData="string" Title="Telefon">
-                                    <Template>
-                                        @(context?.User?.ContactPhone ?? StringConstants.Dash)
-                                    </Template>
-                                </Column>
-                                <ActionColumn>
-                                    <Space>
-                                        <Button Style="margin-right:4px;" Icon="edit" Shape="ButtonShape.Circle"
-                                                OnClick="@(() => OpenEditModal(context))" />
-                                        <Button Icon="delete" Shape="ButtonShape.Circle" Danger
-                                                OnClick="@(() => ConfirmDelete(context))" />
-                                    </Space>
-                                </ActionColumn>
-                            </ChildContent>
-                        </Table>
+                        <div class="table-wrapper">
+                            <Table TItem="ReservationDto" DataSource="@PagedReservations" Responsive
+                                   PaginationPosition="bottomRight">
+                                <PaginationTemplate>
+                                    <div style="display: flex; justify-content: flex-end; padding: 16px; background:white">
+                                        <Pagination Total="@TotalReservationCount" PageSize="@PageSize" Current="@CurrentPage"
+                                                    OnChange="HandlePaginationChange" ShowSizeChanger="true"
+                                                    PageSizeOptions="@(new int[] { 5, 10, 20, 50 })" />
+                                    </div>
+                                </PaginationTemplate>
+                                <ChildContent>
+                                    <Column TData="string" DataIndex="@nameof(ReservationDto.Location)" Title="Konum"></Column>
+                                    <Column TData="string" DataIndex="@nameof(ReservationDto.RoomName)" Title="Salon"></Column>
+                                    <Column TData="string" Title="Saat">
+                                        <Template>
+                                            @context.StartTime.ToLocalTime().ToString("dd MMMM yyyy dddd")
+                                        </Template>
+                                    </Column>
+                                    <Column TData="string" Title="Saat">
+                                        <Template>
+                                            <Tag Color="TagColor.Blue">
+                                                @context.StartTime.ToLocalTime().ToString("HH:mm") -
+                                                @context.EndTime.ToLocalTime().ToString("HH:mm")
+                                            </Tag>
+                                        </Template>
+                                    </Column>
+                                    <Column TData="string" Title="Şirket">
+                                        <Template>
+                                            @(context?.User?.Company ?? StringConstants.Dash)
+                                        </Template>
+                                    </Column>
+                                    <Column TData="string" Title="Yetkili">
+                                        <Template>
+                                            @(context?.User?.CompanyOfficial ?? StringConstants.Dash)
+                                        </Template>
+                                    </Column>
+                                    <Column TData="string" Title="Telefon">
+                                        <Template>
+                                            @(context?.User?.ContactPhone ?? StringConstants.Dash)
+                                        </Template>
+                                    </Column>
+                                    <ActionColumn>
+                                        <Space>
+                                            <Button Style="margin-right:4px;" Icon="edit" Shape="ButtonShape.Circle"
+                                                    OnClick="@(() => OpenEditModal(context))" />
+                                            <Button Icon="delete" Shape="ButtonShape.Circle" Danger
+                                                    OnClick="@(() => ConfirmDelete(context))" />
+                                        </Space>
+                                    </ActionColumn>
+                                </ChildContent>
+                            </Table>
+                        </div>
                     }
                 </div>
             </div>
@@ -193,8 +216,6 @@
     private List<ReservationDto> FilteredReservations => AllReservations.Where(x => x.StartTime > DateTime.UtcNow).OrderBy(r
     => r.StartTime).ToList();
     string[] columns = ["Location"];
-    private Func<PaginationTotalContext, string> ShowTotalText => context =>
-         $"{context.Range.from}-{context.Range.to} / {context.Total}";
     protected override async Task OnInitializedAsync()
     {
         var reservations = await ReservationService.GetAllReservationsAsync();
