@@ -36,10 +36,9 @@
             }
 </style>
 <div class="container">
-    <Modal @bind-Visible="@IsCreateModalVisible" Footer="null">
-
+    <Modal @bind-Visible="@IsCreateModalVisible" Footer="null" Header="null">
         <div class="create-user-panel">
-            <Form Style="gap:8px; width:100%; display:flex; flex-direction:column;align-items: flex-start; font-size:16px;"
+            <Form Style="width:100%; display:flex; flex-direction:column;align-items: flex-start; font-size:16px;"
                   Model="@NewUser">
 
                 <FormItem Label="" Required>
@@ -94,7 +93,7 @@
         </div>
         <div style="display:flex; justify-content: center;margin-top:15px">
             <Button Style="background-color:#0095FF;border-radius:6px;width:30%;height:48px" Type="ButtonType.Primary"
-                    OnClick="CreateUser" Disabled="@(!IsCreateFormValid())">
+                    OnClick="CreateUser">
                 Kaydet
             </Button>
         </div>
@@ -193,7 +192,7 @@
                                 @(!string.IsNullOrEmpty(context.ContactPhone) ? $"+90{context.ContactPhone}" : "-")
                             </Template>
                         </Column>
-                        <Column TData="string" Title="Telefon">
+                        <Column TData="string" Title="Aktif">
                             <Template>
                                 @if (context.IsActive)
                                 {
