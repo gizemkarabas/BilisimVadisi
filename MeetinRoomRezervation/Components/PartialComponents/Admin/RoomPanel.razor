@@ -1,0 +1,86 @@
+﻿@using AntDesign
+@using MeetinRoomRezervation.Components.PartialComponents.Reservations
+@using MeetinRoomRezervation.Constants
+@using MeetinRoomRezervation.Models
+@using MeetinRoomRezervation.Data
+
+<div class="halls">
+    <div style="display:flex;justify-content:end">
+        <AntDesign.Button Size="@AntDesign.ButtonSize.Small"
+                          Style="align-self:end;margin-bottom: 20px; margin-right: 5px;"
+                          OnClick="@(() => OpenEditModal.InvokeAsync(Room))" Icon="edit" />
+        <AntDesign.Button Size="@AntDesign.ButtonSize.Small" Style="align-self:end;margin-bottom: 20px;"
+                          OnClick="@(() => DeleteRoom.InvokeAsync(Room.Id))" Icon="delete" Danger />
+    </div>
+    <div class="halls-header">@Room.Name</div>
+
+    <AntDesign.Space Direction="@AntDesign.SpaceDirection.Vertical" Style="width:100%">
+        @foreach (var slot in Room.Slots)
+        {
+            <AntDesign.SpaceItem Style="width:100%">
+                <div class="button-wrapper">
+                <AntDesign.Button Block Disabled="@slot.IsDisabled"
+                                  Type="@(slot.IsReserved? AntDesign.ButtonType.Primary: AntDesign.ButtonType.Default)"
+                                  OnClick="@(() => ToggleSlotDetails(slot.HourIntervalText))">
+                    <div class="button-detail">
+                        <div>
+                            @slot.HourIntervalText
+                        </div>
+                        <div>
+                            <div class="@(slot.IsReserved ? "selected-button-circle-border" : "button-circle-border")">
+                                <div class="@(slot.IsReserved ? "button-circle" : "")"></div>
+                            </div>
+                        </div>
+                    </div>
+                </AntDesign.Button>
+                @if (slot.IsReserved && expandedSlots.Contains(slot.HourIntervalText))
+                {
+                    var reservation = Room.Reservations.FirstOrDefault(p => p.Id == slot.Id);
+                    <div class="slot-details" style="padding: 10px; background-color: #f5f5f5; margin-top: 5px; border-radius: 4px;">
+                        <Summary Info="new(){
+                                Label1 = StringConstants.Company,
+                                Label2= StringConstants.Authorized,
+                                Label3=StringConstants.Phone,
+                                Value1 = reservation.User.Company,
+                                Value2 = reservation.User.CompanyOfficial,
+                                Value3 = reservation.User.ContactPhone}" />
+                    </div>
+                }
+            </div>
+        </AntDesign.SpaceItem>
+                }
+    </AntDesign.Space>
+
+</div>
+@code {
+    [Parameter] public MeetingRoomDto Room { get; set; }
+    [Parameter] public EventCallback<MeetingRoomDto> OpenEditModal { get; set; }
+    [Parameter] public EventCallback<string> DeleteRoom { get; set; }
+    [Parameter] public List<UserDto> UsersInfo { get; set; }
+    [Parameter] public string ReservationToCancel { get; set; }
+    [Parameter] public bool IsCancelModalVisible { get; set; }
+    public bool isSelected { get; set; }
+
+    private HashSet<string> expandedSlots = new HashSet<string>();
+
+    private void ToggleSlotDetails(string slotId)
+    {
+        if (expandedSlots.Contains(slotId))
+        {
+            expandedSlots.Remove(slotId);
+        }
+        else
+        {
+            expandedSlots.Add(slotId);
+        }
+    }
+
+    private void CancelReservation(string reservationId)
+    {
+        ReservationToCancel = reservationId;
+        IsCancelModalVisible = true;
+    }
+}
+
+
+

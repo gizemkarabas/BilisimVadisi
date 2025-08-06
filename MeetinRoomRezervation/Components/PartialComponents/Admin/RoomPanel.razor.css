@@ -1,0 +1,113 @@
+﻿.halls {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    justify-content: center;
+    background-color: white;
+    margin-top: 30px;
+    box-shadow: 5px 5px 10px rgba(87, 87, 87, 0.1);
+    border-radius: 20px;
+    border-color: #d2d2d2;
+    border: 1.2px solid #e2dfdf;
+    padding: 25px;
+    height: auto;
+}
+
+.halls-header {
+    text-align: center;
+    font-size: 19px;
+    font-weight: bold;
+}
+
+.halls-edit {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.halls-panel {
+    height: 100%;
+    background-color: #e6e6e6;
+    border-radius: 20px;
+    padding: 25px;
+    margin-top: 25px;
+}
+
+.reservation-slot {
+    margin-bottom: 8px;
+    display: flex;
+    flex-direction: column;
+    height: 70px;
+    justify-content: space-between;
+}
+
+.descriptions {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 188px;
+    margin-left: 15px;
+}
+
+.icon-bar {
+    width: 24px;
+    height: 193px;
+    background-color: #0A6FFA;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 5px;
+    padding-bottom: 24px;
+}
+
+.button-circle {
+    background-color: white;
+    border: 0px solid;
+    box-sizing: border-box;
+    border-radius: 100%;
+    width: 13px;
+    height: 13px;
+}
+
+.button-circle-border {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: unset;
+    border-radius: 100%;
+    border: 1.4px solid;
+    border-color: #9B9B9B;
+    width: 20px;
+    height: 20px;
+    box-sizing: border-box;
+}
+
+.selected-button-circle-border {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: unset;
+    border-radius: 100%;
+    border: 1.4px solid;
+    border-color: white;
+    width: 21px;
+    height: 21px;
+    box-sizing: border-box;
+}
+
+.button-detail {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+}
+
+.button-wrapper ::deep .ant-btn span {
+    display: block;
+}
+
+.button-wrapper ::deep .ant-btn {
+    border-color: #0095FF;
+    height: 50px;
+}

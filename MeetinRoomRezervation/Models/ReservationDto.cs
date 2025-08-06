@@ -21,8 +21,10 @@ namespace MeetinRoomRezervation.Models
     }
     public class SlotDto
     {
+        public string Id { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
+        public string HourIntervalText { get; set; }
         public bool IsReserved { get; set; } = false;
         public bool IsDisabled { get; set; } = false;
         public bool IsSelected { get; set; } = false;
