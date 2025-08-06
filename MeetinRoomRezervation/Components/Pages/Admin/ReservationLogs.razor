@@ -18,7 +18,7 @@
 				<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
 					<Title Level="2">Rezervasyon Logları</Title>
 					<div style="display: flex; gap: 10px; align-items: center;">
-						<RangePicker @bind-Value="@DateRange" Format="dd/MM/yyyy" Style="width: 250px;" />
+						<RangePicker @bind-Value="@DateRange" Format="dd/MM/yyyy" Style="width: 250px;" Placeholder="@(new string[] { "Başlangıç Tarihi", "Bitiş Tarihi" })" />
 						<Button Type="ButtonType.Primary" OnClick="FilterByDateRange" Icon="search">Filtrele</Button>
 						<Button OnClick="ClearFilters" Icon="reload">Temizle</Button>
 					</div>
@@ -35,10 +35,10 @@
 				else
 				{
 						<Table DataSource="@Logs" 
-						       TItem="ReservationLogDto" 
-						       Size="TableSize.Middle"
-						       Bordered="true"
-						       PageSize="10">
+							   TItem="ReservationLogDto" 
+							   Size="TableSize.Middle"
+							   Bordered="true"
+							   PageSize="10">
 							<Column Title="Tarih/Saat" DataIndex="@nameof(ReservationLogDto.Timestamp)" TData="DateTime" Width="150">
 								@context.Timestamp.ToString("dd/MM/yyyy HH:mm")
 							</Column>
