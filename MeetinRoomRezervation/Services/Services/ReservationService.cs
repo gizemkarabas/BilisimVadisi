@@ -1,5 +1,6 @@
 ﻿using MeetinRoomRezervation.Data;
 using MeetinRoomRezervation.Models;
+using MeetinRoomRezervation.Services.LogService;
 using Microsoft.AspNetCore.Components.Authorization;
 using MongoDB.Driver;
 using System.Security.Claims;
@@ -13,18 +14,22 @@ namespace MeetinRoomRezervation.Services.ReservationService
         private readonly AuthenticationStateProvider _authStateProvider;
         private readonly ILogger<ReservationService> _logger;
         private readonly IUserService _userService;
+        private readonly IReservationLogService _logService;
 
         public ReservationService(
             MongoDbContext context,
             IHttpContextAccessor httpContextAccessor,
             AuthenticationStateProvider authStateProvider,
-            ILogger<ReservationService> logger, IUserService userService)
+            ILogger<ReservationService> logger, 
+            IUserService userService,
+            IReservationLogService logService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
             _authStateProvider = authStateProvider;
             _logger = logger;
             _userService = userService;
+            _logService = logService;
         }
 
         public async Task<string> AddReservationAsync(ReservationDto reservationDto)
@@ -186,6 +191,43 @@ namespace MeetinRoomRezervation.Services.ReservationService
                     await _context.Reservations.InsertOneAsync(reservation);
                     reservationIds.Add(reservation.Id);
 
+                    // Log kaydı oluştur
+                    try
+                    {
+                        // İşlemi yapan kişiyi belirle (admin vs normal user)
+                        var currentUser = await GetCurrentUserAsync();
+                        var performedByUser = currentUser?.Id ?? "";
+                        var performedByEmail = currentUser?.Email ?? "";
+                        
+                        // Eğer admin başka kullanıcı adına rezervasyon yapıyorsa detayları güncelle
+                        var details = "Rezervasyon oluşturuldu";
+                        if (!string.IsNullOrEmpty(reservationDto.UserId) && currentUser?.Id != targetUser?.Id)
+                        {
+                            details = $"Admin tarafından {targetUser?.FirstName} {targetUser?.LastName} adına rezervasyon oluşturuldu";
+                        }
+
+                        await _logService.LogReservationActionAsync(
+                            reservationId: reservation.Id,
+                            userId: targetUser?.Id ?? "",
+                            userEmail: targetUser?.Email ?? "",
+                            userName: $"{targetUser?.FirstName} {targetUser?.LastName}".Trim(),
+                            userCompany: targetUser?.Company ?? "",
+                            roomId: reservation.RoomId,
+                            roomName: roomDto?.Name ?? "",
+                            location: reservation.Location,
+                            action: "Created",
+                            startTime: reservation.StartTime,
+                            endTime: reservation.EndTime,
+                            performedBy: performedByUser,
+                            performedByEmail: performedByEmail,
+                            details: details
+                        );
+                    }
+                    catch (Exception logEx)
+                    {
+                        _logger.LogError(logEx, "Failed to log reservation creation for ReservationId: {ReservationId}", reservation.Id);
+                    }
+
                     _logger.LogInformation("Reservation created: {ReservationId} - Local: {LocalStart}-{LocalEnd}, UTC: {UtcStart}-{UtcEnd}",
                         reservation.Id, localStartTime, localEndTime, utcStartTime, utcEndTime);
                 }
@@ -202,31 +244,155 @@ namespace MeetinRoomRezervation.Services.ReservationService
 
         public async Task<bool> UpdateReservationAsync(ReservationDto updated)
         {
-            var reservation = new Reservation
+            try
             {
-                Id = updated.Id,
-                UserId = updated.UserId,
-                RoomId = updated.RoomId,
-                StartTime = updated.StartTime,
-                EndTime = updated.EndTime,
+                // Mevcut rezervasyon bilgilerini al
+                var existingReservation = await _context.Reservations
+                    .Find(r => r.Id == updated.Id)
+                    .FirstOrDefaultAsync();
 
-            };
-            var filter = Builders<Reservation>.Filter.Eq(r => r.Id, updated.Id);
-            var update = Builders<Reservation>.Update
-                .Set(r => r.StartTime, updated.StartTime)
-                .Set(r => r.EndTime, updated.EndTime);
+                if (existingReservation == null)
+                {
+                    return false;
+                }
 
-            var result = await _context.Reservations.UpdateOneAsync(filter, update);
-            return result.ModifiedCount > 0;
+                var reservation = new Reservation
+                {
+                    Id = updated.Id,
+                    UserId = updated.UserId,
+                    RoomId = updated.RoomId,
+                    StartTime = updated.StartTime,
+                    EndTime = updated.EndTime,
+                };
+
+                var filter = Builders<Reservation>.Filter.Eq(r => r.Id, updated.Id);
+                var update = Builders<Reservation>.Update
+                    .Set(r => r.StartTime, updated.StartTime)
+                    .Set(r => r.EndTime, updated.EndTime);
+
+                var result = await _context.Reservations.UpdateOneAsync(filter, update);
+
+                if (result.ModifiedCount > 0)
+                {
+                    // Log kaydı oluştur
+                    try
+                    {
+                        var user = await _userService.GetUserByIdAsync(existingReservation.UserId);
+                        var room = await _context.Rooms
+                            .Find(r => r.Id == existingReservation.RoomId)
+                            .FirstOrDefaultAsync();
+                        var currentUser = await GetCurrentUserAsync();
+
+                        // Eğer admin başka kullanıcının rezervasyonunu güncelliyorsa detayları güncelle
+                        var details = $"Rezervasyon güncellendi - Yeni zaman: {updated.StartTime:dd.MM.yyyy HH:mm} - {updated.EndTime:dd.MM.yyyy HH:mm}";
+                        if (currentUser?.Id != user?.Id)
+                        {
+                            details = $"Admin tarafından {user?.FirstName} {user?.LastName} adına rezervasyon güncellendi - Yeni zaman: {updated.StartTime:dd.MM.yyyy HH:mm} - {updated.EndTime:dd.MM.yyyy HH:mm}";
+                        }
+
+                        await _logService.LogReservationActionAsync(
+                            reservationId: updated.Id,
+                            userId: user?.Id ?? "",
+                            userEmail: user?.Email ?? "",
+                            userName: $"{user?.FirstName} {user?.LastName}".Trim(),
+                            userCompany: user?.Company ?? "",
+                            roomId: existingReservation.RoomId,
+                            roomName: room?.Name ?? "",
+                            location: existingReservation.Location,
+                            action: "Updated",
+                            startTime: updated.StartTime,
+                            endTime: updated.EndTime,
+                            performedBy: currentUser?.Id ?? "",
+                            performedByEmail: currentUser?.Email ?? "",
+                            details: details
+                        );
+                    }
+                    catch (Exception logEx)
+                    {
+                        _logger.LogError(logEx, "Failed to log reservation update for ReservationId: {ReservationId}", updated.Id);
+                    }
+                }
+
+                return result.ModifiedCount > 0;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating reservation: {ReservationId}", updated.Id);
+                throw;
+            }
         }
         public async Task CancelReservationAsync(string reservationId)
         {
-            var filter = Builders<Reservation>.Filter.Eq(r => r.Id, reservationId);
-            await _context.Reservations.DeleteOneAsync(filter);
+            try
+            {
+                // Rezervasyon bilgilerini iptal etmeden önce al
+                var reservation = await _context.Reservations
+                    .Find(r => r.Id == reservationId)
+                    .FirstOrDefaultAsync();
+
+                if (reservation != null)
+                {
+                    // Kullanıcı ve salon bilgilerini al
+                    var user = await _userService.GetUserByIdAsync(reservation.UserId);
+                    var room = await _context.Rooms
+                        .Find(r => r.Id == reservation.RoomId)
+                        .FirstOrDefaultAsync();
+
+                    // Mevcut kullanıcı bilgilerini al
+                    var currentUser = await GetCurrentUserAsync();
+
+                    // Rezervasyonu iptal et
+                    var filter = Builders<Reservation>.Filter.Eq(r => r.Id, reservationId);
+                    await _context.Reservations.DeleteOneAsync(filter);
+
+                    // Log kaydı oluştur
+                    try
+                    {
+                        // Eğer admin başka kullanıcının rezervasyonunu iptal ediyorsa detayları güncelle
+                        var details = "Rezervasyon iptal edildi";
+                        if (currentUser?.Id != user?.Id)
+                        {
+                            details = $"Admin tarafından {user?.FirstName} {user?.LastName} adına rezervasyon iptal edildi";
+                        }
+
+                        await _logService.LogReservationActionAsync(
+                            reservationId: reservationId,
+                            userId: user?.Id ?? "",
+                            userEmail: user?.Email ?? "",
+                            userName: $"{user?.FirstName} {user?.LastName}".Trim(),
+                            userCompany: user?.Company ?? "",
+                            roomId: reservation.RoomId,
+                            roomName: room?.Name ?? "",
+                            location: reservation.Location,
+                            action: "Cancelled",
+                            startTime: reservation.StartTime,
+                            endTime: reservation.EndTime,
+                            performedBy: currentUser?.Id ?? "",
+                            performedByEmail: currentUser?.Email ?? "",
+                            details: details
+                        );
+                    }
+                    catch (Exception logEx)
+                    {
+                        _logger.LogError(logEx, "Failed to log reservation cancellation for ReservationId: {ReservationId}", reservationId);
+                    }
+                }
+                else
+                {
+                    _logger.LogWarning("Reservation not found for cancellation: {ReservationId}", reservationId);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error cancelling reservation: {ReservationId}", reservationId);
+                throw;
+            }
         }
         public async Task<List<ReservationDto>> GetAllReservationsAsync()
         {
-            var reservations = await _context.Reservations.Find(_ => true).ToListAsync();
+            var reservations = await _context.Reservations
+                .Find(r => r.Status == ReservationStatus.Active)
+                .ToListAsync();
             var result = new List<ReservationDto>();
             foreach (var reservation in reservations)
             {
@@ -468,11 +634,63 @@ namespace MeetinRoomRezervation.Services.ReservationService
         {
             try
             {
-                var update = Builders<Reservation>.Update.Set(r => r.Status, ReservationStatus.Cancelled);
-                var result = await _context.Reservations.UpdateOneAsync(r => r.Id == reservationId, update);
+                // Rezervasyon bilgilerini silmeden önce al
+                var reservation = await _context.Reservations
+                    .Find(r => r.Id == reservationId)
+                    .FirstOrDefaultAsync();
 
-                _logger.LogInformation("Reservation cancelled by admin: {ReservationId}", reservationId);
-                return result.ModifiedCount > 0;
+                if (reservation != null)
+                {
+                    // Kullanıcı ve salon bilgilerini al
+                    var user = await _userService.GetUserByIdAsync(reservation.UserId);
+                    var room = await _context.Rooms
+                        .Find(r => r.Id == reservation.RoomId)
+                        .FirstOrDefaultAsync();
+
+                    // Mevcut kullanıcı bilgilerini al (admin)
+                    var currentUser = await GetCurrentUserAsync();
+
+                    var update = Builders<Reservation>.Update.Set(r => r.Status, ReservationStatus.Cancelled);
+                    var result = await _context.Reservations.UpdateOneAsync(r => r.Id == reservationId, update);
+
+                    // Log kaydı oluştur
+                    if (result.ModifiedCount > 0)
+                    {
+                        try
+                        {
+                            var details = $"Admin tarafından {user?.FirstName} {user?.LastName} adına rezervasyon silindi";
+
+                            await _logService.LogReservationActionAsync(
+                                reservationId: reservationId,
+                                userId: user?.Id ?? "",
+                                userEmail: user?.Email ?? "",
+                                userName: $"{user?.FirstName} {user?.LastName}".Trim(),
+                                userCompany: user?.Company ?? "",
+                                roomId: reservation.RoomId,
+                                roomName: room?.Name ?? "",
+                                location: reservation.Location,
+                                action: "Cancelled",
+                                startTime: reservation.StartTime,
+                                endTime: reservation.EndTime,
+                                performedBy: currentUser?.Id ?? "",
+                                performedByEmail: currentUser?.Email ?? "",
+                                details: details
+                            );
+                        }
+                        catch (Exception logEx)
+                        {
+                            _logger.LogError(logEx, "Failed to log admin reservation deletion for ReservationId: {ReservationId}", reservationId);
+                        }
+                    }
+
+                    _logger.LogInformation("Reservation cancelled by admin: {ReservationId}", reservationId);
+                    return result.ModifiedCount > 0;
+                }
+                else
+                {
+                    _logger.LogWarning("Reservation not found for admin deletion: {ReservationId}", reservationId);
+                    return false;
+                }
             }
             catch (Exception ex)
             {

@@ -7,6 +7,7 @@ namespace MeetinRoomRezervation.Data
         public IMongoCollection<User> Users => mongoClient.GetDatabase("ReservationDb").GetCollection<User>("Users");
         public IMongoCollection<Reservation> Reservations => mongoClient.GetDatabase("ReservationDb").GetCollection<Reservation>("Reservations");
         public IMongoCollection<MeetingRoom> Rooms => mongoClient.GetDatabase("ReservationDb").GetCollection<MeetingRoom>("MeetingRooms");
+        public IMongoCollection<ReservationLog> ReservationLogs => mongoClient.GetDatabase("ReservationDb").GetCollection<ReservationLog>("ReservationLogs");
 
     }
 }
