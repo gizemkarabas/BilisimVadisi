@@ -7,7 +7,34 @@
 @using AntDesign
 @using MeetinRoomRezervation.Services.ReservationService
 @inject NavigationManager Navigation
+<style>
+    .table-wrapper {
+        border-radius: 20px;
+        overflow: hidden;
+        border: 1px solid #f0f0f0;
+    }
 
+        .table-wrapper .ant-table {
+            border: none !important;
+            border-radius: 0 !important;
+        }
+
+        .table-wrapper .ant-table-container {
+            border-radius: 0 !important;
+        }
+
+        .table-wrapper .ant-table-thead > tr > th {
+            border-top: none !important;
+        }
+
+            .table-wrapper .ant-table-thead > tr > th:first-child {
+                border-left: none !important;
+            }
+
+            .table-wrapper .ant-table-thead > tr > th:last-child {
+                border-right: none !important;
+            }
+</style>
 <div class="container">
     <Modal @bind-Visible="@IsCreateModalVisible" Footer="null">
 
@@ -127,25 +154,23 @@
             </Button>
         </div>
     </Modal>
-    <div>
+    <div style="width:100%">
         <div class="user-search" style="display:flex;justify-content:center">
             <Input Placeholder="Ara" @bind-Value="searchTerm"
-                   Style="width:100%; width:80vw; height:30px; border-radius:10px; background:#fafafa; border:1px solid #e6e6e6; font-size:16px; padding-left:36px; box-sizing:border-box; margin-top:8px;"
+                   Style="width:100%; height:30px; border-radius:10px; background:#fafafa; border:1px solid #e6e6e6; font-size:16px; padding-left:36px; box-sizing:border-box; margin-top:8px;"
                    PrefixIcon="search" OnInput="@(e => OnSearchChanged(e.Value?.ToString()))" />
         </div>
         <div class="users-panel">
-
-            <div>
-
-                <div style="display:flex;justify-content: space-between;align-items: center;">
-                    <div class="table-header">Kullanıcılar</div>
-                </div>
+            <div style="display:flex;justify-content: space-between;align-items: center;">
+                <div class="table-header">Kullanıcılar</div>
+            </div>
+            <div class="table-wrapper">
                 <Table TItem="UserDto"
                        DataSource="@PagedUsers"
                        Responsive
                        PaginationPosition="bottomRight">
                     <PaginationTemplate>
-                        <div style="display: flex; justify-content: flex-end; padding-top: 16px;">
+                        <div style="display: flex; justify-content: flex-end; padding: 16px; background:white">
                             <Pagination Total="@TotalUserCount"
                                         PageSize="@PageSize"
                                         Current="@CurrentPage"

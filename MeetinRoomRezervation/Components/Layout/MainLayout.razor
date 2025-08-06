@@ -2,10 +2,6 @@
 @inject AuthenticationStateProvider AuthProvider
 @inject NavigationManager Navigation
 @inject IAuthService AuthService
-@using Microsoft.AspNetCore.Components.Authorization
-@using MeetinRoomRezervation.Services
-@using MeetinRoomRezervation.Data
-@using System.Security.Claims
 
 
 <div Style="min-height: 90vh; background-color: white; ">
@@ -48,27 +44,33 @@
 						else
 						{
 							<MenuItem Key="1">
-								<div class="wellcome" style="color: white;">
-									<Icon Type="user" Theme="IconThemeType.Outline" />
-									<span>Hoş geldin, @CurrentUserCompany</span>
-								</div>
+							<div class="wellcome" style="color: white;">
+								<Icon Type="user" Theme="IconThemeType.Outline" />
+								<span>Hoş geldin, @CurrentUserCompany</span>
+							</div>
 							</MenuItem>
 							<MenuItem Key="2" RouterLink="/user/myReservations" RouterMatch="NavLinkMatch.All"
 								style="color: white!important;">
-								<div class="my-reservations">
-									<Icon Type="home" Theme="IconThemeType.Outline" Style="margin-right:5px" />
-									Rezervasyonlarım
-								</div>
+							<div class="my-reservations">
+								<Icon Type="home" Theme="IconThemeType.Outline" Style="margin-right:5px" />
+								Rezervasyonlarım
+							</div>
 							</MenuItem>
 						}
 						<MenuItem Key="3">
-							<div class="exit" style="cursor: pointer; color: white;" @onclick="HandleLogout">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                    <path d="M16 17L21 12L16 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                    <path d="M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-							</div>
+						<div class="exit" style="cursor: pointer; color: white;" @onclick="HandleLogout">
+							<svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+								xmlns="http://www.w3.org/2000/svg">
+								<path
+									d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9"
+									stroke="currentColor" stroke-width="2" stroke-linecap="round"
+									stroke-linejoin="round" />
+								<path d="M16 17L21 12L16 7" stroke="currentColor" stroke-width="2"
+									stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+									stroke-linejoin="round" />
+							</svg>
+						</div>
 						</MenuItem>
 					</div>
 				</div>
