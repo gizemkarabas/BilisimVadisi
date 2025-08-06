@@ -10,6 +10,7 @@
 @inject IUserService UserService
 @using AntDesign
 @using MeetinRoomRezervation.Services.ReservationService
+@using System.Globalization
 @inject NavigationManager Navigation
 <style>
     .table-wrapper {
@@ -86,9 +87,9 @@
                                 <ChildContent>
                                     <Column TData="string" DataIndex="@nameof(ReservationDto.Location)" Title="Konum"></Column>
                                     <Column TData="string" DataIndex="@nameof(ReservationDto.RoomName)" Title="Salon"></Column>
-                                    <Column TData="string" Title="Saat">
+                                    <Column TData="string" Title="Tarih">
                                         <Template>
-                                            @context.StartTime.ToLocalTime().ToString("dd MMMM yyyy dddd")
+                                            @context.StartTime.ToLocalTime().ToString("dd MMMM yyyy dddd", turkishCulture)
                                         </Template>
                                     </Column>
                                     <Column TData="string" Title="Saat">
@@ -216,6 +217,8 @@
     private List<ReservationDto> FilteredReservations => AllReservations.Where(x => x.StartTime > DateTime.UtcNow).OrderBy(r
     => r.StartTime).ToList();
     string[] columns = ["Location"];
+    private static readonly CultureInfo turkishCulture = new CultureInfo("tr-TR");
+
     protected override async Task OnInitializedAsync()
     {
         var reservations = await ReservationService.GetAllReservationsAsync();
