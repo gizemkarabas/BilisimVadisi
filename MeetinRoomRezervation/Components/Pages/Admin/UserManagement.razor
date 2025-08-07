@@ -1,6 +1,7 @@
 ﻿@page "/admin/users"
 @layout AdminLayout
 @using MeetinRoomRezervation.Components.Layout
+@using MeetinRoomRezervation.Components.PartialComponents.Shared
 @using MeetinRoomRezervation.Models
 @inject IReservationService ReservationService
 @inject IUserService UserService
@@ -153,72 +154,73 @@
             </Button>
         </div>
     </Modal>
-    <div style="width:100%">
+    <div class="dashboard-panel">
         <div class="user-search" style="display:flex;justify-content:center">
             <Input Placeholder="Ara" @bind-Value="searchTerm"
                    Style="width:100%; height:30px; border-radius:10px; background:#fafafa; border:1px solid #e6e6e6; font-size:16px; padding-left:36px; box-sizing:border-box; margin-top:8px;"
-                   PrefixIcon="search" OnInput="@(e => OnSearchChanged(e.Value?.ToString()))" />
+                   PrefixIcon="search" OnInput="@(e => OnSearchChanged(e.Value?.ToString() ?? string.Empty))" />
         </div>
         <div class="users-panel">
             <div style="display:flex;justify-content: space-between;align-items: center;">
                 <div class="table-header">Kullanıcılar</div>
             </div>
             <div class="table-wrapper">
-                <Table TItem="UserDto"
-                       DataSource="@PagedUsers"
-                       Responsive
-                       PaginationPosition="bottomRight">
-                    <PaginationTemplate>
-                        <div style="display: flex; justify-content: flex-end; padding: 16px; background:white">
-                            <Pagination Total="@TotalUserCount"
-                                        PageSize="@PageSize"
-                                        Current="@CurrentPage"
-                                        OnChange="HandlePaginationChange"
-                                        ShowSizeChanger="true"
-                                        PageSizeOptions="@(new int[] { 5, 10, 20, 50 })" />
-                        </div>
-                    </PaginationTemplate>
-                    <ChildContent>
-                        <Column TData="string" DataIndex="@nameof(UserDto.Company)" Title="Şirket İsmi" />
-                        <Column TData="string" DataIndex="@nameof(UserDto.CompanyOfficial)" Title="Yetkili" />
-                        <Column TData="string" Title="Aylık Kalan Haklar">
-                            <Template>
-                                @context.UsedThisMonth/@context.MonthlyUsageLimit saat
-                            </Template>
-                        </Column>
-                        <Column TData="string" DataIndex="@nameof(UserDto.Email)" Title="Email" />
-                        <Column TData="string" Title="Telefon">
-                            <Template>
-                                @(!string.IsNullOrEmpty(context.ContactPhone) ? $"+90{context.ContactPhone}" : "-")
-                            </Template>
-                        </Column>
-                        <Column TData="string" Title="Aktif">
-                            <Template>
-                                @if (context.IsActive)
-                                {
-                                    <Tag Color="TagColor.Lime" Style="cursor:pointer;"
-                                         OnClick="@(() => ToggleStatus(context))">Aktif</Tag>
-                                }
-                                else
-                                {
-                                    <Tag Color="TagColor.Red" Style="cursor:pointer;"
-                                         OnClick="@(() => ToggleStatus(context))">Pasif</Tag>
-                                }
-                            </Template>
-                        </Column>
-                        <ActionColumn>
-                            <Space>
-                                <Button Style="margin-right:4px;margin-bottom:4px" Icon="edit"
-                                        Shape="ButtonShape.Circle" OnClick="@(() => EditUser(context))">
-                                </Button>
-                                <Popconfirm Title="Bu kullanıcı silinsin mi?"
-                                            OnConfirm="@(() => DeleteUser(context.Id))">
-                                    <Button Icon="delete" Shape="ButtonShape.Circle" Danger></Button>
-                                </Popconfirm>
-                            </Space>
-                        </ActionColumn>
-                    </ChildContent>
-                </Table>
+                @if (IsLoading)
+                {
+                    <SkeletonTable ColumnCount="7"></SkeletonTable>
+                }
+                else
+                {
+                    <Table TItem="UserDto" DataSource="@PagedUsers" Responsive PaginationPosition="bottomRight">
+                        <PaginationTemplate>
+                            <div style="display: flex; justify-content: flex-end; padding: 16px; background:white">
+                                <Pagination Total="@TotalUserCount" PageSize="@PageSize" Current="@CurrentPage"
+                                            OnChange="HandlePaginationChange" ShowSizeChanger="true"
+                                            PageSizeOptions="@(new int[] { 5, 10, 20, 50 })" />
+                            </div>
+                        </PaginationTemplate>
+                        <ChildContent>
+                            <Column TData="string" DataIndex="@nameof(UserDto.Company)" Title="Şirket İsmi" />
+                            <Column TData="string" DataIndex="@nameof(UserDto.CompanyOfficial)" Title="Yetkili" />
+                            <Column TData="string" Title="Aylık Kalan Haklar">
+                                <Template>
+                                    @context.UsedThisMonth/@context.MonthlyUsageLimit saat
+                                </Template>
+                            </Column>
+                            <Column TData="string" DataIndex="@nameof(UserDto.Email)" Title="Email" />
+                            <Column TData="string" Title="Telefon">
+                                <Template>
+                                    @(!string.IsNullOrEmpty(context.ContactPhone) ? $"+90{context.ContactPhone}" : "-")
+                                </Template>
+                            </Column>
+                            <Column TData="string" Title="Aktif">
+                                <Template>
+                                    @if (context.IsActive)
+                                    {
+                                        <Tag Color="TagColor.Lime" Style="cursor:pointer;"
+                                             OnClick="@(() => ToggleStatus(context))">Aktif</Tag>
+                                    }
+                                    else
+                                    {
+                                        <Tag Color="TagColor.Red" Style="cursor:pointer;"
+                                             OnClick="@(() => ToggleStatus(context))">Pasif</Tag>
+                                    }
+                                </Template>
+                            </Column>
+                            <ActionColumn>
+                                <Space>
+                                    <Button Style="margin-right:4px;margin-bottom:4px" Icon="edit"
+                                            Shape="ButtonShape.Circle" OnClick="@(() => EditUser(context))">
+                                    </Button>
+                                    <Popconfirm Title="Bu kullanıcı silinsin mi?"
+                                                OnConfirm="@(() => DeleteUser(context.Id))">
+                                        <Button Icon="delete" Shape="ButtonShape.Circle" Danger></Button>
+                                    </Popconfirm>
+                                </Space>
+                            </ActionColumn>
+                        </ChildContent>
+                    </Table>
+                }
             </div>
         </div>
     </div>
@@ -235,6 +237,7 @@
     private UserDto NewUser = new();
     private bool IsEditModalVisible = false;
     private UserDto EditingUser = new();
+    private bool IsLoading = true;
 
     // Validation messages
     private string companyValidationMessage = "Şirket ismi giriniz.";
@@ -247,9 +250,13 @@
 
     protected override async Task OnInitializedAsync()
     {
+        IsLoading = true;
+        StateHasChanged();
         await UserService.UpdateMonthlyUsageAsync();
         await LoadUsers();
         _shouldCheckModalQuery = true;
+        IsLoading = false;
+        StateHasChanged();
     }
 
     private bool _shouldCheckModalQuery = false;
@@ -338,15 +345,39 @@
 
     private async Task LoadUsers()
     {
-        AllUsers = await UserService.GetAllUsersAsync();
-        TotalUserCount = AllUsers.Count;
-        ApplySearchAndPage();
+        try
+        {
+            IsLoading = true;
+            StateHasChanged();
+            AllUsers = await UserService.GetAllUsersAsync();
+            TotalUserCount = AllUsers.Count;
+            ApplySearchAndPage();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading users: {ex.Message}");
+        }
+        finally
+        {
+            IsLoading = false;
+            StateHasChanged();
+        }
     }
 
-    private void OnSearchChanged(string? value)
+    private void OnSearchChanged(string value)
     {
         searchTerm = value ?? string.Empty;
-        ApplySearchAndPage();
+
+        IsLoading = true;
+        StateHasChanged();
+
+        Task.Run(async () =>
+        {
+            await Task.Delay(200);
+            ApplySearchAndPage();
+            IsLoading = false;
+            await InvokeAsync(StateHasChanged);
+        });
     }
 
     private void ApplySearchAndPage()
@@ -380,6 +411,9 @@
 
     private async Task ToggleStatus(UserDto user)
     {
+        IsLoading = true;
+        StateHasChanged();
+
         user.IsActive = !user.IsActive;
         await UserService.UpdateUserStatusAsync(user.Id, user.IsActive);
         await LoadUsers();
@@ -387,6 +421,9 @@
 
     private async Task DeleteUser(string id)
     {
+        IsLoading = true;
+        StateHasChanged();
+
         await UserService.DeleteUserAsync(id);
         await LoadUsers();
     }
@@ -400,8 +437,17 @@
             PageSize = args.PageSize;
         }
 
-        LoadPage();
+        IsLoading = true;
         StateHasChanged();
+
+        LoadPage();
+
+        Task.Run(async () =>
+        {
+            await Task.Delay(300);
+            IsLoading = false;
+            await InvokeAsync(StateHasChanged);
+        });
     }
 
     private void EditUser(UserDto user)
@@ -457,6 +503,9 @@
 
     private async Task UpdateUser()
     {
+        IsLoading = true;
+        StateHasChanged();
+
         await UserService.UpdateUserAsync(EditingUser);
         await LoadUsers();
         IsEditModalVisible = false;
@@ -532,7 +581,7 @@
         StateHasChanged();
     }
 
-    private void ValidateEmailInput(string? email)
+    private void ValidateEmailInput(string email)
     {
         if (string.IsNullOrWhiteSpace(email))
         {
@@ -547,7 +596,7 @@
         emailValidationMessage = string.Empty;
     }
 
-    private bool IsValidEmail(string? email)
+    private bool IsValidEmail(string email)
     {
         if (string.IsNullOrWhiteSpace(email)) return false;
         // '@' ve '.' karakteri yoksa MailAddress kontrolü yapma

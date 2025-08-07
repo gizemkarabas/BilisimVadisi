@@ -1,0 +1,19 @@
+﻿<Table TItem="object" DataSource="@(Enumerable.Range(1, RowCount).Select(i => new { }).ToArray())"
+       Responsive>
+    <ChildContent>
+        @foreach (var item in Enumerable.Range(1, ColumnCount))
+        {
+            <Column TData="string">
+                <Template>
+                    <Skeleton Active="true" Title="false" />
+                </Template>
+            </Column>
+        }
+    </ChildContent>
+</Table>
+
+@code {
+    [Parameter] public int RowCount { get; set; } = 10;
+    [Parameter] public int ColumnCount { get; set; }
+
+}

@@ -1,0 +1,19 @@
+﻿.dashboard-panel {
+    width: 100%;
+    margin-bottom: 30px;
+    padding: 16px;
+}
+.logs-panel {
+    background-color: #e6e6e6;
+    margin-top: 30px;
+    box-shadow: 5px 5px 10px rgba(87, 87, 87, 0.1);
+    border-radius: 10px;
+    border-color: #d2d2d2;
+    border: 1.2px solid #e2dfdf;
+    padding: 15px;
+}
+
+.logs-panel-header {
+    font-size: 25px;
+    font-weight: bold;
+}

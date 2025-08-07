@@ -55,7 +55,6 @@
     background-color: #e6e6e6;
     border-radius: 20px;
     padding: 15px;
-    margin: 25px;
 }
 
 .user-search {
@@ -76,6 +75,12 @@
 .table-header {
     font-size: 24px;
     font-weight: bold;
+}
+
+.dashboard-panel {
+    width: 100%;
+    margin-bottom: 30px;
+    padding: 16px;
 }
 
 .table {
@@ -188,17 +193,6 @@
         margin-top: 65px;
         text-align: left;
         margin: 10px;
-    }
-
-    .last-reservation-panel {
-        width: 95vw;
-        max-width: 95vw;
-        height: auto;
-        padding: 5vw 2vw;
-        box-sizing: border-box;
-        overflow-x: auto;
-        overflow-y: hidden;
-        white-space: nowrap;
     }
 
     .users-panel {

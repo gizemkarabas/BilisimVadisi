@@ -3,8 +3,10 @@
 @using AntDesign.TableModels
 @using MeetinRoomRezervation.Components.Layout
 @using MeetinRoomRezervation.Components.PartialComponents.Admin
+@using MeetinRoomRezervation.Components.PartialComponents.Shared
 @using MeetinRoomRezervation.Constants
 @using MeetinRoomRezervation.Models
+@using MeetinRoomRezervation.Services.Services
 @inject IReservationService ReservationService
 @inject IRoomService RoomService
 @inject IUserService UserService
@@ -72,7 +74,13 @@
                 </GridRow>
                 <div class="last-reservation-panel">
                     <div class="last-reservation-panel-header">Son Rezervasyonlar</div>
-                    @if (PagedReservations?.Count > 0)
+                    @if (IsLoading)
+                    {
+                        <div class="table-wrapper">
+                            <SkeletonTable RowCount="10" ColumnCount="8" />
+                        </div>
+                    }
+                    else
                     {
                         <div class="table-wrapper">
                             <Table TItem="ReservationDto" DataSource="@PagedReservations" Responsive
@@ -195,6 +203,7 @@
 </Modal>
 
 @code {
+    private bool IsLoading = true;
     private int TotalRoomCount = 0;
     private int TotalUserCount = 0;
     private double TodayOccupancy = 0;
@@ -213,14 +222,14 @@
     private List<ReservationDto> AllReservations = new();
     private List<ReservationDto> PagedReservations = new();
     private List<ReservationDto> LastReservations = new();
-    private int TotalPages => (int)Math.Ceiling((double)FilteredReservations.Count / PageSize);
-    private List<ReservationDto> FilteredReservations => AllReservations.Where(x => x.StartTime > DateTime.UtcNow).OrderBy(r
-    => r.StartTime).ToList();
-    string[] columns = ["Location"];
+    private List<ReservationDto> FilteredReservations => AllReservations.Where(x => x.StartTime > DateTime.UtcNow).OrderBy(r => r.StartTime).ToList();
     private static readonly CultureInfo turkishCulture = new CultureInfo("tr-TR");
 
     protected override async Task OnInitializedAsync()
     {
+        IsLoading = true;
+        StateHasChanged();
+
         var reservations = await ReservationService.GetAllReservationsAsync();
         // Tüm odaları ve kullanıcıları başta çek
         var allRooms = await RoomService.GetAllRoomsAsync();
@@ -228,6 +237,8 @@
         FillReservationDetailsFromCache(reservations, allRooms, allUsers);
         LoadDashboardDataAsync(reservations, allRooms, allUsers);
         LoadPage();
+
+        IsLoading = false;
         StateHasChanged();
     }
 
@@ -357,6 +368,9 @@
 
     private async Task RefreshReservations()
     {
+        IsLoading = true;
+        StateHasChanged();
+
         var reservations = await ReservationService.GetAllReservationsAsync();
         var allRooms = await RoomService.GetAllRoomsAsync();
         var allUsers = await UserService.GetAllUsersAsync();
@@ -364,6 +378,9 @@
         AllReservations = reservations;
         TotalReservationCount = AllReservations.Count;
         LoadPage();
+
+        IsLoading = false;
+        StateHasChanged();
     }
 
     private void HandlePageIndexChange(PaginationEventArgs args)

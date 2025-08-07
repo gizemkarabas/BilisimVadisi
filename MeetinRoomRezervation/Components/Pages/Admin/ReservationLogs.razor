@@ -3,6 +3,7 @@
 @inject IReservationLogService LogService
 @inject AuthenticationStateProvider AuthProvider
 @using AntDesign
+@using MeetinRoomRezervation.Components.PartialComponents.Shared
 @using MeetinRoomRezervation.Data
 @using MeetinRoomRezervation.Services.LogService
 @using MeetinRoomRezervation.Models
@@ -10,188 +11,220 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Security.Claims
 @inject NavigationManager Navigation
+<style>
+    .table-wrapper {
+        border-radius: 20px;
+        overflow: hidden;
+        border: 1px solid #f0f0f0;
+    }
 
+        .table-wrapper .ant-table {
+            border: none !important;
+            border-radius: 0 !important;
+        }
+
+        .table-wrapper .ant-table-container {
+            border-radius: 0 !important;
+        }
+
+        .table-wrapper .ant-table-thead > tr > th {
+            border-top: none !important;
+        }
+
+            .table-wrapper .ant-table-thead > tr > th:first-child {
+                border-left: none !important;
+            }
+
+            .table-wrapper .ant-table-thead > tr > th:last-child {
+                border-right: none !important;
+            }
+</style>
 <AuthorizeView Roles="Admin" Context="authContext">
-	<Authorized Context="authContext">
-		<div class="container">
-			<div class="admin-logs-header">
-				<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-					<Title Level="2">Rezervasyon Logları</Title>
-					<div style="display: flex; gap: 10px; align-items: center;">
-						<RangePicker @bind-Value="@DateRange" Format="dd/MM/yyyy" Style="width: 250px;" Placeholder="@(new string[] { "Başlangıç Tarihi", "Bitiş Tarihi" })" />
-						<Button Type="ButtonType.Primary" OnClick="FilterByDateRange" Icon="search">Filtrele</Button>
-						<Button OnClick="ClearFilters" Icon="reload">Temizle</Button>
-					</div>
-				</div>
-			</div>
-			<div class="logs-content">
-				@if (IsLoading)
-				{
-					<div style="text-align: center; padding: 50px;">
-						<Spin Size="SpinSize.Large" />
-						<p style="margin-top: 16px;">Loglar yükleniyor...</p>
-					</div>
-				}
-				else
-				{
-						<Table DataSource="@Logs" 
-							   TItem="ReservationLogDto" 
-							   Size="TableSize.Middle"
-							   Bordered="true"
-							   PageSize="10">
-							<Column Title="Tarih/Saat" DataIndex="@nameof(ReservationLogDto.Timestamp)" TData="DateTime" Width="150">
-								@context.Timestamp.ToString("dd/MM/yyyy HH:mm")
-							</Column>
-							<Column Title="İşlem" DataIndex="@nameof(ReservationLogDto.Action)" TData="string" Width="120">
-								<Tag Color="@GetActionColor(context.Action)">
-									@GetActionText(context.Action)
-								</Tag>
-							</Column>
-							<Column Title="Kullanıcı" DataIndex="@nameof(ReservationLogDto.UserEmail)" TData="string" Width="200">
-								<div>
-									<div style="font-weight: bold;">@context.UserEmail</div>
-									@if (!string.IsNullOrEmpty(context.UserCompany))
-									{
-										<div style="font-size: 12px; color: #666;">@context.UserCompany</div>
-									}
-								</div>
-							</Column>
-							<Column Title="Salon" DataIndex="@nameof(ReservationLogDto.RoomName)" TData="string" Width="150">
-								<div>
-									<div style="font-weight: bold;">@context.RoomName</div>
-									@if (!string.IsNullOrEmpty(context.Location))
-									{
-										<div style="font-size: 12px; color: #666;">@context.Location</div>
-									}
-								</div>
-							</Column>
-							<Column Title="Rezervasyon Saati" TData="string" Width="200">
-								@if (context.StartTime != DateTime.MinValue && context.EndTime != DateTime.MinValue)
-								{
-									<div>
-										<div>@context.StartTime.ToString("dd/MM/yyyy")</div>
-										<div style="font-size: 12px; color: #666;">@context.StartTime.ToString("HH:mm") - @context.EndTime.ToString("HH:mm")</div>
-									</div>
-								}
-							</Column>
-							<Column Title="İşlemi Yapan" DataIndex="@nameof(ReservationLogDto.PerformedByEmail)" TData="string" Width="200">
-								@context.PerformedByEmail
-							</Column>
-							<Column Title="Detaylar" DataIndex="@nameof(ReservationLogDto.Details)" TData="string" Width="250">
-								@if (!string.IsNullOrEmpty(context.Details))
-								{
-									<Tooltip Title="@context.Details">
-										<span style="cursor: pointer; color: #1890ff;">
-											@(context.Details.Length > 50 ? context.Details.Substring(0, 50) + "..." : context.Details)
-										</span>
-									</Tooltip>
-								}
-							</Column>
-						</Table>
-					}
-				</div>
-			</div>
-	</Authorized>
-	<NotAuthorized>
-		<div style="padding: 24px; max-width: 600px; margin: 0 auto;">
-			<Alert Type="@AlertType.Warning"
-			Message="Yetkisiz Erişim"
-			Description="Bu sayfaya erişim yetkiniz bulunmamaktadır. Admin yetkisi gereklidir."
-			ShowIcon="true"
-			Style="margin-bottom: 16px;" />
-
-			<div style="text-align: center;">
-				<Space>
-					<SpaceItem>
-						<Button Type="ButtonType.Primary" OnClick="@(() => Navigation.NavigateTo("/"))" Icon="login">
-							Giriş Yap
-						</Button>
-					</SpaceItem>
-					<SpaceItem>
-						<Button Type="ButtonType.Default" OnClick="@(() => Navigation.NavigateTo("/user/meetingRooms"))" Icon="home">
-							Ana Sayfaya Dön
-						</Button>
-					</SpaceItem>
-				</Space>
-			</div>
-		</div>
-	</NotAuthorized>
+    <Authorized Context="authContext">
+        <div class="container">
+            <div class="dashboard-panel">
+                <div class="admin-logs-header">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <GridRow Justify="RowJustify.Center" Gutter="(10, 10)">
+                            <GridCol>
+                                <RangePicker @bind-Value="@DateRange" Format="dd/MM/yyyy" Style="width: 250px;" Placeholder="@(new string[] { "Başlangıç Tarihi", "Bitiş Tarihi" })" />
+                            </GridCol>
+                            <GridCol>
+                                <Button Type="ButtonType.Primary" OnClick="FilterByDateRange" Icon="search">Filtrele</Button>
+                                <Button OnClick="ClearFilters" Icon="reload">Temizle</Button>
+                            </GridCol>
+                        </GridRow>
+                    </div>
+                </div>
+                <div class="logs-panel">
+                    <div class="logs-panel-header">Rezervasyon Logları</div>
+                    @if (IsLoading)
+                    {
+                        <div class="table-wrapper">
+                            <SkeletonTable ColumnCount="7"></SkeletonTable>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-wrapper">
+                            <Table DataSource="@Logs" TItem="ReservationLogDto" Responsive PaginationPosition="bottomRight">
+                                <PaginationTemplate>
+                                    <div style="display: flex; justify-content: flex-end; padding: 16px; background:white">
+                                        <Pagination Total="@Logs.Count" PageSize="@PageSize" Current="@CurrentPage"
+                                                    OnChange="HandlePaginationChange" ShowSizeChanger="true"
+                                                    PageSizeOptions="@(new int[] { 5, 10, 20, 50 })" />
+                                    </div>
+                                </PaginationTemplate>
+                                <ChildContent>
+                                    <Column Title="Tarih/Saat" DataIndex="@nameof(ReservationLogDto.Timestamp)" TData="DateTime">
+                                        @context.Timestamp.ToString("dd/MM/yyyy HH:mm")
+                                    </Column>
+                                    <Column Title="İşlem" DataIndex="@nameof(ReservationLogDto.Action)" TData="string">
+                                        <Tag Color="@GetActionColor(context.Action)">
+                                            @GetActionText(context.Action)
+                                        </Tag>
+                                    </Column>
+                                    <Column Title="Kullanıcı" DataIndex="@nameof(ReservationLogDto.UserEmail)" TData="string">
+                                        <div>
+                                            <div style="font-weight: bold;">@context.UserEmail</div>
+                                            @if (!string.IsNullOrEmpty(context.UserCompany))
+                                            {
+                                                <div style="font-size: 12px; color: #666;">@context.UserCompany</div>
+                                            }
+                                        </div>
+                                    </Column>
+                                    <Column Title="Salon" DataIndex="@nameof(ReservationLogDto.RoomName)" TData="string">
+                                        <div>
+                                            <div style="font-weight: bold;">@context.RoomName</div>
+                                            @if (!string.IsNullOrEmpty(context.Location))
+                                            {
+                                                <div style="font-size: 12px; color: #666;">@context.Location</div>
+                                            }
+                                        </div>
+                                    </Column>
+                                    <Column Title="Rezervasyon Saati" TData="string">
+                                        @if (context.StartTime != DateTime.MinValue && context.EndTime != DateTime.MinValue)
+                                        {
+                                            <div>
+                                                <div>@context.StartTime.ToString("dd/MM/yyyy")</div>
+                                                <div style="font-size: 12px; color: #666;">@context.StartTime.ToString("HH:mm") - @context.EndTime.ToString("HH:mm")</div>
+                                            </div>
+                                        }
+                                    </Column>
+                                    <Column Title="İşlemi Yapan" DataIndex="@nameof(ReservationLogDto.PerformedByEmail)" TData="string">
+                                        @context.PerformedByEmail
+                                    </Column>
+                                    <Column Title="Detaylar" DataIndex="@nameof(ReservationLogDto.Details)" TData="string">
+                                        @if (!string.IsNullOrEmpty(context.Details))
+                                        {
+                                            <Tooltip Title="@context.Details">
+                                                <span style="cursor: pointer; color: #1890ff;">
+                                                    @(context.Details.Length > 50 ? context.Details.Substring(0, 50) + "..." : context.Details)
+                                                </span>
+                                            </Tooltip>
+                                        }
+                                    </Column>
+                                </ChildContent>
+                            </Table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </Authorized>
 </AuthorizeView>
 
 @code {
-	private List<ReservationLogDto> Logs = new();
-	private bool IsLoading = true;
-	private DateTime?[] DateRange = new DateTime?[2];
+    private List<ReservationLogDto> Logs = new();
+    private bool IsLoading = true;
+    private DateTime?[] DateRange = new DateTime?[2];
+    private int PageSize = 10;
+    private int CurrentPage = 1;
 
-	protected override async Task OnInitializedAsync()
-	{
-		await LoadLogs();
-	}
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadLogs();
+    }
 
-	private async Task LoadLogs()
-	{
-		IsLoading = true;
-		try
-		{
-			Logs = await LogService.GetAllLogsAsync();
-		}
-		catch (Exception ex)
-		{
-			Console.WriteLine($"Error loading logs: {ex.Message}");
-		}
-		finally
-		{
-			IsLoading = false;
-		}
-	}
+    private async Task LoadLogs()
+    {
+        IsLoading = true;
+        try
+        {
+            Logs = await LogService.GetAllLogsAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading logs: {ex.Message}");
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
 
-	private async Task FilterByDateRange()
-	{
-		if (DateRange[0].HasValue && DateRange[1].HasValue)
-		{
-			IsLoading = true;
-			try
-			{
-				var startDate = DateRange[0].Value.Date;
-				var endDate = DateRange[1].Value.Date.AddDays(1).AddSeconds(-1);
-				Logs = await LogService.GetLogsByDateRangeAsync(startDate, endDate);
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine($"Error filtering logs: {ex.Message}");
-			}
-			finally
-			{
-				IsLoading = false;
-			}
-		}
-	}
+    private async Task FilterByDateRange()
+    {
+        if (DateRange[0].HasValue && DateRange[1].HasValue)
+        {
+            IsLoading = true;
+            try
+            {
+                var startDate = DateRange[0].Value.Date;
+                var endDate = DateRange[1].Value.Date.AddDays(1).AddSeconds(-1);
+                Logs = await LogService.GetLogsByDateRangeAsync(startDate, endDate);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error filtering logs: {ex.Message}");
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+    }
 
-	private async Task ClearFilters()
-	{
-		DateRange = new DateTime?[2];
-		await LoadLogs();
-	}
+    private async Task ClearFilters()
+    {
+        DateRange = new DateTime?[2];
+        await LoadLogs();
+    }
 
-	private string GetActionColor(string action)
-	{
-		return action.ToLower() switch
-		{
-			"created" => "green",
-			"cancelled" => "red", 
-			"updated" => "blue",
-			_ => "default"
-		};
-	}
+    private string GetActionColor(string action)
+    {
+        return action.ToLower() switch
+        {
+            "created" => "green",
+            "cancelled" => "red",
+            "updated" => "blue",
+            _ => "default"
+        };
+    }
 
-	private string GetActionText(string action)
-	{
-		return action.ToLower() switch
-		{
-			"created" => "Oluşturuldu",
-			"cancelled" => "İptal Edildi",
-			"updated" => "Güncellendi",
-			_ => action
-		};
-	}
+    private string GetActionText(string action)
+    {
+        return action.ToLower() switch
+        {
+            "created" => "Oluşturuldu",
+            "cancelled" => "İptal Edildi",
+            "updated" => "Güncellendi",
+            _ => action
+        };
+    }
+
+    private async Task HandlePaginationChange(PaginationEventArgs args)
+    {
+        if (args.PageSize != PageSize)
+        {
+            PageSize = args.PageSize;
+            CurrentPage = 1;
+        }
+        else
+        {
+            CurrentPage = args.Page;
+        }
+        await LoadLogs();
+        StateHasChanged();
+    }
 }

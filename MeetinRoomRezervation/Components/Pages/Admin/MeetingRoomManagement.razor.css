@@ -1,16 +1,8 @@
 ﻿.containerW {
     background: #fff;
     display: flex;
-    flex-wrap: nowrap;
     padding: 0;
-    margin: 0;
-    width: 100%;
-}
-.containerH {
-    background: #fff;
-    display: flex;
-    flex-direction:column;
-    padding: 0;
+    flex-direction: column;
     margin: 30px;
 }
 .admin-button-title {
@@ -67,7 +59,7 @@
     height: 100%;
     background-color: #e6e6e6;
     border-radius:20px;
-    padding: 25px;
+    padding: 15px;
     margin-top: 25px;
 }
 .halls {
@@ -149,107 +141,6 @@
         flex-direction: column;
     }
 
-    .containerH {
-        background: #fff;
-        display: flex;
-        flex-direction: column;
-        padding: 0;
-        margin: 10px;
-    }
-
-    .date-newreservation-panel {
-        background: #fff;
-        display: flex;
-        justify-content: space-between;
-        flex-wrap: nowrap;
-        padding: 0;
-        margin: 0;
-        flex-direction: column;
-    }
-
-    .admin-panel {
-        width: 95vw;
-        height: 5vh;
-        background-color: unset;
-        box-shadow: unset;
-        padding: 0;
-        margin: 0;
-    }
-    .admin-button-title {
-        margin-left: 5px;
-        color: #4d4d4d;
-        font-size: 12px;
-    }
-
-    .active-admin-button-title {
-        margin-left: 5px;
-        color: white;
-        font-size: 13px;
-        font-weight: bold;
-    }
-
-    .admin-panel-buttons {
-        position: static;
-        margin: 0 0 10px 0;
-        margin-top: 20px;
-        flex-direction: row;
-        height: auto;
-        width: 96vw;
-        justify-content: space-around;
-        align-items: center;
-        display: flex;
-    }
-
-    .halls-panel {
-        width: 100%;
-        height: 100%;
-        background-color: #e6e6e6;
-        border-radius: 20px;
-        padding: 1px;
-        margin-top: 25px;
-    }
-
-    .halls {
-        display: flex;
-        flex-direction: column;
-        align-content: center;
-        justify-content: center;
-        background-color: white;
-        box-shadow: 5px 5px 10px rgba(87, 87, 87, 0.1);
-        border-radius: 20px;
-        border-color: #d2d2d2;
-        border: 1.2px solid #e2dfdf;
-        height: auto;
-        padding: 15px;
-        margin-top: 30px;
-        margin:10px;
-        min-height:35vh;
-    }
-
-    .halls-header {
-        display: flex;
-        flex-direction: column;
-        align-content: center;
-        justify-content: center;
-        background-color: white;
-        box-shadow: 5px 5px 10px rgba(87, 87, 87, 0.1);
-        border-radius: 10px;
-        border-color: #d2d2d2;
-        border: 1.2px solid #e2dfdf;
-        width: 95%;
-        margin: 10px;
-        text-align: center;
-        font-size: 19px;
-        font-weight: bold;
-        min-height: 10vh;
-    }
-
-    .halls-edit {
-        display: flex;
-        justify-content: flex-end;
-    }
-
-
     .date-newreservation-panel {
         background: #fff;
         display: flex;
@@ -257,6 +148,7 @@
         flex-wrap: nowrap;
         padding: 0;
         margin: 0;
+        flex-direction: column;
         margin-bottom: 20px;
     }
 
@@ -264,11 +156,6 @@
         display: flex;
         justify-content: center;
         margin-bottom:20px;
-    }
-    .new-reservation {
-        display: flex;
-        justify-content: center;
-        width:88vw;
     }
 }
 

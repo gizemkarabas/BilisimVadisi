@@ -20,99 +20,109 @@
     <Authorized Context="authContext">
 
         <div class="containerW">
-            <div class="containerH">
-                <div class="date-newreservation-panel">
-                    <div class="calender">
-                        <AntDesign.Col>
-                            <Button OnClick="SelectToday">Bugün</Button>
-                            <Button OnClick="SelectTomorrow" Style="margin-left: 8px;">Yarın</Button>
-                            <DatePicker DefaultValue=@TodayDate @bind-Value="SelectedDate" TValue="DateTime"
-                                        OnChange="OnDateChanged" Style="margin-left: 8px; margin-top:8px" />
-                        </AntDesign.Col>
-                    </div>
+            <div class="date-newreservation-panel">
+                <div class="calender">
                     <AntDesign.Col>
-                        <Button Type="ButtonType.Primary" OnClick="OpenCreateRoomModal" Style="width:100%">
-                            <div class="new-reservation">Yeni Toplantı Odası Oluştur</div>
-                        </Button>
+                        <Button OnClick="SelectToday">Bugün</Button>
+                        <Button OnClick="SelectTomorrow" Style="margin-left: 8px;">Yarın</Button>
+                        <DatePicker DefaultValue=@TodayDate @bind-Value="SelectedDate" TValue="DateTime"
+                                    OnChange="OnDateChanged" Style="margin-left: 8px; margin-top:8px" />
                     </AntDesign.Col>
                 </div>
+                <AntDesign.Col>
+                    <Button Type="ButtonType.Primary" OnClick="OpenCreateRoomModal" Style="width:100%">
+                        <div class="new-reservation">Yeni Toplantı Odası Oluştur</div>
+                    </Button>
+                </AntDesign.Col>
+            </div>
 
-                <div class="halls-panel">
-                    <Row Gutter="16">
+            <div class="halls-panel">
+                <Row Gutter="16">
 
+
+                    @if (IsLoading)
+                    {
+                        @for (int i = 0; i < 6; i++)
+                        {
+
+                            <AntDesign.Col Xs="24" Sm="24" Md="12" Lg="8">
+                                <Card Style="margin-bottom: 16px; width:100%">
+                                    <Skeleton Active Avatar />
+                                </Card>
+                            </AntDesign.Col>
+                        }
+                    }
+                    else
+                    {
                         @foreach (var room in Rooms)
                         {
                             <AntDesign.Col Xs="24" Sm="24" Md="12" Lg="8">
-                                <RoomPanel Room="@room"
-                                           DeleteRoom="DeleteRoom"
-                                           IsCancelModalVisible="@IsCreateModalVisible"
-                                           OpenEditModal="OpenEditModal"
-                                           ReservationToCancel="@ReservationToCancel"
+                                <RoomPanel Room="@room" DeleteRoom="DeleteRoom" IsCancelModalVisible="@IsCreateModalVisible"
+                                           OpenEditModal="OpenEditModal" ReservationToCancel="@ReservationToCancel"
                                            UsersInfo="@UsersInfo" />
                             </AntDesign.Col>
                         }
+                    }
 
-                    </Row>
-                    <Modal Title="Yeni Toplantı Odası Oluştur" @bind-Visible="@IsCreateModalVisible" OnOk="CreateRoom"
-                           OnCancel="CloseCreateModal" OkText="@okButtonText" CancelText="@cancelButtonText">
+                </Row>
+                <Modal Title="Yeni Toplantı Odası Oluştur" @bind-Visible="@IsCreateModalVisible" OnOk="CreateRoom"
+                       OnCancel="CloseCreateModal" OkText="@okButtonText" CancelText="@cancelButtonText">
+                    <Form Model="@NewRoom">
+                        <FormItem Label="Oda Adı" Required>
+                            <Input @bind-Value="NewRoom.Name" />
+                        </FormItem>
+                        <FormItem Label="Kapasite" Required>
+                            <AntDesign.InputNumber @bind-Value="NewRoom.Capacity" Min="1" />
+                        </FormItem>
+                    </Form>
+                </Modal>
+                <Modal Title="Toplantı Odası Düzenle" @bind-Visible="@IsEditModalVisible" OnOk="UpdateRoom"
+                       OnCancel="CloseEditModal" OkText="@okButtonText" CancelText="@cancelButtonText">
 
-                        <Form Model="@NewRoom">
-                            <FormItem Label="Oda Adı" Required>
-                                <Input @bind-Value="NewRoom.Name" />
-                            </FormItem>
-                            <FormItem Label="Kapasite" Required>
-                                <AntDesign.InputNumber @bind-Value="NewRoom.Capacity" Min="1" />
-                            </FormItem>
-                        </Form>
-                    </Modal>
-                    <Modal Title="Toplantı Odası Düzenle" @bind-Visible="@IsEditModalVisible" OnOk="UpdateRoom"
-                           OnCancel="CloseEditModal" OkText="@okButtonText" CancelText="@cancelButtonText">
+                    <Form Model="@EditingRoom">
+                        <FormItem Label="Oda Adı" Required>
+                            <Input @bind-Value="EditingRoom.Name" />
+                        </FormItem>
+                        <FormItem Label="Kapasite" Required>
+                            <AntDesign.InputNumber @bind-Value="EditingRoom.Capacity" Min="1" />
+                        </FormItem>
+                    </Form>
+                </Modal>
+                <Modal @bind-Visible="@IsDeleteModalVisible" OnOk="ConfirmDeleteRoom" OnCancel="CloseDeleteModal"
+                       OkText="deleteButtonText" CancelText="@cancelButtonText" OkType="@ButtonType.Primary"
+                       OkButtonProps="@(new ButtonProps { Danger = true })">
 
-                        <Form Model="@EditingRoom">
-                            <FormItem Label="Oda Adı" Required>
-                                <Input @bind-Value="EditingRoom.Name" />
-                            </FormItem>
-                            <FormItem Label="Kapasite" Required>
-                                <AntDesign.InputNumber @bind-Value="EditingRoom.Capacity" Min="1" />
-                            </FormItem>
-                        </Form>
-                    </Modal>
-                    <Modal @bind-Visible="@IsDeleteModalVisible" OnOk="ConfirmDeleteRoom" OnCancel="CloseDeleteModal"
-                           OkText="deleteButtonText" CancelText="@cancelButtonText" OkType="@ButtonType.Primary"
-                           OkButtonProps="@(new ButtonProps { Danger = true })">
-
-                        <div style="text-align: center; padding: 20px;">
-                            <Icon Type="exclamation-circle" Theme="IconThemeType.Outline"
-                                  Style="font-size: 48px; color: #ff4d4f; margin-bottom: 16px;" />
-                            <p style="font-size: 16px; margin-bottom: 8px;">
-                                Bu toplantı odasını silmek istediğinizden
-                                emin misiniz?
+                    <div style="text-align: center; padding: 20px;">
+                        <Icon Type="exclamation-circle" Theme="IconThemeType.Outline"
+                              Style="font-size: 48px; color: #ff4d4f; margin-bottom: 16px;" />
+                        <p style="font-size: 16px; margin-bottom: 8px;">
+                            Bu toplantı odasını silmek istediğinizden
+                            emin misiniz?
+                        </p>
+                        <p style="color: #666; font-size: 14px;">
+                            Bu işlem geri alınamaz ve odaya ait tüm
+                            rezervasyonlar silinecektir.
+                        </p>
+                        @if (!string.IsNullOrEmpty(RoomToDeleteName))
+                        {
+                            <p style="font-weight: bold; color: #ff4d4f; margin-top: 12px;">
+                                Silinecek Oda:
+                                @RoomToDeleteName
                             </p>
-                            <p style="color: #666; font-size: 14px;">
-                                Bu işlem geri alınamaz ve odaya ait tüm
-                                rezervasyonlar silinecektir.
-                            </p>
-                            @if (!string.IsNullOrEmpty(RoomToDeleteName))
-                            {
-                                <p style="font-weight: bold; color: #ff4d4f; margin-top: 12px;">
-                                    Silinecek Oda:
-                                    @RoomToDeleteName
-                                </p>
-                            }
-                        </div>
-                    </Modal>
+                        }
+                    </div>
+                </Modal>
 
-                    <Modal @bind-Visible="@IsCancelModalVisible" OnOk="ConfirmCancelReservation"
-                           OnCancel="CloseCancelModal" OkText="@deleteButtonText" CancelText="@cancelButtonText"
-                           OkType="@ButtonType.Primary">
-                        <div style="text-align: center; padding: 20px;">
-                            <p style="font-size: 16px; margin-bottom: 8px;">
-                                Bu rezervasyonu iptal etmek istediğinizden
-                                emin misiniz?
-                            </p>
-                        </div>
-                    </Modal>
-                </div>
+                <Modal @bind-Visible="@IsCancelModalVisible" OnOk="ConfirmCancelReservation"
+                       OnCancel="CloseCancelModal" OkText="@deleteButtonText" CancelText="@cancelButtonText"
+                       OkType="@ButtonType.Primary">
+                    <div style="text-align: center; padding: 20px;">
+                        <p style="font-size: 16px; margin-bottom: 8px;">
+                            Bu rezervasyonu iptal etmek istediğinizden
+                            emin misiniz?
+                        </p>
+                    </div>
+                </Modal>
             </div>
         </div>
     </Authorized>
@@ -136,26 +146,27 @@
     private async Task SelectToday()
     {
         SelectedDate = DateTime.Today;
+        IsLoading = true;
         await LoadRoomData();
-        StateHasChanged();
     }
 
     private async Task SelectTomorrow()
     {
         SelectedDate = DateTime.Today.AddDays(1);
+        IsLoading = true;
         await LoadRoomData();
-        StateHasChanged();
     }
 
     private async Task OnDateChanged(DateTimeChangedEventArgs<DateTime> args)
     {
         SelectedDate = args.Date;
+        IsLoading = true;
         await LoadRoomData();
-        StateHasChanged();
     }
     private List<MeetingRoomDto> Rooms = new();
     private bool IsCreateModalVisible = false;
     private bool IsEditModalVisible = false;
+    private bool IsLoading = true;
     private MeetingRoomDto NewRoom = new();
     private MeetingRoomDto EditingRoom = new();
     private bool isAdmin = false;
@@ -177,6 +188,7 @@
         var user = authState.User;
         var isAdmin = user.IsInRole("Admin");
 
+        IsLoading = true;
         await LoadRoomData();
     }
 
@@ -184,6 +196,7 @@
     {
         try
         {
+            IsLoading = true;
             var allRooms = await RoomService.GetAllRoomsAsync();
             var reservations = await ReservationService.GetReservationsByDateAsync(SelectedDate);
 
@@ -212,6 +225,11 @@
         {
             Console.WriteLine($"Error in LoadRoomData: {ex.Message}");
             Console.WriteLine($"Stack trace: {ex.StackTrace}");
+        }
+        finally
+        {
+            IsLoading = false;
+            StateHasChanged();
         }
     }
 
