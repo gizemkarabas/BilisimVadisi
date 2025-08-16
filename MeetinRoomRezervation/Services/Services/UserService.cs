@@ -144,7 +144,8 @@ namespace MeetinRoomRezervation.Services.ReservationService
                 var userReservations = await _context.Reservations
                     .Find(r => r.UserId == user.Id &&
                                r.StartTime >= monthStart &&
-                               r.StartTime < nextMonth)
+                               r.StartTime < nextMonth &&
+                               r.Status == ReservationStatus.Active)
                     .ToListAsync();
 
                 double totalHours = userReservations

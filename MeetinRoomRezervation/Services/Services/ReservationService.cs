@@ -341,6 +341,16 @@ namespace MeetinRoomRezervation.Services.ReservationService
                     // Mevcut kullanıcı bilgilerini al
                     var currentUser = await GetCurrentUserAsync();
 
+                    // Kullanıcının UsedThisMonth değerini azalt
+                    if (user != null)
+                    {
+                        var reservationHours = (int)Math.Ceiling((reservation.EndTime - reservation.StartTime).TotalHours);
+                        user.UsedThisMonth = Math.Max(0, user.UsedThisMonth - reservationHours);
+                        var userFilter = Builders<User>.Filter.Eq(u => u.Id, user.Id);
+                        var userUpdate = Builders<User>.Update.Set(u => u.UsedThisMonth, user.UsedThisMonth);
+                        await _context.Users.UpdateOneAsync(userFilter, userUpdate);
+                    }
+
                     // Rezervasyonu iptal et
                     var filter = Builders<Reservation>.Filter.Eq(r => r.Id, reservationId);
                     await _context.Reservations.DeleteOneAsync(filter);
@@ -614,6 +624,19 @@ namespace MeetinRoomRezervation.Services.ReservationService
                     return false;
                 }
 
+                // Kullanıcının UsedThisMonth değerini azalt
+                if (reservation != null)
+                {
+                    var user = await _userService.GetUserByIdAsync(reservation.UserId);
+                    if (user != null)
+                    {
+                        var reservationHours = (int)Math.Ceiling((reservation.EndTime - reservation.StartTime).TotalHours);
+                        user.UsedThisMonth = Math.Max(0, user.UsedThisMonth - reservationHours);
+                        var userFilter = Builders<User>.Filter.Eq(u => u.Id, user.Id);
+                        var userUpdate = Builders<User>.Update.Set(u => u.UsedThisMonth, user.UsedThisMonth);
+                        await _context.Users.UpdateOneAsync(userFilter, userUpdate);
+                    }
+                }
                 // Soft delete - status'u cancelled yap
                 var update = Builders<Reservation>.Update.Set(r => r.Status, ReservationStatus.Cancelled);
                 var result = await _context.Reservations.UpdateOneAsync(r => r.Id == reservationId, update);
@@ -646,6 +669,16 @@ namespace MeetinRoomRezervation.Services.ReservationService
                     var room = await _context.Rooms
                         .Find(r => r.Id == reservation.RoomId)
                         .FirstOrDefaultAsync();
+
+                    // Kullanıcının UsedThisMonth değerini azalt
+                    if (user != null)
+                    {
+                        var reservationHours = (int)Math.Ceiling((reservation.EndTime - reservation.StartTime).TotalHours);
+                        user.UsedThisMonth = Math.Max(0, user.UsedThisMonth - reservationHours);
+                        var userFilter = Builders<User>.Filter.Eq(u => u.Id, user.Id);
+                        var userUpdate = Builders<User>.Update.Set(u => u.UsedThisMonth, user.UsedThisMonth);
+                        await _context.Users.UpdateOneAsync(userFilter, userUpdate);
+                    }
 
                     // Mevcut kullanıcı bilgilerini al (admin)
                     var currentUser = await GetCurrentUserAsync();
