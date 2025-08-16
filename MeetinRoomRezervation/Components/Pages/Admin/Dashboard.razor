@@ -71,7 +71,7 @@
                     </GridCol>
                 </GridRow>
                 <div class="last-reservation-panel">
-                    <div class="last-reservation-panel-header">Son Rezervasyonlar</div>
+                    <div class="last-reservation-panel-header">Mevcut Rezervasyonlar</div>
                     @if (PagedReservations?.Count > 0)
                     {
                         <div class="table-wrapper">
@@ -209,11 +209,11 @@
     private string cancelButtonText = "Vazgeç";
     private int PageSize = 10;
     private int CurrentPage = 1;
-    private int TotalReservationCount = 0;
+    private int TotalReservationCount => FilteredReservations.Count;
     private List<ReservationDto> AllReservations = new();
     private List<ReservationDto> PagedReservations = new();
     private List<ReservationDto> LastReservations = new();
-    private int TotalPages => (int)Math.Ceiling((double)FilteredReservations.Count / PageSize);
+    private int TotalPages => Math.Max(1, (int)Math.Ceiling((double)FilteredReservations.Count / PageSize));
     private List<ReservationDto> FilteredReservations => AllReservations.Where(x => x.StartTime > DateTime.UtcNow).OrderBy(r
     => r.StartTime).ToList();
     string[] columns = ["Location"];
@@ -276,7 +276,6 @@
         WeeklyOccupancy = CalculateOccupancyPercentage(weekReservations, allRooms.Count * 7);
 
         AllReservations = reservations;
-        TotalReservationCount = AllReservations.Count;
     }
 
     private double CalculateOccupancyPercentage(List<ReservationDto> reservations, int totalRoomDays)
@@ -362,7 +361,7 @@
         var allUsers = await UserService.GetAllUsersAsync();
         FillReservationDetailsFromCache(reservations, allRooms, allUsers);
         AllReservations = reservations;
-        TotalReservationCount = AllReservations.Count;
+    // TotalReservationCount artık sadece getter, atama kaldırıldı.
         LoadPage();
     }
 
@@ -382,13 +381,13 @@
     private void LoadPage()
     {
         var filtered = FilteredReservations;
-        int totalPages = (int)Math.Ceiling((double)filtered.Count / PageSize);
-        if (CurrentPage > totalPages) CurrentPage = totalPages > 0 ? totalPages : 1;
+        int totalPages = Math.Max(1, (int)Math.Ceiling((double)filtered.Count / PageSize));
+        if (CurrentPage > totalPages) CurrentPage = totalPages;
         if (CurrentPage < 1) CurrentPage = 1;
         PagedReservations = filtered
-        .Skip((CurrentPage - 1) * PageSize)
-        .Take(PageSize)
-        .ToList();
+            .Skip((CurrentPage - 1) * PageSize)
+            .Take(PageSize)
+            .ToList();
     }
 
 
