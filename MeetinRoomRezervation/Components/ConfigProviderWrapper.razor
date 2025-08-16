@@ -1,0 +1,8 @@
+@using AntDesign
+<ConfigProvider Locale="LocaleProvider.Turkish">
+    @ChildContent
+</ConfigProvider>
+
+@code {
+    [Parameter] public RenderFragment ChildContent { get; set; }
+}
