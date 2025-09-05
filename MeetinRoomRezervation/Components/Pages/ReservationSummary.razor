@@ -1,4 +1,5 @@
 ﻿@page "/user/reservation-summary"
+@attribute [Authorize]
 @using MeetinRoomReservation.Constants
 @using MeetinRoomRezervation.Components.PartialComponents.Reservations
 @using MeetinRoomRezervation.Components.PartialComponents.Shared
@@ -7,6 +8,7 @@
 @using MeetinRoomRezervation.Services.ReservationService
 @using AntDesign
 @using System.Globalization
+@using Microsoft.AspNetCore.Authorization
 @inject ReservationDto ReservationState
 @inject IReservationService ReservationService
 @inject IRoomService RoomService

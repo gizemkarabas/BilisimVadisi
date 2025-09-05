@@ -2,6 +2,7 @@
 @inject AuthenticationStateProvider AuthProvider
 @inject NavigationManager Navigation
 @inject IAuthService AuthService
+@inject IUserService UserService
 
 
 <div Style="min-height: 90vh; background-color: white; ">
@@ -44,9 +45,15 @@
 						else
 						{
 							<MenuItem Key="1">
-							<div class="wellcome" style="color: white;">
+							<div class="wellcome" style="color: white; display:flex; align-items:center; gap:16px;">
 								<Icon Type="user" Theme="IconThemeType.Outline" />
 								<span>Hoş geldin, @CurrentUserCompany</span>
+								@if (CurrentUserUsageLimit > 0)
+								{
+									<span style="color: white; font-size: 16px; font-family: 'Segoe UI', 'Arial', 'sans-serif'; font-weight: 500; margin-left: 8px;">
+										Kalan Hak: @CurrentUserRemaining/@CurrentUserUsageLimit saat
+									</span>
+								}
 							</div>
 							</MenuItem>
 							<MenuItem Key="2" RouterLink="/user/myReservations" RouterMatch="NavLinkMatch.All"
@@ -90,6 +97,9 @@
 
 @code {
 	[Parameter] public string CurrentUserCompany { get; set; } = string.Empty;
+	private int CurrentUserUsageLimit { get; set; } = 0;
+	private int CurrentUserUsed { get; set; } = 0;
+	private int CurrentUserRemaining => Math.Max(0, CurrentUserUsageLimit - CurrentUserUsed);
 
 	private string GetHomePageUrl(ClaimsPrincipal user)
 	{
@@ -121,7 +131,9 @@
 				var currentUser = await AuthService.GetCurrentUserAsync(email);
 				if (currentUser != null && !string.IsNullOrEmpty(currentUser.Company))
 				{
-					CurrentUserCompany = currentUser.Company;
+					CurrentUserCompany = currentUser.Company ?? string.Empty;
+					CurrentUserUsageLimit = currentUser.MonthlyUsageLimit;
+					CurrentUserUsed = currentUser.UsedThisMonth;
 				}
 			}
 		}

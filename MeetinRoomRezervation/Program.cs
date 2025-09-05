@@ -15,7 +15,13 @@ using Serilog;
 using System.IdentityModel.Tokens.Jwt;
 
 
+using System.Globalization;
+
 var builder = WebApplication.CreateBuilder(args);
+// Uygulama başlatılırken kültürü Türkçe olarak ayarla
+var cultureInfo = new CultureInfo("tr-TR");
+CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
     .WriteTo.Console()
@@ -46,8 +52,6 @@ builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPasswordResetService, PasswordResetService>();
 builder.Services.AddScoped<IReservationLogService, ReservationLogService>();
-
-// Modal State Management
 
 builder.Services.AddValidatorsFromAssemblyContaining<MeetingRoomValidator>();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
@@ -91,7 +95,6 @@ builder.Services.AddScoped<SeedDataService>();
 builder.Services.AddCascadingAuthenticationState();
 
 var app = builder.Build();
-
 using (var scope = app.Services.CreateScope())
 {
     var seedService = scope.ServiceProvider.GetRequiredService<SeedDataService>();

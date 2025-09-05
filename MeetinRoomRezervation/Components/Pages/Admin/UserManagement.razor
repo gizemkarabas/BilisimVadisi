@@ -92,6 +92,10 @@
                 </FormItem>
             </Form>
         </div>
+        @if (showCreateFormError)
+        {
+            <Alert Type="AlertType.Error" ShowIcon="true" Message="Lütfen eksik veya hatalı alanları düzeltin." Description="@(GetCreateFormErrorDescription())" Style="margin-bottom:10px;" />
+        }
         <div style="display:flex; justify-content: center;margin-top:15px">
             <Button Style="background-color:#0095FF;border-radius:6px;width:30%;height:48px" Type="ButtonType.Primary"
                     OnClick="CreateUser">
@@ -321,6 +325,7 @@
         emailValidationMessage = string.Empty;
     }
 
+    private bool showCreateFormError = false;
     private async Task CreateUser()
     {
         // Tüm validasyonları tetikle
@@ -329,8 +334,13 @@
         ValidateEmailInput(NewUser.Email);
         StateHasChanged();
 
-        if (!IsCreateFormValid()) return;
-
+        if (!IsCreateFormValid())
+        {
+            showCreateFormError = true;
+            return;
+        }
+        // Form geçerliyse uyarı otomatik kapanmalı
+        showCreateFormError = false;
         try
         {
             await UserService.AddUserAsync(NewUser);
@@ -341,6 +351,18 @@
         {
             Console.WriteLine($"Error creating user: {ex.Message}");
         }
+    }
+    private string GetCreateFormErrorDescription()
+    {
+        var errors = new List<string>();
+        if (string.IsNullOrWhiteSpace(NewUser.Company)) errors.Add("Şirket ismi zorunludur.");
+        if (string.IsNullOrWhiteSpace(NewUser.CompanyOfficial)) errors.Add("Yetkili kişi zorunludur.");
+        if (string.IsNullOrWhiteSpace(NewUser.ContactPhone)) errors.Add("Telefon zorunludur.");
+        else if (NewUser.ContactPhone.Length != 10 || !NewUser.ContactPhone.StartsWith("5")) errors.Add("Telefon 5 ile başlamalı ve 10 haneli olmalı.");
+        if (string.IsNullOrWhiteSpace(NewUser.Email)) errors.Add("E-posta zorunludur.");
+        else if (!string.IsNullOrEmpty(emailValidationMessage)) errors.Add(emailValidationMessage);
+        if (NewUser.MonthlyUsageLimit <= 0) errors.Add("Aylık kullanım hakkı zorunludur.");
+        return string.Join(" ", errors);
     }
 
     private async Task LoadUsers()
@@ -534,7 +556,10 @@
         }
 
         if (isCreate)
+        {
             companyValidationMessage = message;
+            showCreateFormError = false;
+        }
         else
             editCompanyValidationMessage = message;
 
@@ -578,6 +603,7 @@
     private void ValidatePhoneInput(string phone, bool isCreate)
     {
         ValidatePhoneNumber(phone, isCreate);
+        showCreateFormError = false;
         StateHasChanged();
     }
 
@@ -586,14 +612,17 @@
         if (string.IsNullOrWhiteSpace(email))
         {
             emailValidationMessage = "E-posta adresi zorunludur.";
+            showCreateFormError = false;
             return;
         }
         if (!IsValidEmail(email))
         {
             emailValidationMessage = "Geçerli bir e-posta adresi giriniz.";
+            showCreateFormError = false;
             return;
         }
         emailValidationMessage = string.Empty;
+        showCreateFormError = false;
     }
 
     private bool IsValidEmail(string email)

@@ -1,8 +1,10 @@
 ﻿@page "/user/reservationForm"
+@attribute [Authorize]
 @using System.Security.Claims
 @using MeetinRoomRezervation.Components.PartialComponents.Shared
 @using MeetinRoomRezervation.Models
 @using MeetinRoomRezervation.Services.ReservationService
+@using Microsoft.AspNetCore.Authorization
 
 @inject IReservationService ReservationService
 @inject IRoomService RoomService
