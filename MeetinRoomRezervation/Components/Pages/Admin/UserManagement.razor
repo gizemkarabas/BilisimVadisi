@@ -4,6 +4,7 @@
 @using MeetinRoomRezervation.Models
 @inject IReservationService ReservationService
 @inject IUserService UserService
+@inject IPasswordResetService PasswordResetService
 @using AntDesign
 @using MeetinRoomRezervation.Services.ReservationService
 @inject NavigationManager Navigation
@@ -337,6 +338,20 @@
         try
         {
             await UserService.AddUserAsync(NewUser);
+            // Kullanıcı başarıyla eklendikten sonra, veritabanından tekrar çekip e-posta adresiyle şifre sıfırlama maili gönder
+            var createdUser = (await UserService.GetAllUsersAsync()).FirstOrDefault(u => u.Email == NewUser.Email);
+            if (createdUser != null && !string.IsNullOrWhiteSpace(createdUser.Email))
+            {
+                try
+                {
+                    await Task.Delay(200);
+                    await PasswordResetService.SendPasswordResetEmailAsync(createdUser.Email);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Şifre sıfırlama maili gönderilemedi: {ex.Message}");
+                }
+            }
             await LoadUsers();
             CancelCreate();
         }
